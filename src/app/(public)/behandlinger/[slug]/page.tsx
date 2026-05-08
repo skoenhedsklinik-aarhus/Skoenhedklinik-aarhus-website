@@ -148,7 +148,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
             </h2>
             
             <div className="space-y-12">
-              {Object.entries(groupedPrices).map(([group, groupPrices]) => (
+              {(Object.entries(groupedPrices) as [string, any[]][]).map(([group, groupPrices]) => (
                 <div key={group}>
                   {group !== 'Andre' && (
                     <h3 className="font-heading text-xl text-textPrimary border-b border-sand pb-2 mb-6">
@@ -156,7 +156,8 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
                     </h3>
                   )}
                   <ul className="space-y-4">
-                    {groupPrices.map((price) => (
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {groupPrices.map((price: any) => (
                       <li key={price.id} className="flex justify-between items-center text-textBody">
                         <span>{price.name}</span>
                         <span className="font-medium text-textPrimary font-[tabular-nums]">
