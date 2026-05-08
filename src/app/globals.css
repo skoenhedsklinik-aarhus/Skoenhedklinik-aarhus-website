@@ -2,26 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 36 43% 96%; /* #FAF6F0 Cream */
+    --foreground: 28 15% 25%; /* #4A3F36 Body */
+
+    --card: 38 38% 90%; /* #F0E9DD Beige */
+    --card-foreground: 21 28% 14%; /* #2C1F18 Primary */
+
+    --popover: 36 43% 96%;
+    --popover-foreground: 28 15% 25%;
+
+    --primary: 29 34% 31%; /* #6B4F35 Cognac */
+    --primary-foreground: 36 43% 96%; /* Cream */
+
+    --secondary: 35 27% 87%; /* #E8E0D5 Sand */
+    --secondary-foreground: 21 28% 14%;
+
+    --muted: 35 27% 87%;
+    --muted-foreground: 29 5% 51%; /* #8B7E73 Muted */
+
+    --accent: 38 38% 90%;
+    --accent-foreground: 21 28% 14%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 35 27% 87%; /* #E8E0D5 Sand */
+    --input: 35 27% 87%;
+    --ring: 29 34% 31%; /* Cognac */
+
+    --radius: 0.5rem; /* 8px border radius as per PRD */
+  }
+
+  /* No dark mode definitions per PRD, but keeping format */
+  .dark {
+    --background: 28 15% 25%;
+    --foreground: 36 43% 96%;
+    --card: 21 28% 14%;
+    --card-foreground: 36 43% 96%;
+    --popover: 28 15% 25%;
+    --popover-foreground: 36 43% 96%;
+    --primary: 29 34% 31%;
+    --primary-foreground: 36 43% 96%;
+    --secondary: 21 28% 14%;
+    --secondary-foreground: 36 43% 96%;
+    --muted: 21 28% 14%;
+    --muted-foreground: 29 5% 51%;
+    --accent: 21 28% 14%;
+    --accent-foreground: 36 43% 96%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 36 43% 96%;
+    --border: 21 28% 14%;
+    --input: 21 28% 14%;
+    --ring: 29 34% 31%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading text-textPrimary tracking-tight;
+  }
+  h1 {
+    @apply text-5xl md:text-6xl lg:text-[72px] leading-[1.1] font-light;
+  }
+  h2 {
+    @apply text-4xl md:text-[48px] leading-[1.15] font-light;
+  }
+  h3 {
+    @apply text-3xl md:text-[32px] font-medium;
+  }
+  h4 {
+    @apply text-2xl md:text-[22px] font-medium;
+  }
+  
+  .eyebrow {
+    @apply font-sans font-medium uppercase tracking-[0.15em] text-[12px] md:text-[13px];
+  }
+  
+  .tnum {
+    font-feature-settings: "tnum";
   }
 }
