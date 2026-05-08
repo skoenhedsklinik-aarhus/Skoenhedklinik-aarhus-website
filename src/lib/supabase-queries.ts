@@ -4,11 +4,18 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-// Use standard client for public queries so we can generate pages statically at build time
-const createClient = () => createSupabaseClient(supabaseUrl, supabaseKey);
+// Returns null when env vars are missing (e.g. during Vercel build without secrets set).
+// All query functions handle null gracefully by returning empty data so generateStaticParams
+// returns [] and pages are rendered on-demand at runtime instead of crashing the build.
+const createClient = () => {
+  if (!supabaseUrl || !supabaseKey) return null;
+  return createSupabaseClient(supabaseUrl, supabaseKey);
+};
 
 export async function getServices(): Promise<any[]> {
   const supabase = createClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase
     .from("services")
     .select("*")
@@ -24,6 +31,8 @@ export async function getServices(): Promise<any[]> {
 
 export async function getServiceBySlug(slug: string): Promise<any> {
   const supabase = createClient();
+  if (!supabase) return null;
+
   const { data, error } = await supabase
     .from("services")
     .select("*")
@@ -40,6 +49,8 @@ export async function getServiceBySlug(slug: string): Promise<any> {
 
 export async function getPricingTiers(): Promise<any[]> {
   const supabase = createClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase
     .from("pricing_tiers")
     .select("*")
@@ -55,6 +66,8 @@ export async function getPricingTiers(): Promise<any[]> {
 
 export async function getTeamMembers(): Promise<any[]> {
   const supabase = createClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase
     .from("team_members")
     .select("*")
@@ -70,6 +83,8 @@ export async function getTeamMembers(): Promise<any[]> {
 
 export async function getPackagesOffers(): Promise<any[]> {
   const supabase = createClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase
     .from("packages_offers")
     .select("*")
@@ -85,6 +100,8 @@ export async function getPackagesOffers(): Promise<any[]> {
 
 export async function getOpeningHours(): Promise<any[]> {
   const supabase = createClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase
     .from("opening_hours")
     .select("*")
@@ -99,6 +116,8 @@ export async function getOpeningHours(): Promise<any[]> {
 
 export async function getSiteSettings(): Promise<Record<string, any>> {
   const supabase = createClient();
+  if (!supabase) return {};
+
   const { data, error } = await supabase
     .from("site_settings")
     .select("*");
@@ -107,7 +126,7 @@ export async function getSiteSettings(): Promise<Record<string, any>> {
     console.error("Error fetching site settings:", error);
     return {};
   }
-  
+
   const settings: Record<string, string | null> = {};
   data.forEach((row: any) => {
     settings[row.key] = row.value;
@@ -117,6 +136,8 @@ export async function getSiteSettings(): Promise<Record<string, any>> {
 
 export async function getTipsAndTricks(): Promise<any[]> {
   const supabase = createClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase
     .from("tips")
     .select("*")

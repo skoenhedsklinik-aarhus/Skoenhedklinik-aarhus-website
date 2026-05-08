@@ -22,6 +22,9 @@ export async function generateStaticParams() {
   }));
 }
 
+// Allow pages not pre-generated at build time to be rendered on demand
+export const dynamicParams = true;
+
 export default async function ServiceDetailPage({ params }: { params: { slug: string } }) {
   const service = await getServiceBySlug(params.slug);
 
