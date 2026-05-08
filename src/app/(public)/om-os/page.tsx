@@ -142,7 +142,8 @@ export default async function AboutPage() {
                   />
                   {member.qualifications && Array.isArray(member.qualifications) && member.qualifications.length > 0 && (
                     <ul className="text-textBody space-y-2 mt-4 text-sm bg-cream p-4 rounded-lg inline-block text-left">
-                      {member.qualifications.map((qual, qIdx) => (
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {(member.qualifications as any[]).map((qual: any, qIdx: number) => (
                         <li key={qIdx} className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-cognac shrink-0" />
                           {String(qual)}
