@@ -29,7 +29,7 @@ export async function createService(data: any) {
         is_popular: data.is_popular,
         requires_consultation: data.requires_consultation,
         is_active: data.is_active,
-      },
+      } as never,
     ]);
 
   if (error) {
@@ -67,7 +67,7 @@ export async function updateService(id: string, data: any) {
         is_popular: data.is_popular,
         requires_consultation: data.requires_consultation,
         is_active: data.is_active,
-    })
+    } as never)
     .eq("id", id);
 
   if (error) {

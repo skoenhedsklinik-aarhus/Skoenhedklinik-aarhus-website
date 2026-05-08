@@ -19,7 +19,7 @@ export async function createTeamMember(data: any) {
         qualifications: data.qualifications || [],
         display_order: parseInt(data.display_order, 10),
         is_active: data.is_active,
-      },
+      } as never,
     ]);
 
   if (error) {
@@ -46,7 +46,7 @@ export async function updateTeamMember(id: string, data: any) {
       qualifications: data.qualifications || [],
       display_order: parseInt(data.display_order, 10),
       is_active: data.is_active,
-    })
+    } as never)
     .eq("id", id);
 
   if (error) {

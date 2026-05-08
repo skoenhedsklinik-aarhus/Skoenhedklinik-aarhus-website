@@ -56,7 +56,7 @@ export function OpeningHoursForm({ initialData }: OpeningHoursFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {hours.map((hour) => (
-        <div key={hour.id} className="flex items-center gap-4 bg-beige p-4 rounded-lg">
+        <div key={hour.day_of_week} className="flex items-center gap-4 bg-beige p-4 rounded-lg">
           <div className="w-24 font-medium text-textPrimary">
             {daysMap[hour.day_of_week]}
           </div>

@@ -24,8 +24,8 @@ export async function updateOpeningHours(hours: OpeningHour[]) {
           open_time: hour.is_closed ? null : hour.open_time,
           close_time: hour.is_closed ? null : hour.close_time,
           is_closed: hour.is_closed,
-        })
-        .eq("id", hour.id);
+        } as never)
+        .eq("day_of_week", hour.day_of_week);
         
       if (error) throw error;
     }

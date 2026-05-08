@@ -22,7 +22,7 @@ export async function createPackage(data: any) {
         planway_link: data.planway_link || null,
         display_order: parseInt(data.display_order, 10) || 0,
         is_active: data.is_active,
-      },
+      } as never,
     ]);
 
   if (error) {
@@ -53,7 +53,7 @@ export async function updatePackage(id: string, data: any) {
         planway_link: data.planway_link || null,
         display_order: parseInt(data.display_order, 10) || 0,
         is_active: data.is_active,
-    })
+    } as never)
     .eq("id", id);
 
   if (error) {

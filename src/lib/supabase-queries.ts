@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+// Use standard client for public queries so we can generate pages statically at build time
+const createClient = () => createSupabaseClient(supabaseUrl, supabaseKey);
 
 export async function getServices(): Promise<any[]> {
   const supabase = createClient();

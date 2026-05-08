@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Database } from "@/types/supabase";
 import { updateSiteSettings } from "./actions";
 import { toast } from "sonner";
 
-type SiteSettings = Database["public"]["Tables"]["site_settings"]["Row"];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SiteSettings = any;
 
 interface SiteSettingsFormProps {
   initialData: SiteSettings;
@@ -18,7 +18,7 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev: SiteSettings) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

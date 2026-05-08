@@ -53,7 +53,7 @@ export function PackagesOffer({ packagesOffers }: PackagesOfferProps) {
                   </h3>
                   <div
                     className="prose prose-sm text-textBody mb-6 flex-grow"
-                    dangerouslySetInnerHTML={{ __html: pkg.description }}
+                    dangerouslySetInnerHTML={{ __html: pkg.description || "" }}
                   />
                   <div className="flex items-end gap-3 mb-6">
                     <span className="text-3xl font-medium text-textPrimary">

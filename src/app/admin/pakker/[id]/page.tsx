@@ -16,6 +16,10 @@ export default async function EditPackagePage({ params }: { params: { id: string
     notFound();
   }
 
+  // Cast data to avoid TS never inference issues
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const packageData = data as any;
+
   return (
     <div className="max-w-3xl">
       <div className="mb-6">
@@ -23,11 +27,11 @@ export default async function EditPackagePage({ params }: { params: { id: string
           <ChevronLeft className="w-4 h-4 mr-1" />
           Tilbage til Pakker
         </Link>
-        <h1 className="font-heading text-3xl text-textPrimary">Rediger {data.name}</h1>
+        <h1 className="font-heading text-3xl text-textPrimary">Rediger {packageData.name}</h1>
       </div>
       
       <div className="bg-white rounded-xl p-8 border border-sand shadow-sm">
-        <PackageForm initialData={data} />
+        <PackageForm initialData={packageData} />
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ export async function createPricingTier(data: any) {
         notes: data.notes || null,
         display_order: parseInt(data.display_order, 10) || 0,
         is_active: data.is_active,
-      },
+      } as never,
     ]);
 
   if (error) {
@@ -48,7 +48,7 @@ export async function updatePricingTier(id: string, data: any) {
         notes: data.notes || null,
         display_order: parseInt(data.display_order, 10) || 0,
         is_active: data.is_active,
-    })
+    } as never)
     .eq("id", id);
 
   if (error) {
