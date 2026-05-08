@@ -148,6 +148,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
             </h2>
             
             <div className="space-y-12">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {(Object.entries(groupedPrices) as [string, any[]][]).map(([group, groupPrices]) => (
                 <div key={group}>
                   {group !== 'Andre' && (
