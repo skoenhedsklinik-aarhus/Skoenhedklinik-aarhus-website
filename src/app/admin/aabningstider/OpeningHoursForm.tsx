@@ -29,9 +29,9 @@ export function OpeningHoursForm({ initialData }: OpeningHoursFormProps) {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (id: string, field: "open_time" | "close_time" | "is_closed", value: any) => {
+  const handleChange = (day: number, field: "open_time" | "close_time" | "is_closed", value: any) => {
     setHours((prev) =>
-      prev.map((h) => (h.id === id ? { ...h, [field]: value } : h))
+      prev.map((h) => (h.day_of_week === day ? { ...h, [field]: value } : h))
     );
   };
 
@@ -65,7 +65,7 @@ export function OpeningHoursForm({ initialData }: OpeningHoursFormProps) {
             <input
               type="checkbox"
               checked={hour.is_closed}
-              onChange={(e) => handleChange(hour.id, "is_closed", e.target.checked)}
+              onChange={(e) => handleChange(hour.day_of_week, "is_closed", e.target.checked)}
               className="rounded text-cognac focus:ring-cognac"
             />
             Lukket
@@ -76,7 +76,7 @@ export function OpeningHoursForm({ initialData }: OpeningHoursFormProps) {
               <input
                 type="time"
                 value={hour.open_time || ""}
-                onChange={(e) => handleChange(hour.id, "open_time", e.target.value)}
+                onChange={(e) => handleChange(hour.day_of_week, "open_time", e.target.value)}
                 className="px-3 py-1.5 border border-sand rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-cognac"
                 required={!hour.is_closed}
               />
@@ -84,7 +84,7 @@ export function OpeningHoursForm({ initialData }: OpeningHoursFormProps) {
               <input
                 type="time"
                 value={hour.close_time || ""}
-                onChange={(e) => handleChange(hour.id, "close_time", e.target.value)}
+                onChange={(e) => handleChange(hour.day_of_week, "close_time", e.target.value)}
                 className="px-3 py-1.5 border border-sand rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-cognac"
                 required={!hour.is_closed}
               />
