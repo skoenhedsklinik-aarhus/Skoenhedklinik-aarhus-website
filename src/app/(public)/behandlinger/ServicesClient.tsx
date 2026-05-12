@@ -34,31 +34,44 @@ export function ServicesClient({ services }: ServicesClientProps) {
 
   return (
     <main className="flex flex-col min-h-screen">
-      <section className="bg-cream py-20 lg:py-32 text-center px-4">
-        <div className="container mx-auto max-w-3xl">
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-textPrimary mb-6">
-            Behandlinger
-          </h1>
-          <p className="text-lg text-textBody leading-relaxed">
-            Gå på opdagelse i vores store udvalg af professionelle skønhedsbehandlinger.
-            Uanset om du søger permanent hårfjerning, en fornyende ansigtsbehandling eller
-            noget helt tredje, så har vi ekspertisen til at hjælpe dig i mål.
-          </p>
+      {/* Hero */}
+      <section className="section-dark relative py-32 lg:py-44 overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-15 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse 80% 60% at 20% 80%, rgba(107,79,53,0.7) 0%, transparent 60%)",
+          }}
+        />
+        <div className="container mx-auto px-4 lg:px-8 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span className="eyebrow text-cognac-light mb-5 block">Skønhedsklinik Aarhus</span>
+            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl text-cream font-light leading-[1.06] mb-6 max-w-2xl text-balance">
+              Vores behandlinger
+            </h1>
+            <p className="text-cream/60 text-lg leading-relaxed max-w-xl">
+              Professionelle skønhedsbehandlinger tilpasset din hud, dine ønsker og dit liv.
+            </p>
+          </motion.div>
         </div>
       </section>
 
+      {/* Category filter + grid */}
       <section className="py-16 px-4 bg-white flex-grow">
         <div className="container mx-auto lg:px-8">
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-3 mb-16">
+          {/* Filter tabs */}
+          <div className="flex flex-wrap gap-2 mb-14">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`px-5 py-2 rounded-full text-xs font-medium tracking-[0.12em] uppercase transition-all duration-250 ${
                   activeCategory === cat.id
-                    ? "bg-cognac text-white shadow-md"
-                    : "bg-beige text-textBody hover:bg-cognac/10 hover:text-cognac"
+                    ? "bg-cognac text-white shadow-sm"
+                    : "bg-beige text-textMuted hover:bg-sand hover:text-textBody"
                 }`}
               >
                 {cat.label}
@@ -66,39 +79,46 @@ export function ServicesClient({ services }: ServicesClientProps) {
             ))}
           </div>
 
-          {/* Services Grid */}
-          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <AnimatePresence>
-              {filteredServices.map((service) => (
+          {/* Services grid */}
+          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <AnimatePresence mode="popLayout">
+              {filteredServices.map((service, index) => (
                 <motion.div
                   key={service.slug}
                   layout
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.4, delay: index * 0.04 }}
                 >
                   <Link
                     href={`/behandlinger/${service.slug}`}
-                    className="group flex flex-col h-full bg-white rounded-xl overflow-hidden transition-all duration-400 hover:-translate-y-[2px]"
+                    className="group relative flex flex-col overflow-hidden rounded-sm cursor-pointer block"
                   >
-                    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl mb-4">
+                    {/* Image */}
+                    <div className="relative aspect-[3/4] w-full overflow-hidden">
                       <Image
                         src={service.hero_image_url || "/placeholder.jpg"}
                         alt={service.name}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                        className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05]"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+
+                      {/* Content overlay */}
+                      <div className="absolute inset-x-0 bottom-0 p-5">
+                        <h3 className="font-heading text-2xl text-white font-light leading-tight mb-1.5">
+                          {service.name}
+                        </h3>
+                        <p className="text-white/60 text-xs leading-relaxed line-clamp-2 mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 max-h-0 group-hover:max-h-10 overflow-hidden">
+                          {service.short_description}
+                        </p>
+                        <span className="inline-flex items-center gap-1.5 text-cognac-light text-xs font-medium tracking-wide">
+                          Book konsultation
+                          <span className="translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
+                        </span>
+                      </div>
                     </div>
-                    <h3 className="font-heading text-2xl text-textPrimary mb-2">
-                      {service.name}
-                    </h3>
-                    <p className="text-textBody line-clamp-2 mb-4 flex-grow">
-                      {service.short_description}
-                    </p>
-                    <span className="text-cognac font-medium flex items-center group-hover:text-cognac-hover transition-colors">
-                      Læs mere <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                    </span>
                   </Link>
                 </motion.div>
               ))}

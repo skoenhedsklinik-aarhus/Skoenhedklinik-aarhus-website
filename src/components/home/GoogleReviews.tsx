@@ -1,78 +1,102 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 
-const googleReviews = [
+const MOCK_REVIEWS = [
   {
-    author_name: 'Sofie Nielsen',
+    name: "Sofie M.",
     rating: 5,
-    text: 'Virkelig professionel og tryg oplevelse. Aliaa er super dygtig og tager sig god tid til at forklare alt. Kan varmt anbefale laserbehandling her!',
-    time: 1690890200,
+    text: "Utrolig professionel behandling. Aliaa er super dygtig og gav mig en grundig vejledning inden behandlingen. Kan varmt anbefales!",
+    service: "Permanent hårfjerning",
+    timeAgo: "2 uger siden",
   },
   {
-    author_name: 'Camilla Jensen',
+    name: "Mette K.",
     rating: 5,
-    text: 'Fantastisk klinik med en utrolig afslappet og luksuriøs stemning. Fik lavet sugaring, og det var næsten smertefrit. Kommer helt sikkert igen.',
-    time: 1690000000,
+    text: "Fantastisk klinik med en helt unik atmosfære. Følte mig tryg fra første sekund. Resultatet er bedre end jeg turde håbe på.",
+    service: "Ansigtsbehandling",
+    timeAgo: "1 måned siden",
   },
   {
-    author_name: 'Maria Pedersen',
+    name: "Amira B.",
     rating: 5,
-    text: 'Jeg har fået fjernet en tatovering, og resultatet er over al forventning. God vejledning og ærlig rådgivning fra start til slut.',
-    time: 1689000000,
-  }
+    text: "Har prøvet sugaring og bryn-behandling her — begge dele var perfekte. Personalet er super venligt og professionelt.",
+    service: "Sugaring & Bryn",
+    timeAgo: "3 uger siden",
+  },
+  {
+    name: "Lotte P.",
+    rating: 5,
+    text: "Endelig fundet en klinik jeg kan stole på. Grundig konsultation, synlige resultater og fair priser. Kommer igen og igen!",
+    service: "BB Glow",
+    timeAgo: "1 uge siden",
+  },
 ];
+
+function StarRow({ count }: { count: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <Star key={i} className="w-3.5 h-3.5 fill-cognac text-cognac" />
+      ))}
+    </div>
+  );
+}
 
 export function GoogleReviews() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 lg:py-32 bg-beige overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="mb-12 text-center">
-          <span className="text-xs font-medium tracking-widest uppercase text-cognac mb-2 block">
-            Anmeldelser
-          </span>
-          <h2 className="font-heading text-3xl md:text-4xl text-textPrimary">
-            Vores kunders oplevelser
-          </h2>
-        </div>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6"
+        >
+          <div>
+            <span className="eyebrow text-cognac mb-4 block">Anmeldelser</span>
+            <h2 className="font-heading text-4xl md:text-5xl text-textPrimary font-light">
+              Hvad vores klienter siger
+            </h2>
+          </div>
+          {/* Google rating badge */}
+          <div className="glass-cream rounded-xl px-5 py-3.5 flex items-center gap-3 shrink-0">
+            <div>
+              <p className="text-2xl font-heading font-light text-textPrimary leading-none">5.0</p>
+              <div className="mt-1"><StarRow count={5} /></div>
+            </div>
+            <div className="w-px h-10 bg-sand" />
+            <div>
+              <p className="text-xs text-textMuted uppercase tracking-wide font-medium">Google</p>
+              <p className="text-xs text-textMuted">Anmeldelser</p>
+            </div>
+          </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {googleReviews.slice(0, 3).map((review, index) => (
+        {/* Review cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {MOCK_REVIEWS.map((review, i) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-beige rounded-xl p-8 flex flex-col"
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+              className="glass-cream rounded-xl p-6 flex flex-col gap-4 hover:shadow-md transition-shadow duration-300"
             >
-              <div className="flex gap-1 mb-6 text-cognac">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
-                ))}
-              </div>
-              <blockquote className="font-heading italic text-xl text-textPrimary mb-6 flex-grow leading-relaxed">
-                &quot;{review.text}&quot;
-              </blockquote>
-              <div className="font-medium text-textBody">
-                – {review.author_name}
+              <StarRow count={review.rating} />
+              <p className="text-textBody text-sm leading-relaxed flex-grow">
+                &ldquo;{review.text}&rdquo;
+              </p>
+              <div className="border-t border-sand/60 pt-4">
+                <p className="font-medium text-textPrimary text-sm">{review.name}</p>
+                <p className="text-textMuted text-xs mt-0.5">{review.service} · {review.timeAgo}</p>
               </div>
             </motion.div>
           ))}
-        </div>
-
-        <div className="text-center">
-          <Link
-            href="#"
-            className="text-cognac font-medium flex items-center justify-center group hover:text-cognac-hover transition-colors"
-          >
-            Se alle anmeldelser på Google{" "}
-            <span className="ml-2 group-hover:translate-x-1 transition-transform">
-              →
-            </span>
-          </Link>
         </div>
       </div>
     </section>

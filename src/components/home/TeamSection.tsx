@@ -2,67 +2,130 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Database } from "@/types/supabase";
 
-type TeamMember = Database["public"]["Tables"]["team_members"]["Row"];
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  short_bio: string | null;
+  photo_url: string | null;
+  display_order: number;
+}
+
+const TEAM_PHOTO_MAP: Record<string, string> = {
+  "Aliaa Jamil": "/images/team-aliaa.avif",
+  "Lise Lindhal": "/images/team-lise.avif",
+  "Louise Simonsen": "/images/team-louise.avif",
+};
+
+function getTeamPhoto(member: TeamMember): string {
+  return TEAM_PHOTO_MAP[member.name] || member.photo_url || "/images/filler.avif";
+}
 
 interface TeamSectionProps {
   teamMembers: TeamMember[];
 }
 
 export function TeamSection({ teamMembers }: TeamSectionProps) {
+  if (!teamMembers || teamMembers.length === 0) return null;
+
+  const [featured, ...rest] = teamMembers;
+
   return (
-    <section className="py-24 bg-cream">
+    <section className="py-24 lg:py-32 bg-cream overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="mb-16 text-center">
-          <span className="text-xs font-medium tracking-widest uppercase text-cognac mb-2 block">
-            Teamet
-          </span>
-          <h2 className="font-heading text-3xl md:text-4xl text-textPrimary">
-            Mød vores specialister
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-14"
+        >
+          <span className="eyebrow text-cognac mb-4 block">Vores team</span>
+          <h2 className="font-heading text-4xl md:text-5xl text-textPrimary font-light">
+            Mødt vores eksperter
           </h2>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 max-w-5xl mx-auto mb-16">
-          {teamMembers.map((member, index) => (
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Featured member — large */}
+          {featured && (
             <motion.div
-              key={member.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex flex-col items-center text-center"
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-2 group relative overflow-hidden rounded-sm"
             >
-              <div className="relative w-[240px] h-[240px] rounded-full overflow-hidden mb-6 border-4 border-white shadow-sm">
+              <div className="relative aspect-[16/10] lg:aspect-[16/9] w-full">
                 <Image
-                  src={member.photo_url || "/placeholder.jpg"}
-                  alt={member.name}
+                  src={getTeamPhoto(featured)}
+                  alt={featured.name}
                   fill
-                  className="object-cover"
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                {/* Glass name card */}
+                <div className="absolute bottom-6 left-6 glass rounded-xl px-6 py-4">
+                  <p className="font-heading text-2xl text-white font-light">{featured.name}</p>
+                  <p className="eyebrow text-cognac-light text-[10px] mt-1">{featured.role}</p>
+                </div>
               </div>
-              <h3 className="font-heading text-[28px] text-textPrimary mb-1">
-                {member.name}
-              </h3>
-              <div className="text-cognac font-medium mb-4">
-                {member.role}
-              </div>
-              <p className="text-textBody text-base line-clamp-3 max-w-xs mx-auto">
-                {member.short_bio}
-              </p>
+              {featured.short_bio && (
+                <div className="pt-5 pb-2">
+                  <p className="text-textBody text-sm leading-relaxed line-clamp-2">{featured.short_bio}</p>
+                </div>
+              )}
             </motion.div>
-          ))}
+          )}
+
+          {/* Remaining members — stacked */}
+          <div className="flex flex-col gap-6">
+            {rest.slice(0, 2).map((member, i) => (
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 + 0.15 }}
+                className="group relative overflow-hidden rounded-sm flex-1"
+              >
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src={getTeamPhoto(member)}
+                    alt={member.name}
+                    fill
+                    className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
+
+                  <div className="absolute bottom-4 left-4 glass rounded-lg px-4 py-3">
+                    <p className="font-heading text-lg text-white font-light">{member.name}</p>
+                    <p className="eyebrow text-cognac-light text-[9px] mt-0.5">{member.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        <div className="text-center">
-          <Link href="/om-os">
-            <Button variant="ghost" className="text-cognac border border-cognac hover:bg-beige rounded-full px-8">
-              Læs mere om os
-            </Button>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-10 text-center"
+        >
+          <Link
+            href="/om-os"
+            className="inline-flex items-center gap-2 text-cognac hover:text-cognac-hover text-sm font-medium tracking-wide transition-colors group"
+          >
+            Læs mere om os
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

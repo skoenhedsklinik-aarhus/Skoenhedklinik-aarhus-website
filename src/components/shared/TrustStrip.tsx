@@ -1,50 +1,40 @@
-import { Shield, Heart, Award, Clock } from "lucide-react";
+"use client";
+
+
 
 const TRUST_ITEMS = [
-  {
-    icon: Shield,
-    title: "Certificerede specialister",
-    description: "Registreret hos Styrelsen for Patientsikkerhed",
-  },
-  {
-    icon: Heart,
-    title: "Personlig rådgivning",
-    description: "Vi tager os tid til at forstå dine ønsker",
-  },
-  {
-    icon: Award,
-    title: "Kvalitetsprodukter",
-    description: "Vi bruger kun professionelle, godkendte produkter",
-  },
-  {
-    icon: Clock,
-    title: "Gratis konsultation",
-    description: "Start altid med en uforpligtende samtale",
-  },
+  "Registreret hos Styrelsen for Patientsikkerhed",
+  "Certificerede behandlere",
+  "Gratis konsultation",
+  "Aarhus C siden 2015",
+  "Markedets bedste udstyr",
+  "Personlig rådgivning",
+  "Registreret hos Styrelsen for Patientsikkerhed",
+  "Certificerede behandlere",
+  "Gratis konsultation",
+  "Aarhus C siden 2015",
+  "Markedets bedste udstyr",
+  "Personlig rådgivning",
 ];
 
 export function TrustStrip() {
   return (
-    <section className="bg-cream border-y border-sand py-12">
-      <div className="container mx-auto px-4 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-center lg:text-left">
-          {TRUST_ITEMS.map((item, i) => (
-            <div key={i} className="flex flex-col lg:flex-row items-center lg:items-start gap-4">
-              <div className="bg-white p-3 rounded-full shrink-0 text-cognac shadow-sm border border-sand/50">
-                <item.icon className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-heading text-lg md:text-xl font-medium text-textPrimary mb-1">
-                  {item.title}
-                </h4>
-                <p className="text-textBody text-sm leading-relaxed max-w-[200px] lg:max-w-none mx-auto">
-                  {item.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="relative bg-white border-y border-sand py-4 overflow-hidden">
+      {/* Fade edges */}
+      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+      <div className="flex animate-marquee whitespace-nowrap">
+        {TRUST_ITEMS.map((item, i) => (
+          <span
+            key={i}
+            className="inline-flex items-center gap-3 mx-6 text-textMuted text-xs font-medium tracking-[0.14em] uppercase shrink-0"
+          >
+            <span className="w-1 h-1 rounded-full bg-cognac inline-block shrink-0" />
+            {item}
+          </span>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }

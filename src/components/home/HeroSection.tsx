@@ -1,53 +1,51 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import ScrollExpandMedia from "@/components/blocks/scroll-expansion-hero";
+
+function HeroContent() {
+  return (
+    <section className="py-20 lg:py-28 bg-white">
+      <div className="container mx-auto px-4 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center">
+          <span className="eyebrow text-cognac mb-5 block">Skønhedsklinik Aarhus</span>
+          <h2 className="font-heading text-4xl md:text-5xl text-textPrimary font-light leading-tight mb-5 text-balance">
+            Certificeret skønhed — tilpasset dig
+          </h2>
+          <div className="w-10 h-px bg-cognac mx-auto mb-7" />
+          <p className="text-textBody text-lg leading-relaxed mb-10 max-w-xl mx-auto">
+            Professionelle behandlinger i hjertet af Aarhus C. Vi sætter din tryghed øverst og leverer synlige resultater med markedets bedste udstyr.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/behandlinger">
+              <button className="px-8 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors">
+                Se behandlinger
+              </button>
+            </Link>
+            <Link href="/om-os">
+              <button className="px-8 py-4 bg-beige hover:bg-sand text-textPrimary rounded-full text-sm font-medium tracking-wide transition-colors">
+                Lær os at kende
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export function HeroSection() {
   return (
-    <section className="relative w-full h-[70vh] lg:h-[60vh] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/services/permanent-haarfjerning.avif"
-          alt="Behandlerrum hos Skønhedsklinik Aarhus"
-          fill
-          priority
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-black/25" />
-      </div>
-
-      <div className="container relative z-10 mx-auto px-4 text-center text-white flex flex-col items-center">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="text-xs md:text-sm font-medium tracking-widest uppercase mb-4 block">
-            Skønhedsklinik i Aarhus
-          </span>
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-light mb-6 max-w-4xl mx-auto leading-tight">
-            Hvor naturlig skønhed møder professionel pleje
-          </h1>
-          <p className="text-lg md:text-xl font-light max-w-2xl mx-auto mb-10 opacity-90">
-            Certificeret behandling med fokus på sikkerhed, synlige resultater og personlig rådgivning.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/book">
-              <Button className="w-full sm:w-auto bg-cognac hover:bg-cognac-hover text-white rounded-full px-8 py-6 text-base border border-cognac">
-                Book gratis konsultation
-              </Button>
-            </Link>
-            <Link href="/behandlinger">
-              <Button variant="outline" className="w-full sm:w-auto bg-transparent hover:bg-white/10 text-white border-white rounded-full px-8 py-6 text-base">
-                Se behandlinger
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    </section>
+    <ScrollExpandMedia
+      mediaType="video"
+      mediaSrc="/videos/hero.mp4"
+      bgImageSrc="/images/filler.avif"
+      title="Tidløs Skønhed"
+      date="Skønhedsklinik Aarhus"
+      scrollToExpand="↓ Scroll for at opleve"
+      textBlend={false}
+    >
+      <HeroContent />
+    </ScrollExpandMedia>
   );
 }

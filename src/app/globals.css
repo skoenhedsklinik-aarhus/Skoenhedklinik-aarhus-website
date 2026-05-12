@@ -4,38 +4,28 @@
 
 @layer base {
   :root {
-    --background: 36 43% 96%; /* #FAF6F0 Cream */
-    --foreground: 28 15% 25%; /* #4A3F36 Body */
-
-    --card: 38 38% 90%; /* #F0E9DD Beige */
-    --card-foreground: 21 28% 14%; /* #2C1F18 Primary */
-
+    --background: 36 43% 96%;
+    --foreground: 28 15% 25%;
+    --card: 38 38% 90%;
+    --card-foreground: 21 28% 14%;
     --popover: 36 43% 96%;
     --popover-foreground: 28 15% 25%;
-
-    --primary: 29 34% 31%; /* #6B4F35 Cognac */
-    --primary-foreground: 36 43% 96%; /* Cream */
-
-    --secondary: 35 27% 87%; /* #E8E0D5 Sand */
+    --primary: 29 34% 31%;
+    --primary-foreground: 36 43% 96%;
+    --secondary: 35 27% 87%;
     --secondary-foreground: 21 28% 14%;
-
     --muted: 35 27% 87%;
-    --muted-foreground: 29 5% 51%; /* #8B7E73 Muted */
-
+    --muted-foreground: 29 5% 51%;
     --accent: 38 38% 90%;
     --accent-foreground: 21 28% 14%;
-
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 35 27% 87%; /* #E8E0D5 Sand */
+    --border: 35 27% 87%;
     --input: 35 27% 87%;
-    --ring: 29 34% 31%; /* Cognac */
-
-    --radius: 0.5rem; /* 8px border radius as per PRD */
+    --ring: 29 34% 31%;
+    --radius: 0.5rem;
   }
 
-  /* No dark mode definitions per PRD, but keeping format */
   .dark {
     --background: 28 15% 25%;
     --foreground: 36 43% 96%;
@@ -63,17 +53,28 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground font-sans;
+
+  html {
+    scroll-behavior: smooth;
   }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  ::selection {
+    background-color: #6B4F35;
+    color: #FAF6F0;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading text-textPrimary tracking-tight;
   }
   h1 {
-    @apply text-5xl md:text-6xl lg:text-[72px] leading-[1.1] font-light;
+    @apply text-5xl md:text-6xl lg:text-[72px] leading-[1.08] font-light;
   }
   h2 {
-    @apply text-4xl md:text-[48px] leading-[1.15] font-light;
+    @apply text-4xl md:text-[48px] leading-[1.12] font-light;
   }
   h3 {
     @apply text-3xl md:text-[32px] font-medium;
@@ -81,12 +82,79 @@
   h4 {
     @apply text-2xl md:text-[22px] font-medium;
   }
-  
+
   .eyebrow {
-    @apply font-sans font-medium uppercase tracking-[0.15em] text-[12px] md:text-[13px];
+    @apply font-sans font-medium uppercase tracking-[0.18em] text-[11px] md:text-[12px];
   }
-  
+
   .tnum {
     font-feature-settings: "tnum";
+  }
+}
+
+@layer utilities {
+  /* ── Glassmorphism ─────────────────────────────────── */
+  .glass {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-dark {
+    background: rgba(13, 13, 11, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-cream {
+    background: rgba(250, 246, 240, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(232, 224, 213, 0.55);
+  }
+
+  .glass-cognac {
+    background: rgba(107, 79, 53, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(107, 79, 53, 0.22);
+  }
+
+  /* ── Dark section helpers ──────────────────────────── */
+  .section-dark {
+    background-color: #0D0D0B;
+    color: #FAF6F0;
+  }
+
+  .section-mink {
+    background-color: #1A1410;
+    color: #FAF6F0;
+  }
+
+  .section-dark h1,
+  .section-dark h2,
+  .section-dark h3,
+  .section-dark h4,
+  .section-mink h1,
+  .section-mink h2,
+  .section-mink h3,
+  .section-mink h4 {
+    color: #FAF6F0;
+  }
+
+  /* ── Layout utilities ──────────────────────────────── */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .cognac-rule::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background-color: #6B4F35;
+    margin-top: 12px;
   }
 }

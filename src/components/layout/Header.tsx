@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -15,7 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu, ChevronDown, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TREATMENTS = [
   { name: "Permanent hårfjerning", slug: "permanent-haarfjerning" },
@@ -31,104 +31,186 @@ const TREATMENTS = [
 ];
 
 export function Header() {
+  // Only show header AFTER the hero has fully expanded
+  const [heroExpanded, setHeroExpanded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    // Listen for the hero expansion event dispatched by ScrollExpandMedia
+    const onHeroExpanded = (e: Event) => {
+      const detail = (e as CustomEvent<{ expanded: boolean }>).detail;
+      setHeroExpanded(detail.expanded);
+      // Reset scrolled state when hero collapses
+      if (!detail.expanded) setScrolled(false);
+    };
+
+    window.addEventListener("heroExpanded", onHeroExpanded);
+    return () => window.removeEventListener("heroExpanded", onHeroExpanded);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Glass/cream when scrolled down after hero, dark transparent right after expansion
+  const atTop = !scrolled;
+
   return (
-    <>
-      <div className="w-full bg-cognac text-cream text-center py-2 text-sm font-medium tracking-wide uppercase">
-        REGISTRERET HOS STYRELSEN FOR PATIENTSIKKERHED ✓
-      </div>
-      <header
-        className={`sticky top-0 z-50 w-full transition-all duration-200 bg-white ${
-          scrolled ? "shadow-sm border-b border-sand" : ""
-        }`}
-      >
-        <div className="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
-          <Link href="/" className="font-heading text-2xl font-medium tracking-tight text-textPrimary">
-            Skønhedsklinik Aarhus
-          </Link>
-
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-textBody hover:text-textPrimary transition-colors outline-none font-medium">
-                Behandlinger <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[400px] p-4 grid grid-cols-2 gap-2 rounded-xl">
-                {TREATMENTS.map((t) => (
-                  <DropdownMenuItem key={t.slug} className="cursor-pointer hover:bg-cream rounded-md p-0">
-                    <Link href={`/behandlinger/${t.slug}`} className="w-full text-textBody px-2 py-1.5 block">
-                      {t.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Link href="/priser" className="text-textBody hover:text-textPrimary transition-colors font-medium">
-              Priser
+    <AnimatePresence>
+      {heroExpanded && (
+        <motion.header
+          key="header"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed top-0 left-0 right-0 z-50 w-full border-b"
+          style={{
+            backgroundColor: atTop ? "rgba(0,0,0,0)" : "rgba(250,246,240,0.92)",
+            backdropFilter: atTop ? "blur(0px)" : "blur(16px)",
+            WebkitBackdropFilter: atTop ? "blur(0px)" : "blur(16px)",
+            borderBottomColor: atTop ? "rgba(232,224,213,0)" : "rgba(232,224,213,0.5)",
+            transition: "background-color 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease",
+          }}
+        >
+          <div className="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
+            {/* Logo */}
+            <Link
+              href="/"
+              className={`font-heading text-2xl font-medium tracking-tight transition-colors duration-300 ${
+                atTop ? "text-white" : "text-textPrimary"
+              }`}
+            >
+              Skønhedsklinik Aarhus
             </Link>
-            <Link href="/om-os" className="text-textBody hover:text-textPrimary transition-colors font-medium">
-              Om os
-            </Link>
-            <Link href="/kontakt" className="text-textBody hover:text-textPrimary transition-colors font-medium">
-              Kontakt
-            </Link>
-          </nav>
 
-          <div className="hidden lg:block">
-            <Link href="/book">
-              <Button className="bg-cognac hover:bg-cognac-hover text-white rounded-full px-8">
-                Book nu
-              </Button>
-            </Link>
-          </div>
-
-          {/* Mobile Nav */}
-          <Sheet>
-            <SheetTrigger render={<Button variant="ghost" size="icon" className="text-textPrimary" />}>
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle menu</span>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-cream">
-              <nav className="flex flex-col gap-6 mt-10">
-                <div className="space-y-4">
-                  <h4 className="font-medium text-textPrimary uppercase tracking-wider text-sm">Behandlinger</h4>
-                  <div className="flex flex-col gap-3 pl-4 border-l border-sand">
-                    {TREATMENTS.map((t) => (
-                      <SheetClose key={t.slug} render={<Link href={`/behandlinger/${t.slug}`} className="w-full text-left text-textBody hover:text-cognac transition-colors py-2 px-4 rounded-lg hover:bg-beige block" />}>
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-8">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={`flex items-center gap-1 transition-colors duration-300 outline-none font-medium text-sm tracking-wide ${
+                    atTop ? "text-white/90 hover:text-white" : "text-textBody hover:text-textPrimary"
+                  }`}
+                >
+                  Behandlinger <ChevronDown className="h-3.5 w-3.5 mt-0.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[420px] p-5 grid grid-cols-2 gap-1 rounded-xl bg-cream/95 backdrop-blur-md border border-sand shadow-xl">
+                  {TREATMENTS.map((t) => (
+                    <DropdownMenuItem key={t.slug} className="cursor-pointer hover:bg-beige rounded-lg p-0 focus:bg-beige">
+                      <Link
+                        href={`/behandlinger/${t.slug}`}
+                        className="w-full text-textBody hover:text-textPrimary px-3 py-2 block text-sm transition-colors"
+                      >
                         {t.name}
-                      </SheetClose>
-                    ))}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {["Priser", "Om os", "Kontakt"].map((label) => (
+                <Link
+                  key={label}
+                  href={`/${label.toLowerCase().replace(" ", "-").replace("ø", "o")}`}
+                  className={`transition-colors duration-300 font-medium text-sm tracking-wide ${
+                    atTop ? "text-white/90 hover:text-white" : "text-textBody hover:text-textPrimary"
+                  }`}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Book CTA */}
+            <div className="hidden lg:block">
+              <Link href="/book">
+                <button
+                  className={`rounded-full px-7 py-2.5 text-sm font-medium tracking-wide transition-all duration-300 ${
+                    atTop
+                      ? "bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-sm"
+                      : "bg-cognac hover:bg-cognac-hover text-white"
+                  }`}
+                >
+                  Book nu
+                </button>
+              </Link>
+            </div>
+
+            {/* Mobile hamburger */}
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger>
+                <button
+                  className={`lg:hidden p-2 transition-colors duration-300 ${
+                    atTop ? "text-white" : "text-textPrimary"
+                  }`}
+                  aria-label="Åbn menu"
+                >
+                  <Menu className="h-6 w-6" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[380px] bg-noir border-l border-white/10 p-0">
+                <div className="flex flex-col h-full p-8">
+                  <div className="flex justify-between items-center mb-10">
+                    <span className="font-heading text-xl text-cream">Menu</span>
+                    <SheetClose className="text-cream/50 hover:text-cream transition-colors">
+                      <X className="h-5 w-5" />
+                    </SheetClose>
+                  </div>
+
+                  <nav className="flex flex-col gap-1 flex-grow">
+                    <p className="eyebrow text-cognac-accent mb-4">Behandlinger</p>
+                    <div className="flex flex-col gap-0.5 mb-8">
+                      {TREATMENTS.map((t) => (
+                        <Link
+                          key={t.slug}
+                          href={`/behandlinger/${t.slug}`}
+                          onClick={() => setMobileOpen(false)}
+                          className="text-cream/70 hover:text-cream text-sm py-2 px-3 rounded-lg hover:bg-white/5 transition-all"
+                        >
+                          {t.name}
+                        </Link>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-col gap-2 border-t border-white/10 pt-6">
+                      {[
+                        { label: "Behandlinger", href: "/behandlinger" },
+                        { label: "Priser", href: "/priser" },
+                        { label: "Om os", href: "/om-os" },
+                        { label: "Kontakt", href: "/kontakt" },
+                      ].map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="font-heading text-2xl text-cream hover:text-cognac-light transition-colors py-1"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </nav>
+
+                  <div className="mt-auto pt-8 border-t border-white/10">
+                    <Link
+                      href="/book"
+                      onClick={() => setMobileOpen(false)}
+                      className="block w-full py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-center text-sm font-medium tracking-wide transition-colors"
+                    >
+                      Book konsultation
+                    </Link>
                   </div>
                 </div>
-                <SheetClose render={<Link href="/behandlinger" className="w-full text-left font-heading text-3xl mb-4 text-textPrimary hover:text-cognac transition-colors block" />}>
-                  Behandlinger
-                </SheetClose>
-                <SheetClose render={<Link href="/om-os" className="w-full text-left font-heading text-3xl text-textPrimary hover:text-cognac transition-colors block" />}>
-                  Om os
-                </SheetClose>
-                <SheetClose render={<Link href="/kontakt" className="w-full text-left font-heading text-3xl text-textPrimary hover:text-cognac transition-colors block" />}>
-                  Kontakt
-                </SheetClose>
-                <SheetClose render={<Link href="/book" className="mt-4 block" />}>
-                  <Button className="w-full bg-cognac hover:bg-cognac-hover text-white rounded-full">
-                    Book nu
-                  </Button>
-                </SheetClose>
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </header>
-    </>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </motion.header>
+      )}
+    </AnimatePresence>
   );
 }
