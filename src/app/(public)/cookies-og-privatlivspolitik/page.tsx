@@ -1,3 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Cookies og Privatlivspolitik — Skønhedsklinik Aarhus",
+  description:
+    "Læs om hvordan Skønhedsklinik Aarhus behandler dine personoplysninger og vores brug af cookies. GDPR-kompatibel privatlivspolitik.",
+  alternates: { canonical: "/cookies-og-privatlivspolitik" },
+  robots: { index: true, follow: false },
+};
+
 export default function PrivacyPolicyPage() {
   return (
     <main className="flex flex-col min-h-screen bg-cream">

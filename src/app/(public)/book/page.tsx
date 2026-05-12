@@ -1,46 +1,14 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
+import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Info, ExternalLink } from "lucide-react";
+import { Info } from "lucide-react";
+import { BookingIframe } from "./BookingIframe";
 
-function BookingIframe() {
-  const searchParams = useSearchParams();
-  const serviceSlug = searchParams.get("service");
-  
-  // Base URL from mock settings
-  let iframeUrl = "https://skonhedsklinik-aarhus.planway.com/";
-  
-  // If we had a real mapping of slug to planway_service_id, we would append it here.
-  // For mock purposes, if there is a service, we'll pretend to deep link.
-  if (serviceSlug) {
-    // Just a mock deep link pattern since we don't have real IDs mapped in mock yet
-    iframeUrl += `?d=laser`; 
-  }
-
-  return (
-    <div className="w-full flex flex-col items-center">
-      <iframe
-        src={iframeUrl}
-        width="100%"
-        style={{ minHeight: "100vh", border: 0 }}
-        title="Book behandling hos Skønhedsklinik Aarhus"
-        loading="lazy"
-        allow="payment"
-        className="bg-white rounded-xl shadow-sm"
-      />
-      <a
-        href={iframeUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 flex items-center gap-2 text-textBody hover:text-cognac transition-colors"
-      >
-        Problemer med booking? <strong className="font-medium">Åbn i nyt vindue</strong>
-        <ExternalLink className="w-4 h-4" />
-      </a>
-    </div>
-  );
-}
+export const metadata: Metadata = {
+  title: "Book din tid — Skønhedsklinik Aarhus",
+  description:
+    "Book en behandling eller gratis konsultation online hos Skønhedsklinik Aarhus. Vælg behandling, dato og tidspunkt direkte her.",
+  robots: { index: false, follow: false },
+};
 
 export default function BookPage() {
   return (
@@ -81,3 +49,4 @@ export default function BookPage() {
     </main>
   );
 }
+

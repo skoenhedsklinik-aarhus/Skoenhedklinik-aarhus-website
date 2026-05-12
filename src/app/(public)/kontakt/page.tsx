@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import { getOpeningHours, getSiteSettings } from "@/lib/supabase-queries";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { MapPin, Phone, Mail, Car, Bus, Clock } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Kontakt — Skønhedsklinik Aarhus",
+  description:
+    "Find os på Tordenskjoldsgade 61, 8000 Aarhus C. Ring på +45 61 44 59 99 eller skriv til info@skoenhedsklinik-aarhus.dk. Se åbningstider og kort.",
+  alternates: { canonical: "/kontakt" },
+  openGraph: {
+    title: "Kontakt — Skønhedsklinik Aarhus",
+    description:
+      "Adresse, telefonnummer, åbningstider og kort til Skønhedsklinik Aarhus i Aarhus C.",
+    url: "/kontakt",
+  },
+};
 
 export default async function ContactPage() {
   const openingHours = await getOpeningHours();

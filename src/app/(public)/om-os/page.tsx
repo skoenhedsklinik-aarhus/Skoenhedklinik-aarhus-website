@@ -1,7 +1,21 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { getTeamMembers } from "@/lib/supabase-queries";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { Shield, Heart, Sparkles, Eye } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Om os — Skønhedsklinik Aarhus",
+  description:
+    "Mød teamet bag Skønhedsklinik Aarhus. Læs om vores filosofi, værdier og de specialister, der gør en forskel for vores gæster hver dag. Registreret hos Styrelsen for Patientsikkerhed.",
+  alternates: { canonical: "/om-os" },
+  openGraph: {
+    title: "Om os — Skønhedsklinik Aarhus",
+    description:
+      "Mød Aliaa, Lise og Louise — teamet bag Skønhedsklinik Aarhus. Professionelle behandlere med hjertet i det rigtige sted.",
+    url: "/om-os",
+  },
+};
 
 const VALUES = [
   {
@@ -35,7 +49,7 @@ export default async function AboutPage() {
       <section className="relative w-full h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80"
+            src="/images/services/ansigtsbehandling.avif"
             alt="Klinikkens indretning"
             fill
             priority

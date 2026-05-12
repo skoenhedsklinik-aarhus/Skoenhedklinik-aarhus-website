@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { ExternalLink } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
+export const metadata: Metadata = {
+  title: "Gavekort — Skønhedsklinik Aarhus",
+  description:
+    "Giv gaven af velfærd og selvforkælelse. Køb et gavekort til Skønhedsklinik Aarhus online. Gyldigt i 3 år. Kan bruges til alle behandlinger.",
+  alternates: { canonical: "/gavekort" },
+  openGraph: {
+    title: "Gavekort — Skønhedsklinik Aarhus",
+    description:
+      "Den perfekte gave — køb et gavekort til en kær og lad dem vælge behandling selv.",
+    url: "/gavekort",
+  },
+};
 
 export default function GiftCardPage() {
   const iframeUrl = "https://skonhedsklinik-aarhus.planway.com/widget/buy_giftcard";

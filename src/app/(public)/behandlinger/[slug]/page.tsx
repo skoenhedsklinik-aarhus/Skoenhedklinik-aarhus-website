@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { getServices, getServiceBySlug, getPricingTiers } from "@/lib/supabase-queries";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Shield, Clock, Leaf, Info } from "lucide-react"; // Reusing some standard icons for benefits
+import { Shield, Clock, Leaf, Info } from "lucide-react";
+import { medicalProcedureSchema, faqPageSchema } from "@/lib/schema";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://skoenhedsklinik-aarhus.dk";
 
 const iconMap: Record<string, React.ElementType> = {
   shield: Shield,
@@ -24,6 +28,52 @@ export async function generateStaticParams() {
 
 // Allow pages not pre-generated at build time to be rendered on demand
 export const dynamicParams = true;
+
+// Dynamic per-service metadata
+export async function generateMetadata(
+  { params }: { params: { slug: string } }
+): Promise<Metadata> {
+  const service = await getServiceBySlug(params.slug);
+
+  if (!service) {
+    return {
+      title: "Behandling ikke fundet",
+      description: "Den ønskede behandling kunne ikke findes.",
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const s = service as any;
+  const title = s.meta_title || `${s.name} — Skønhedsklinik Aarhus`;
+  const description = s.meta_description || s.short_description || "";
+  const image = s.og_image_url || s.hero_image_url || "/images/og-default.jpg";
+  const canonical = `/behandlinger/${s.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      images: [
+        {
+          url: image.startsWith("http") ? image : `${SITE_URL}${image}`,
+          width: 1200,
+          height: 630,
+          alt: s.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image.startsWith("http") ? image : `${SITE_URL}${image}`],
+    },
+  };
+}
 
 export default async function ServiceDetailPage({ params }: { params: { slug: string } }) {
   const service = await getServiceBySlug(params.slug);
@@ -53,8 +103,28 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
     ? relatedServices 
     : allServices.filter(s => s.is_popular && s.slug !== service.slug).slice(0, 3);
 
+  // Build JSON-LD schemas
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const s = service as any;
+  const procedureJsonLd = medicalProcedureSchema(s);
+  const hasFaq = s.faq && Array.isArray(s.faq) && s.faq.length > 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const faqJsonLd = hasFaq ? faqPageSchema(s.faq as any[]) : null;
+
   return (
     <main className="flex flex-col min-h-screen">
+      {/* Schema.org MedicalProcedure */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(procedureJsonLd) }}
+      />
+      {/* Schema.org FAQPage (conditional) */}
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       {/* Hero Section */}
       <section className="relative w-full h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

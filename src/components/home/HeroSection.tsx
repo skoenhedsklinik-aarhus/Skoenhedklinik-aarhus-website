@@ -10,7 +10,7 @@ export function HeroSection() {
     <section className="relative w-full h-[70vh] lg:h-[60vh] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80"
+          src="/images/services/permanent-haarfjerning.avif"
           alt="Behandlerrum hos Skønhedsklinik Aarhus"
           fill
           priority
