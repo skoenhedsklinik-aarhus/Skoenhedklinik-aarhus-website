@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   Sheet,
@@ -36,8 +37,18 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const pathname = usePathname();
+  // The scroll-expansion hero (which dispatches "heroExpanded") only exists on
+  // the homepage. Every other route should show the header immediately.
+  const isHome = pathname === "/";
+
   useEffect(() => {
-    // Listen for the hero expansion event dispatched by ScrollExpandMedia
+    setHeroExpanded(!isHome);
+  }, [isHome]);
+
+  useEffect(() => {
+    // Only the homepage hero drives expansion; ignore the event elsewhere.
+    if (!isHome) return;
     const onHeroExpanded = (e: Event) => {
       const detail = (e as CustomEvent<{ expanded: boolean }>).detail;
       setHeroExpanded(detail.expanded);
@@ -47,7 +58,7 @@ export function Header() {
 
     window.addEventListener("heroExpanded", onHeroExpanded);
     return () => window.removeEventListener("heroExpanded", onHeroExpanded);
-  }, []);
+  }, [isHome]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,7 +89,11 @@ export function Header() {
             transition: "background-color 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease",
           }}
         >
-          <div className="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
+          {/* Top scrim — keeps white nav legible over light hero media */}
+          {atTop && (
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
+          )}
+          <div className="container relative z-10 mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
             {/* Logo */}
             <Link
               href="/"

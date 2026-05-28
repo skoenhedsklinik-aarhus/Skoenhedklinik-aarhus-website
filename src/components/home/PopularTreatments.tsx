@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Database } from "@/types/supabase";
+import { getServiceThumbnail } from "@/lib/services-fallback";
 
 type Service = Database["public"]["Tables"]["services"]["Row"];
 
@@ -72,7 +73,7 @@ export function PopularTreatments({ services }: PopularTreatmentsProps) {
                 {/* Image container */}
                 <div className="relative aspect-[3/4] w-full overflow-hidden">
                   <Image
-                    src={service.hero_image_url || "/placeholder.jpg"}
+                    src={getServiceThumbnail(service.slug, service.hero_image_url)}
                     alt={service.name}
                     fill
                     className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"

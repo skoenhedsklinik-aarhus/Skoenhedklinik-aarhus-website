@@ -110,7 +110,7 @@ const ScrollExpandMedia = ({
         if (newP >= 1) setMediaFullyExpanded(true);
       } else {
         // Phase 2: blur video + reveal content on top
-        const newR = Math.min(Math.max(revealProgress + we.deltaY * 0.0012, 0), 1);
+        const newR = Math.min(Math.max(revealProgress + we.deltaY * 0.01, 0), 1);
         setRevealProgress(newR);
 
         if (newR >= 1) setContentFullyRevealed(true);
@@ -140,7 +140,7 @@ const ScrollExpandMedia = ({
         setScrollProgress(newP);
         if (newP >= 1) setMediaFullyExpanded(true);
       } else {
-        const newR = Math.min(Math.max(revealProgress + dy * 0.007, 0), 1);
+        const newR = Math.min(Math.max(revealProgress + dy * 0.06, 0), 1);
         setRevealProgress(newR);
         if (newR >= 1) setContentFullyRevealed(true);
         if (newR <= 0 && dy < 0) {

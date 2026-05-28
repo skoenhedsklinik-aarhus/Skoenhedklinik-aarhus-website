@@ -23,6 +23,8 @@ export interface Database {
           meta_description: string | null
           benefits: Json
           faq: Json
+          pre_instructions: Json
+          post_instructions: Json
           related_service_ids: string[]
           planway_service_id: string | null
           planway_staff_id: string | null

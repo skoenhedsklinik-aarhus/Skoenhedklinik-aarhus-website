@@ -34,7 +34,7 @@ export function ParallaxFloating() {
           >
             <div className="relative aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-sm shadow-2xl">
               <Image
-                src="/images/sugaring.avif"
+                src="/images/services/sugaring-2.avif"
                 alt="Sugaring behandling hos Skønhedsklinik Aarhus"
                 fill
                 className="object-cover"

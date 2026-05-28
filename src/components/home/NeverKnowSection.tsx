@@ -13,16 +13,16 @@ export function NeverKnowSection() {
     offset: ["start end", "end start"],
   });
 
-  // True parallax — each image moves at a different rate
-  const leftImageY = useTransform(scrollYProgress, [0, 1], ["12%", "-12%"]);
-  const rightImageY = useTransform(scrollYProgress, [0, 1], ["18%", "-8%"]);
-  const textY = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
+  // True parallax — gentle drift so images stay grouped with the text
+  const leftImageY = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
+  const rightImageY = useTransform(scrollYProgress, [0, 1], ["8%", "-4%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["3%", "-3%"]);
   const bgGlow = useTransform(scrollYProgress, [0, 0.5, 1], [0.05, 0.25, 0.1]);
 
   return (
     <section
       ref={ref}
-      className="section-dark relative py-32 lg:py-48 overflow-hidden"
+      className="section-dark relative py-20 lg:py-28 overflow-hidden"
     >
       {/* Animated cognac glow blob */}
       <motion.div
@@ -54,7 +54,7 @@ export function NeverKnowSection() {
             transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 mb-12 lg:mb-0"
           >
-            <div className="relative aspect-[3/4] w-full max-w-[420px] overflow-hidden rounded-sm shadow-2xl">
+            <div className="relative aspect-[4/5] w-full max-w-[360px] overflow-hidden rounded-sm shadow-2xl">
               <Image
                 src="/images/ansigtsbehandling.avif"
                 alt="Naturlig glød efter ansigtsbehandling"
@@ -68,7 +68,7 @@ export function NeverKnowSection() {
           {/* Center text */}
           <motion.div
             style={{ y: textY }}
-            className="lg:col-span-4 lg:col-start-5 lg:px-6 flex flex-col justify-center"
+            className="lg:col-span-4 lg:col-start-6 lg:px-6 flex flex-col justify-center"
           >
             <motion.div
               initial={{ opacity: 0, y: 36 }}
@@ -107,7 +107,7 @@ export function NeverKnowSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.28 }}
-            className="hidden lg:block lg:col-span-3 lg:col-start-10 self-end"
+            className="hidden lg:block lg:col-span-3 lg:col-start-10"
           >
             <div className="relative aspect-[3/4] w-full max-w-[230px] ml-auto overflow-hidden rounded-sm shadow-2xl">
               <Image
