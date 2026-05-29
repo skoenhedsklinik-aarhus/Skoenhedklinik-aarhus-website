@@ -28,7 +28,7 @@ export function localBusinessSchema(options?: {
     logo: `${SITE_URL}/images/logo.png`,
     image: `${SITE_URL}/images/og-default.jpg`,
     description:
-      "Certificeret skønhedsklinik i Aarhus C. Specialister i permanent hårfjerning, laser, ansigtsbehandlinger, sugaring og meget mere. Registreret hos Styrelsen for Patientsikkerhed.",
+      "Certificeret skønhedsklinik i Aarhus C. Specialister i laser hårfjerning, laser, ansigtsbehandlinger, sugaring og meget mere. Registreret hos Styrelsen for Patientsikkerhed.",
     telephone: "+4561445999",
     email: "info@skoenhedsklinik-aarhus.dk",
     address: CLINIC_ADDRESS,

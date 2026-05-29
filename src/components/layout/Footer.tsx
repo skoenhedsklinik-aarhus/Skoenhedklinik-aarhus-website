@@ -20,7 +20,7 @@ export function Footer() {
           <div>
             <h4 className="font-medium mb-6 tracking-wide uppercase text-sm">Behandlinger</h4>
             <ul className="space-y-3 text-cream/80">
-              <li><Link href="/behandlinger/permanent-haarfjerning" className="hover:text-cream transition-colors">Permanent hårfjerning</Link></li>
+              <li><Link href="/behandlinger/laser-haarfjerning" className="hover:text-cream transition-colors">Laser hårfjerning</Link></li>
               <li><Link href="/behandlinger/tattoo-fjernelse" className="hover:text-cream transition-colors">Tattoo fjernelse</Link></li>
               <li><Link href="/behandlinger/ansigtsbehandling" className="hover:text-cream transition-colors">Ansigtsbehandling</Link></li>
               <li><Link href="/behandlinger/sugaring" className="hover:text-cream transition-colors">Sugaring</Link></li>

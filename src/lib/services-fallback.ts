@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const skeletonServices: Record<string, any> = {
-  "permanent-haarfjerning": { name: "Permanent hårfjerning", slug: "permanent-haarfjerning", category: "laser", short_description: "Effektiv og skånsom permanent hårfjerning med avanceret diode-laser.", hero_image_url: "/placeholder.jpg", requires_consultation: true, is_popular: true, is_active: true },
+  "laser-haarfjerning": { name: "Laser hårfjerning", slug: "laser-haarfjerning", category: "laser", short_description: "Effektiv og skånsom laser hårfjerning med avanceret diode-laser.", hero_image_url: "/placeholder.jpg", requires_consultation: true, is_popular: true, is_active: true },
   "tattoo-fjernelse": { name: "Tattoo-fjernelse", slug: "tattoo-fjernelse", category: "laser", short_description: "Professionel fjernelse af uønskede tatoveringer med Pico Laser-teknologi.", hero_image_url: "/placeholder.jpg", requires_consultation: true, is_popular: true, is_active: true },
   "ansigtsbehandling": { name: "Ansigtsbehandling", slug: "ansigtsbehandling", category: "hudpleje", short_description: "Skræddersyede ansigtsbehandlinger for alle hudtyper – opnå en sund og strålende hud.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: true, is_active: true },
   "sugaring": { name: "Sugaring hårfjerning", slug: "sugaring", category: "haarfjerning", short_description: "Naturlig og skånsom hårfjerning med sukker. Glat hud i 4–6 uger.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: true, is_active: true },
@@ -50,8 +50,9 @@ const galleryMap: Record<string, string[]> = {
     "/images/services/bryn-og-vipper-lashlift.avif",
   ],
   "mix-sugaring-og-wax": ["/images/services/mix-sugaring-og-wax-2.avif"],
-  "permanent-haarfjerning": ["/images/services/permanent-haarfjerning-2.avif"],
+  "laser-haarfjerning": ["/images/services/laser-haarfjerning-2.avif"],
   "sugaring": ["/images/services/sugaring-2.avif"],
+  "tattoo-fjernelse": ["/images/services/tattoo-fjernelse-2.avif"],
   "tandblegning": ["/images/services/tandblegning-hero-live.jpg"],
   "threading": ["/images/services/threading-2.avif"],
   "wax-behandling": ["/images/services/wax-behandling-2.avif"],
@@ -64,7 +65,7 @@ const galleryMap: Record<string, string[]> = {
 const heroVideoMap: Record<string, string> = {
   "threading": "/videos/services/threading.mp4",
   "ansigtsbehandling": "/videos/services/ansigtsbehandling.mp4",
-  "permanent-haarfjerning": "/videos/services/permanent-haarfjerning.mp4",
+  "laser-haarfjerning": "/videos/services/laser-haarfjerning.mp4",
   "sugaring": "/videos/services/sugaring.mp4",
   "bryn-og-vipper": "/videos/services/bryn-og-vipper.mp4",
   "mix-sugaring-og-wax": "/videos/services/mix-sugaring-og-wax.mp4",
@@ -97,9 +98,9 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
   if (!s.hero_video_url) s.hero_video_url = heroVideoMap[slug] || null;
 
   switch (slug) {
-    case "permanent-haarfjerning":
+    case "laser-haarfjerning":
       if (!s.long_description || s.long_description.length < 200) {
-        s.long_description = `<p>Diode-laser er den mest effektive metode til permanent reduktion af uønsket hårvækst. Laseren målretter pigmentet i hårsækken og ødelægger den ved roden, så hårene enten stopper med at vokse eller bliver markant finere og svagere over tid.</p><p>Behandlingen er skånsom, hurtig og velegnet til de fleste hudtyper. Diode-laseren har indbygget køling, som gør den mere behagelig end mange andre hårfjerningsmetoder. Allerede efter få behandlinger vil du opleve en tydelig reduktion af hårvæksten.</p><p>Hvis du ønsker et langtidsresultat uden barbering, voks eller indgroede hår, er diode-laser den mest moderne og holdbare løsning.</p><h3>Glat hud uden irritation</h3><p>Permanent hårfjerning med diode-laser hjælper ikke kun med at fjerne uønsket hår – den reducerer også risikoen for irritation og indgroede hår markant.</p><p>Når hårsækken ødelægges, stopper den med at producere hår, der kan vokse skævt ind i huden. Det gør diode-laser særligt ideel til dig, der ofte oplever røde knopper, skægpest-lignende irritation eller indgroede hår efter barbering eller voksbehandlinger.</p><p>Behandlingen giver en mere ensartet, blød og glat hud med færre gener i hverdagen. Kontakt os for rådgivning, eller book en tid for at komme i gang.</p>`;
+        s.long_description = `<p>Diode-laser er den mest effektive metode til varig reduktion af uønsket hårvækst. Laseren målretter pigmentet i hårsækken og ødelægger den ved roden, så hårene enten stopper med at vokse eller bliver markant finere og svagere over tid.</p><p>Behandlingen er skånsom, hurtig og velegnet til de fleste hudtyper. Diode-laseren har indbygget køling, som gør den mere behagelig end mange andre hårfjerningsmetoder. Allerede efter få behandlinger vil du opleve en tydelig reduktion af hårvæksten.</p><p>Hvis du ønsker et langtidsresultat uden barbering, voks eller indgroede hår, er diode-laser den mest moderne og holdbare løsning.</p><h3>Glat hud uden irritation</h3><p>Laser hårfjerning med diode-laser hjælper ikke kun med at fjerne uønsket hår – den reducerer også risikoen for irritation og indgroede hår markant.</p><p>Når hårsækken ødelægges, stopper den med at producere hår, der kan vokse skævt ind i huden. Det gør diode-laser særligt ideel til dig, der ofte oplever røde knopper, skægpest-lignende irritation eller indgroede hår efter barbering eller voksbehandlinger.</p><p>Behandlingen giver en mere ensartet, blød og glat hud med færre gener i hverdagen. Kontakt os for rådgivning, eller book en tid for at komme i gang.</p>`;
       }
       if (s.benefits.length === 0) {
         s.benefits = [
@@ -111,8 +112,8 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
       if (s.faq.length === 0) {
         s.faq = [
           {
-            question: "Hvad er permanent hårfjerning med diode-laser?",
-            answer: "<p>Permanent hårfjerning med diode-laser er en avanceret og effektiv metode til at reducere uønsket hårvækst permanent. Laseren sender et præcist lysimpuls ned i hårsækken, hvor varmeenergien ødelægger hårroden, så den ikke kan producere hår igen.</p>"
+            question: "Hvad er laser hårfjerning med diode-laser?",
+            answer: "<p>Laser hårfjerning med diode-laser er en avanceret og effektiv metode til at reducere uønsket hårvækst markant. Laseren sender et præcist lysimpuls ned i hårsækken, hvor varmeenergien ødelægger hårroden, så den ikke kan producere hår igen.</p>"
           },
           {
             question: "Gør laserbehandlingen ondt?",
@@ -232,7 +233,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
 
     case "sugaring":
       if (!s.long_description || s.long_description.length < 200) {
-        s.long_description = `<p>Sugaring er en af de ældste, mest skånsomme og naturlige metoder til midlertidig hårfjerning. Behandlingen udføres med en 100% naturlig sukkerpasta lavet udelukkende af sukker, vand og citronsaft. Sukkerpastaen påføres mod hårretningen og trækkes lynhurtigt af i hårets naturlige vækstretning. Dette reducerer smerten markant og minimerer risikoen for knækkede hår.</p><p>Da massen kun klæber sig til hårene og ikke til de levende hudceller, er sugaring ekstremt skånsomt og velegnet til selv de mest følsomme områder, herunder intim hårfjerning (Intim Sugaring / Brazilian) for både mænd og kvinder.</p><h3>Silkeblød hud i ugevis</h3><p>Når hårene fjernes helt fra roden med sugaring, tager det markant længere tid for dem at vokse ud igen sammenlignet med barbering. Du kan nyde glat hud i 4–6 uger.</p><p>Over tid vil du desuden opleve, at de nye hår vokser ud meget blødere, finere og svagere, og mange oplever, at hårvæksten reduceres permanent over et regelmæssigt forløb. Desuden reduceres forekomsten af indgroede hår markant, da hårene ikke knækker under huden.</p>`;
+        s.long_description = `<p>Sugaring er en af de ældste, mest skånsomme og naturlige metoder til midlertidig hårfjerning. Behandlingen udføres med en 100% naturlig sukkerpasta lavet udelukkende af sukker, vand og citronsaft. Sukkerpastaen påføres mod hårretningen og trækkes lynhurtigt af i hårets naturlige vækstretning. Dette reducerer smerten markant og minimerer risikoen for knækkede hår.</p><p>Da massen kun klæber sig til hårene og ikke til de levende hudceller, er sugaring ekstremt skånsomt og velegnet til selv de mest følsomme områder, herunder intim hårfjerning (Intim Sugaring / Brazilian) for både mænd og kvinder.</p><h3>Silkeblød hud i ugevis</h3><p>Når hårene fjernes helt fra roden med sugaring, tager det markant længere tid for dem at vokse ud igen sammenlignet med barbering. Du kan nyde glat hud i 4–6 uger.</p><p>Over tid vil du desuden opleve, at de nye hår vokser ud meget blødere, finere og svagere, og mange oplever, at hårvæksten reduceres mærkbart over et regelmæssigt forløb. Desuden reduceres forekomsten af indgroede hår markant, da hårene ikke knækker under huden.</p>`;
       }
       if (s.benefits.length === 0) {
         s.benefits = [

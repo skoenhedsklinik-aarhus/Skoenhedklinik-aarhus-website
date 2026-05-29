@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     template: "%s | Skønhedsklinik Aarhus",
   },
   description:
-    "Certificeret skønhedsklinik i Aarhus C. Specialister i permanent hårfjerning (laser), ansigtsbehandlinger, sugaring, tandblegning og meget mere. Registreret hos Styrelsen for Patientsikkerhed.",
+    "Certificeret skønhedsklinik i Aarhus C. Specialister i laser hårfjerning, ansigtsbehandlinger, sugaring, tandblegning og meget mere. Registreret hos Styrelsen for Patientsikkerhed.",
   keywords: [
     "skønhedsklinik aarhus",
-    "permanent hårfjerning aarhus",
+    "laser hårfjerning aarhus",
     "laser hårfjerning aarhus",
     "ansigtsbehandling aarhus",
     "sugaring aarhus",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     siteName: "Skønhedsklinik Aarhus",
     title: "Skønhedsklinik Aarhus — Professionel skønhedsbehandling",
     description:
-      "Certificeret skønhedsklinik i Aarhus C. Specialister i permanent hårfjerning, ansigtsbehandlinger og meget mere.",
+      "Certificeret skønhedsklinik i Aarhus C. Specialister i laser hårfjerning, ansigtsbehandlinger og meget mere.",
     images: [
       {
         url: "/images/og-default.jpg",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Skønhedsklinik Aarhus",
     description:
-      "Certificeret skønhedsklinik i Aarhus C. Specialister i permanent hårfjerning og ansigtsbehandlinger.",
+      "Certificeret skønhedsklinik i Aarhus C. Specialister i laser hårfjerning og ansigtsbehandlinger.",
     images: ["/images/og-default.jpg"],
   },
   alternates: {

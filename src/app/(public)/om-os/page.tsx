@@ -47,7 +47,7 @@ const PROFILES = [
     bio: [
       "Jeg hedder Aliaa, og jeg kommer oprindeligt fra København. I 2010 blev jeg færdiguddannet fra NEXT/Cph West som kosmetiker – en uddannelse der gav mig et solidt fundament inden for både skønhed, hudpleje og æstetik. Siden da har jeg arbejdet i flere anerkendte klinikker i København, hvor jeg har oparbejdet stor erfaring inden for hudpleje, kropsbehandlinger og professionelle produkter. Med tiden udviklede jeg en særlig passion for huden, og i dag er jeg specialiseret i hudterapi og resultatorienteret pleje.",
       "Af kærlighedens vej flyttede jeg til Aarhus og startede et helt nyt kapitel i mit liv i denne smukke og varme by. Her grundlagde jeg min egen klinik, hvor jeg hver dag får lov til at arbejde med det, jeg elsker: at hjælpe mennesker med at føle sig smukke, selvsikre og godt tilpas i deres egen hud.",
-      "Hos Skønhedsklinik Aarhus tilbyder jeg ansigtsbehandlinger, sugaring og voks, permanent hårfjerning, tandblegning og meget mere. Jeg vælger altid behandlinger med omtanke og arbejder professionelt, trygt og omsorgsfuldt, så hver kunde får den bedste oplevelse.",
+      "Hos Skønhedsklinik Aarhus tilbyder jeg ansigtsbehandlinger, sugaring og voks, laser hårfjerning, tandblegning og meget mere. Jeg vælger altid behandlinger med omtanke og arbejder professionelt, trygt og omsorgsfuldt, så hver kunde får den bedste oplevelse.",
       "Som person er jeg nærværende, kærlig og imødekommende. For mig er skønhed ikke kun behandlinger – det er også følelsen af at blive set, hørt og mødt med varme. Min dør er åben for alle, og jeg ønsker, at alle der træder ind hos mig føler sig velkomne, trygge og værdsatte.",
     ],
   },

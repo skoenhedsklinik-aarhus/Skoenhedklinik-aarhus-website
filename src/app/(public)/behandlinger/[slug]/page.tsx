@@ -197,7 +197,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
                   <span className="eyebrow text-cognac text-[10px] tracking-wider mb-2 block uppercase font-medium">Lovpligtig forundersøgelse</span>
                   <h4 className="font-heading text-2xl text-textPrimary font-light mb-4">Konsultation v/ Louise</h4>
                   <p className="text-textBody text-sm leading-relaxed mb-5 font-light">
-                    Hos Skønhedsklinik Aarhus tilbyder vi en gratis og helt uforpligtende konsultation, før du kan starte et forløb med permanent hårfjerning. Konsultationen er et lovpligtigt krav og en vigtig del af processen, så vi sikrer, at behandlingen er den rette for dig.
+                    Hos Skønhedsklinik Aarhus tilbyder vi en gratis og helt uforpligtende konsultation, før du kan starte et forløb med laser hårfjerning. Konsultationen er et lovpligtigt krav og en vigtig del af processen, så vi sikrer, at behandlingen er den rette for dig.
                   </p>
                   <p className="text-textBody text-sm leading-relaxed mb-6 font-light">
                     Vores erfarne sygeplejerske Louise, som har mange års erfaring inden for laser- og skønhedsbehandlinger, gennemgår hele forløbet med dig. Sammen taler I om dine ønsker, vurderer din hud- og hårtype for at lægge den mest præcise og sikre behandlingsplan. Du får også mulighed for at få prøvet laseren på et lille område, så du kan mærke behandlingen inden start.

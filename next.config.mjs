@@ -33,6 +33,17 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        // Slug renamed: "permanent hårfjerning" → "laser hårfjerning".
+        // Preserve existing links / search rankings with a permanent 301.
+        source: "/behandlinger/permanent-haarfjerning",
+        destination: "/behandlinger/laser-haarfjerning",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     // Explicitly allow AVIF — our local assets are in this format
     formats: ["image/avif", "image/webp"],

@@ -19,7 +19,7 @@ import { Menu, ChevronDown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TREATMENTS = [
-  { name: "Permanent hårfjerning", slug: "permanent-haarfjerning" },
+  { name: "Laser hårfjerning", slug: "laser-haarfjerning" },
   { name: "Tattoo fjernelse", slug: "tattoo-fjernelse" },
   { name: "Ansigtsbehandling", slug: "ansigtsbehandling" },
   { name: "Sugaring hårfjerning", slug: "sugaring" },

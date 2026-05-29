@@ -79,7 +79,7 @@ export function PopularTreatments({ services }: PopularTreatmentsProps) {
                     className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
                   />
 
-                  {/* Permanent dark gradient at bottom */}
+                  {/* Dark gradient at bottom */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                   {/* Hover overlay — glassmorphism strip */}

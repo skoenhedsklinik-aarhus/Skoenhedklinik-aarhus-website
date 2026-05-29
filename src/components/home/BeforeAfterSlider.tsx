@@ -62,7 +62,7 @@ export function BeforeAfterSlider() {
               <div className="absolute inset-0">
                 <Image
                   src="/images/before-after-2.avif"
-                  alt="Efter permanent hårfjerning"
+                  alt="Efter laser hårfjerning"
                   fill
                   className="object-cover"
                   draggable={false}
@@ -77,7 +77,7 @@ export function BeforeAfterSlider() {
                 <div className="absolute inset-0" style={{ width: `${10000 / position}%` }}>
                   <Image
                     src="/images/before-after-1.avif"
-                    alt="Før permanent hårfjerning"
+                    alt="Før laser hårfjerning"
                     fill
                     className="object-cover"
                     draggable={false}
@@ -133,7 +133,7 @@ export function BeforeAfterSlider() {
             </h2>
             <div className="w-10 h-px bg-cognac mb-7" />
             <p className="text-textBody text-base md:text-lg leading-relaxed mb-4">
-              Permanent hårfjerning med laser giver langvarige resultater, som ses allerede fra første behandling. Vores certificerede behandlere tilpasser hvert forløb til din hud og behov.
+              Laser hårfjerning med laser giver langvarige resultater, som ses allerede fra første behandling. Vores certificerede behandlere tilpasser hvert forløb til din hud og behov.
             </p>
             <p className="text-textBody text-base leading-relaxed mb-10">
               Billederne er fra en af vores klienters behandlingsforløb — optaget i vores klinik i Aarhus C.
@@ -158,7 +158,7 @@ export function BeforeAfterSlider() {
             </div>
 
             <Link
-              href="/behandlinger/permanent-haarfjerning"
+              href="/behandlinger/laser-haarfjerning"
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors group"
             >
               Læs om behandlingen

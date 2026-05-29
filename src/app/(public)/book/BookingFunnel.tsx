@@ -9,7 +9,7 @@ import { Check, Phone, MapPin, ChevronLeft } from "lucide-react";
 const PLANWAY_BASE = "https://skonhedsklinik-aarhus.planway.com/";
 
 const SERVICES = [
-  { name: "Permanent hårfjerning", slug: "permanent-haarfjerning", emoji: "✨" },
+  { name: "Laser hårfjerning", slug: "laser-haarfjerning", emoji: "✨" },
   { name: "Tattoo fjernelse", slug: "tattoo-fjernelse", emoji: "🖤" },
   { name: "Ansigtsbehandling", slug: "ansigtsbehandling", emoji: "🌿" },
   { name: "Sugaring hårfjerning", slug: "sugaring", emoji: "🍯" },

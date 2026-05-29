@@ -34,7 +34,7 @@ export default function TermsPage() {
 
           <h2>2. Lovpligtig forundersøgelse</h2>
           <p>
-            Nogle behandlinger (bl.a. permanent hårfjerning og tatoveringsfjernelse med laser) kræver ifølge Styrelsen for Patientsikkerhed en lovpligtig forundersøgelse hos vores læge eller sygeplejerske mindst 48 timer før selve behandlingen må finde sted. Forundersøgelsen er gratis og uforpligtende.
+            Nogle behandlinger (bl.a. laser hårfjerning og tatoveringsfjernelse med laser) kræver ifølge Styrelsen for Patientsikkerhed en lovpligtig forundersøgelse hos vores læge eller sygeplejerske mindst 48 timer før selve behandlingen må finde sted. Forundersøgelsen er gratis og uforpligtende.
           </p>
 
           <h2>3. Priser og betaling</h2>

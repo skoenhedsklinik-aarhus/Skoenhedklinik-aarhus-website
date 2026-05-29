@@ -8,7 +8,7 @@ const MOCK_REVIEWS = [
     name: "Sofie M.",
     rating: 5,
     text: "Utrolig professionel behandling. Aliaa er super dygtig og gav mig en grundig vejledning inden behandlingen. Kan varmt anbefales!",
-    service: "Permanent hårfjerning",
+    service: "Laser hårfjerning",
     timeAgo: "2 uger siden",
   },
   {

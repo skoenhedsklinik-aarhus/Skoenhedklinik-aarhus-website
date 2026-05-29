@@ -62,7 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${SITE_URL}/behandlinger/${service.slug}`,
     lastModified: service.updated_at ? new Date(service.updated_at) : new Date(),
     changeFrequency: "monthly" as const,
-    priority: service.slug === "permanent-haarfjerning" ? 0.95 : 0.85,
+    priority: service.slug === "laser-haarfjerning" ? 0.95 : 0.85,
   }));
 
   return [...staticRoutes, ...serviceRoutes];
