@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BookingIframe } from "./BookingIframe";
+import { getServices } from "@/lib/supabase-queries";
+import type { BookableService } from "@/lib/booking";
 
 export const metadata: Metadata = {
   title: "Book din tid — Skønhedsklinik Aarhus",
@@ -8,7 +10,20 @@ export const metadata: Metadata = {
     "Book din tid hos Skønhedsklinik Aarhus. Vælg behandling, dato og tidspunkt direkte online — nemt og hurtigt.",
 };
 
-export default function BookPage() {
+export default async function BookPage() {
+  // Map active services by slug so the embed can resolve ?service=<slug> from
+  // deep links (e.g. /book?service=laser-haarfjerning) to a Planway service id.
+  const services = await getServices();
+  const serviceMap: Record<string, BookableService> = {};
+  for (const s of services) {
+    if (!s?.slug) continue;
+    serviceMap[s.slug] = {
+      slug: s.slug,
+      name: s.name ?? s.slug,
+      planwayServiceId: s.planway_service_id ?? null,
+    };
+  }
+
   return (
     <main className="bg-cream min-h-screen">
       {/* Hero */}
@@ -28,7 +43,7 @@ export default function BookPage() {
       {/* Embed */}
       <section className="w-full max-w-[1500px] mx-auto px-3 sm:px-6 lg:px-8 pb-24">
         <Suspense fallback={null}>
-          <BookingIframe />
+          <BookingIframe serviceMap={serviceMap} />
         </Suspense>
       </section>
     </main>

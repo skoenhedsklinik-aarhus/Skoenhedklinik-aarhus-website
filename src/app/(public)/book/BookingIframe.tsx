@@ -2,23 +2,39 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Check } from "lucide-react";
+import { buildPlanwayUrl, type BookableService } from "@/lib/booking";
 
-export function BookingIframe() {
+export function BookingIframe({
+  serviceMap,
+}: {
+  serviceMap: Record<string, BookableService>;
+}) {
   const searchParams = useSearchParams();
   const serviceSlug = searchParams.get("service");
   const [loaded, setLoaded] = useState(false);
 
-  // Base Planway URL
-  let iframeUrl = "https://skonhedsklinik-aarhus.planway.com/";
-
-  // Deep link if a service slug is in the URL (Planway_service_id mapping TBD)
-  if (serviceSlug) {
-    iframeUrl += `?d=${serviceSlug}`;
-  }
+  // Resolve the deep-linked service (if any) and build the Planway URL centrally.
+  // Note: Planway's widget doesn't currently read the param, so this deep-links
+  // forward-compatibly while we surface the choice in-page below. See lib/booking.ts.
+  const selected = serviceSlug ? serviceMap[serviceSlug] : undefined;
+  const iframeUrl = buildPlanwayUrl(selected?.planwayServiceId);
 
   return (
     <div className="w-full">
+      {selected && (
+        <div className="mb-5 flex items-center gap-3 rounded-2xl border border-cognac/30 bg-cognac/5 px-5 py-4">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cognac">
+            <Check className="h-3.5 w-3.5 text-white" />
+          </span>
+          <p className="text-sm text-textBody">
+            Du booker:{" "}
+            <span className="font-medium text-textPrimary">{selected.name}</span>
+            {" — "}vælg behandlingen i kalenderen nedenfor.
+          </p>
+        </div>
+      )}
+
       <div className="relative w-full bg-white rounded-3xl border border-sand/70 overflow-hidden min-h-[900px]">
         {!loaded && (
           <div className="absolute inset-0 flex items-center justify-center">
