@@ -29,11 +29,11 @@ const AREAS: Area[] = [
     id: "haar",
     label: "Uønsket hår",
     emoji: "🪶",
-    desc: "Permanent eller skånsom hårfjerning",
+    desc: "Effektiv eller skånsom hårfjerning",
     question: {
       prompt: "Hvad er vigtigst for dig?",
       options: [
-        { label: "Et permanent resultat", value: "permanent" },
+        { label: "Et varigt resultat", value: "varig" },
         { label: "Skånsomt og naturligt", value: "skaansom" },
         { label: "Små områder i ansigtet", value: "ansigt" },
         { label: "Hurtigt på større områder", value: "krop" },
@@ -41,7 +41,7 @@ const AREAS: Area[] = [
     },
     resolve: (a) =>
       ({
-        permanent: "laser-haarfjerning",
+        varig: "laser-haarfjerning",
         skaansom: "sugaring",
         ansigt: "threading",
         krop: "wax-behandling",
@@ -90,7 +90,7 @@ const TREATMENTS: Record<string, { name: string; emoji: string; blurb: string }>
   "laser-haarfjerning": {
     name: "Laser hårfjerning",
     emoji: "✨",
-    blurb: "Permanent reduktion af uønsket hår med skånsom laserteknologi.",
+    blurb: "Varig reduktion af uønsket hår med skånsom laserteknologi.",
   },
   sugaring: {
     name: "Sugaring",
