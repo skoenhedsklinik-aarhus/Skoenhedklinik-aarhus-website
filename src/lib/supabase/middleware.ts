@@ -9,9 +9,26 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // If Supabase isn't configured, never 500 the whole site. Let public routes
+  // through and fail closed on protected /admin routes by sending to login.
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (
+      request.nextUrl.pathname.startsWith("/admin") &&
+      request.nextUrl.pathname !== "/admin/login"
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         get(name: string) {
@@ -56,9 +73,14 @@ export async function updateSession(request: NextRequest) {
   );
 
   // refreshing the auth token
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  } catch {
+    // Treat auth errors as "not logged in" rather than crashing middleware.
+    user = null;
+  }
 
   // Admin route protection
   if (request.nextUrl.pathname.startsWith("/admin")) {
