@@ -56,8 +56,8 @@ export function NeverKnowSection() {
           >
             <div className="relative aspect-[4/5] w-full max-w-[360px] overflow-hidden rounded-sm shadow-2xl">
               <Image
-                src="/images/ansigtsbehandling.avif"
-                alt="Naturlig glød efter ansigtsbehandling"
+                src="/images/home-glow.avif"
+                alt="Strålende, glødende hud efter behandling"
                 fill
                 className="object-cover"
               />

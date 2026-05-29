@@ -31,6 +31,17 @@ const nextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        // Hero videos rarely change — cache aggressively so repeat visits
+        // play from cache instead of re-downloading the file.
+        source: "/videos/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, stale-while-revalidate=86400",
+          },
+        ],
+      },
     ];
   },
   async redirects() {

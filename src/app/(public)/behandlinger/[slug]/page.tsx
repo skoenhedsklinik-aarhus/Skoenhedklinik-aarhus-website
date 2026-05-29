@@ -105,7 +105,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
 
       {/* ─── 1. Parallax Hero ──────────────────────────────────────── */}
       <section className="relative w-full h-[70vh] min-h-[500px] flex items-end overflow-hidden">
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 bg-textPrimary">
           {s.hero_video_url ? (
             <video
               className="h-full w-full object-cover"
@@ -113,7 +113,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
               muted
               loop
               playsInline
-              poster={service.hero_image_url || undefined}
+              preload="auto"
             >
               <source src={s.hero_video_url} type="video/mp4" />
             </video>
