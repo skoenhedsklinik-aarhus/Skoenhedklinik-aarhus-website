@@ -61,7 +61,7 @@ export function BeforeAfterSlider() {
               {/* After (full image beneath) */}
               <div className="absolute inset-0">
                 <Image
-                  src="/images/before-after-2.avif"
+                  src="/images/laser-after.avif"
                   alt="Efter laser hårfjerning"
                   fill
                   className="object-cover"
@@ -76,7 +76,7 @@ export function BeforeAfterSlider() {
               >
                 <div className="absolute inset-0" style={{ width: `${10000 / position}%` }}>
                   <Image
-                    src="/images/before-after-1.avif"
+                    src="/images/laser-before.avif"
                     alt="Før laser hårfjerning"
                     fill
                     className="object-cover"
