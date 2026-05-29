@@ -44,12 +44,12 @@ export function BeforeAfterSlider() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="relative"
+            className="relative max-w-[420px] mx-auto lg:mx-0"
           >
             {/* Slider container */}
             <div
               ref={containerRef}
-              className="relative aspect-[4/5] w-full overflow-hidden rounded-sm cursor-ew-resize select-none shadow-2xl"
+              className="relative aspect-[9/10] w-full overflow-hidden rounded-sm cursor-ew-resize select-none shadow-2xl"
               onMouseDown={() => setIsDragging(true)}
               onMouseUp={() => setIsDragging(false)}
               onMouseLeave={() => setIsDragging(false)}
