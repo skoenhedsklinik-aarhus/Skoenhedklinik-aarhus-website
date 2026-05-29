@@ -29,7 +29,7 @@ const AREAS: Area[] = [
     id: "haar",
     label: "Uønsket hår",
     emoji: "🪶",
-    desc: "Effektiv eller skånsom hårfjerning",
+    desc: "Laser- eller skånsom hårfjerning",
     question: {
       prompt: "Hvad er vigtigst for dig?",
       options: [
