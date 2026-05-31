@@ -77,6 +77,9 @@ const ScrollExpandMedia = ({
   const [revealProgress, setRevealProgress] = useState(0);   // 0→1: content reveals on top
   const [mediaFullyExpanded, setMediaFullyExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  // Viewport size — used to compute the expanded scale so the media never
+  // overflows. SSR-safe defaults; corrected on mount/resize.
+  const [viewport, setViewport] = useState({ w: 1440, h: 900 });
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
@@ -96,10 +99,13 @@ const ScrollExpandMedia = ({
   }, [mediaFullyExpanded]);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const onResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setViewport({ w: window.innerWidth, h: window.innerHeight });
+    };
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   useEffect(() => {
@@ -179,10 +185,20 @@ const ScrollExpandMedia = ({
   }, []);
 
   // ── Sizing (landscape start) ──────────────────────────────────────────────
+  // The media keeps a FIXED layout box (startW × startH) and only the CSS
+  // transform changes while scrolling, so the expansion is GPU-composited —
+  // no per-frame layout, shadow repaint or rounded-corner re-clip.
   const startW = isMobile ? 340 : 640;
   const startH = isMobile ? 210 : 380;
-  const mediaWidth  = startW + scrollProgress * (isMobile ? 560 : 1240);
-  const mediaHeight = startH + scrollProgress * (isMobile ? 280 : 430);
+  // Final (expanded) size — matches the previous width/height animation, capped
+  // to the viewport so the media never overflows.
+  const targetW = Math.min(startW + (isMobile ? 560 : 1240), viewport.w * 0.95);
+  const targetH = Math.min(startH + (isMobile ? 280 : 430), viewport.h * 0.88);
+  // Render at the FINAL size and scale DOWN at the start. At full expansion
+  // scale === 1, so the video is pixel-crisp (no upscaling blur), and the whole
+  // expansion is one GPU-composited transform — no per-frame layout/repaint.
+  const startScale = Math.min(startW / targetW, startH / targetH);
+  const mediaScale = startScale + scrollProgress * (1 - startScale);
 
   const textTranslateX = scrollProgress * (isMobile ? 180 : 150);
   const blurPx = revealProgress * 18;
@@ -226,13 +242,14 @@ const ScrollExpandMedia = ({
 
           {/* Video / Image */}
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl overflow-hidden"
+            className="absolute top-1/2 left-1/2 rounded-2xl overflow-hidden"
             style={{
-              width: `${mediaWidth}px`,
-              height: `${mediaHeight}px`,
-              maxWidth: '95vw',
-              maxHeight: '88vh',
+              width: `${targetW}px`,
+              height: `${targetH}px`,
+              transform: `translate(-50%, -50%) scale(${mediaScale})`,
+              transformOrigin: 'center center',
               boxShadow: '0 0 60px rgba(0,0,0,0.4)',
+              willChange: 'transform',
             }}
           >
             {mediaType === 'video' ? (
