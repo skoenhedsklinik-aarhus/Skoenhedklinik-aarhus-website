@@ -82,19 +82,22 @@ const ScrollExpandMedia = ({
   // resize). SSR-safe defaults; corrected on mount/resize.
   const [viewport, setViewport] = useState({ w: 1440, h: 900 });
 
-  // Animation progress lives in refs, NOT React state. The wheel/touch
-  // listeners run once and we write styles DIRECTLY to the DOM each frame, so
-  // scrolling never triggers a React re-render. That keeps Chrome's main thread
-  // free while it is forced to process the (non-passive) wheel events — the
-  // cause of the Chrome-only jank.
-  const scrollProgressRef = useRef(0);
-  const revealProgressRef = useRef(0);
-  const mediaExpandedRef = useRef(false);
-  const contentRevealedRef = useRef(false);
-  const touchStartYRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
+  // The hero is driven by NATIVE scroll position (no wheel hijack / preventDefault),
+  // so Chrome can keep scrolling on the compositor thread — buttery in every
+  // browser. A tall runway (RUNWAY_VH) is scrolled through while the inner panel
+  // stays pinned (position: sticky); the scroll offset maps to the animation:
+  //   0 … EXPAND_END   → video expands
+  //   EXPAND_END … REVEAL_END → content reveals on top
+  //   REVEAL_END … 1   → hold on the final frame before the panel releases
+  const RUNWAY_VH = 240;
+  const EXPAND_END = 0.6;
+  const REVEAL_END = 0.88;
 
-  // DOM nodes mutated imperatively every frame.
+  const rafRef = useRef<number | null>(null);
+  const expandedRef = useRef(false);
+
+  // DOM nodes mutated imperatively as you scroll (no React render per frame).
+  const runwayRef = useRef<HTMLDivElement | null>(null);
   const mediaRef = useRef<HTMLDivElement | null>(null);
   const blurWrapRef = useRef<HTMLDivElement | null>(null);
   const bgFadeRef = useRef<HTMLDivElement | null>(null);
@@ -103,10 +106,16 @@ const ScrollExpandMedia = ({
   const titlesRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  // Write the current animation state straight to the DOM (no React render).
+  // Map current scroll position to the animation and write it straight to the DOM.
   const applyStyles = useCallback(() => {
-    const sp = scrollProgressRef.current;
-    const rp = revealProgressRef.current;
+    const runway = runwayRef.current;
+    if (!runway) return;
+
+    const total = runway.offsetHeight - window.innerHeight;
+    const scrolled = Math.min(Math.max(-runway.getBoundingClientRect().top, 0), Math.max(total, 1));
+    const progress = total > 0 ? scrolled / total : 0;
+    const sp = Math.min(Math.max(progress / EXPAND_END, 0), 1);
+    const rp = Math.min(Math.max((progress - EXPAND_END) / (REVEAL_END - EXPAND_END), 0), 1);
 
     const mobile = window.innerWidth < 768;
     const startW = mobile ? 340 : 640;
@@ -135,7 +144,14 @@ const ScrollExpandMedia = ({
       contentRef.current.style.opacity = `${rp}`;
       contentRef.current.style.pointerEvents = rp > 0.4 ? 'auto' : 'none';
     }
-  }, [mediaType]);
+
+    // Tell the Header to appear once the video is fully expanded.
+    const expanded = sp >= 1;
+    if (expanded !== expandedRef.current) {
+      expandedRef.current = expanded;
+      setMediaFullyExpanded(expanded);
+    }
+  }, [mediaType, EXPAND_END, REVEAL_END]);
 
   // Tell Header when to appear (after video fully expands)
   useEffect(() => {
@@ -167,59 +183,15 @@ const ScrollExpandMedia = ({
           applyStyles();
         });
     };
-
-    // Apply one input delta. `backwards` = an upward/back gesture (used to
-    // collapse phase 2 back into phase 1).
-    const advance = (deltaP: number, deltaR: number, backwards: boolean) => {
-      if (!mediaExpandedRef.current) {
-        // Phase 1: expand video
-        const newP = Math.min(Math.max(scrollProgressRef.current + deltaP, 0), 1);
-        scrollProgressRef.current = newP;
-        if (newP >= 1) { mediaExpandedRef.current = true; setMediaFullyExpanded(true); }
-      } else {
-        // Phase 2: blur video + reveal content on top
-        const newR = Math.min(Math.max(revealProgressRef.current + deltaR, 0), 1);
-        revealProgressRef.current = newR;
-        if (newR >= 1) contentRevealedRef.current = true;
-        // Scroll back collapses to phase 1
-        if (newR <= 0 && backwards) {
-          mediaExpandedRef.current = false;
-          setMediaFullyExpanded(false);
-          scrollProgressRef.current = 0.98;
-        }
-      }
-      schedule();
-    };
-
-    const onWheel = (e: WheelEvent) => {
-      // Content fully revealed — allow normal page scroll
-      if (contentRevealedRef.current) return;
-      e.preventDefault();
-      advance(e.deltaY * 0.0009, e.deltaY * 0.01, e.deltaY < 0);
-    };
-    const onTouchStart = (e: TouchEvent) => { touchStartYRef.current = e.touches[0].clientY; };
-    const onTouchMove = (e: TouchEvent) => {
-      if (contentRevealedRef.current || !touchStartYRef.current) return;
-      const dy = touchStartYRef.current - e.touches[0].clientY;
-      e.preventDefault();
-      advance(dy * 0.005, dy * 0.06, dy < 0);
-      touchStartYRef.current = e.touches[0].clientY;
-    };
-    const onTouchEnd = () => { touchStartYRef.current = 0; };
-    const onScroll = () => { if (!contentRevealedRef.current) window.scrollTo(0, 0); };
-
-    window.addEventListener('wheel', onWheel, { passive: false });
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('touchstart', onTouchStart, { passive: false });
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
-    window.addEventListener('touchend', onTouchEnd);
+    // PASSIVE listeners — never block scrolling, so Chrome stays on the
+    // compositor thread.
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    schedule();
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
     };
   }, [applyStyles]);
 
@@ -237,11 +209,12 @@ const ScrollExpandMedia = ({
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
 
   return (
-    <div className="overflow-x-hidden">
+    <div ref={runwayRef} className="relative" style={{ height: `${RUNWAY_VH}vh` }}>
       {/* Mini nav — visible only during expansion phase */}
       <MiniNav visible={!mediaFullyExpanded} />
 
-      <section className="relative flex items-center justify-center min-h-[100dvh] overflow-hidden">
+      {/* Pinned panel — stays put while the runway scrolls past it */}
+      <section className="sticky top-0 h-[100dvh] flex items-center justify-center overflow-hidden">
 
         {/* ── Visual layer — gets blurred in phase 2 ── */}
         <div ref={blurWrapRef} className="absolute inset-0" style={{ filter: 'none', willChange: 'auto' }}>
