@@ -53,6 +53,13 @@ const nextConfig = {
         destination: "/behandlinger/laser-haarfjerning",
         permanent: true,
       },
+      {
+        // BB Glow is no longer a standalone treatment — it's presented as part
+        // of Ansigtsbehandling. Redirect the old page to preserve links/SEO.
+        source: "/behandlinger/bb-glow",
+        destination: "/behandlinger/ansigtsbehandling",
+        permanent: true,
+      },
     ];
   },
   images: {

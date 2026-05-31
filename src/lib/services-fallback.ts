@@ -35,13 +35,15 @@ export function getSkeletonService(slug: string): any | null {
  */
 const galleryMap: Record<string, string[]> = {
   "ansigtsbehandling": [
+    // retinol (serum-dråbe-billedet) er hovedbilledet for ansigtsbehandling — det
+    // er gallery[0] og bruges som thumbnail på kort/forside + sekundært detaljebillede.
+    "/images/services/ansigtsbehandling-retinol.avif",
     "/images/services/ansigtsbehandling-clear-skin.avif",
     "/images/services/ansigtsbehandling-even-skin.avif",
     "/images/services/ansigtsbehandling-firm-smooth.avif",
-    "/images/services/ansigtsbehandling-glow.avif",
     "/images/services/ansigtsbehandling-hydra-boost.avif",
-    "/images/services/ansigtsbehandling-redness.avif",
-    "/images/services/ansigtsbehandling-retinol.avif",
+    // BB Glow is folded into Ansigtsbehandling — keep its imagery in the gallery.
+    "/images/services/bb-glow-2.avif",
   ],
   "bb-glow": ["/images/services/bb-glow-2.avif"],
   "bryn-og-vipper": [
@@ -192,7 +194,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
 
     case "ansigtsbehandling":
       if (!s.long_description || s.long_description.length < 200) {
-        s.long_description = `<p>Forkæl din hud med vores skræddersyede ansigtsbehandlinger hos Skønhedsklinik Aarhus. Vi tror på, at en sund hud er en smuk hud, og vi tilpasser altid vores ansigtsbehandlinger nøje efter din specifikke hudtype, tilstand og dine personlige mål. Hvad enten du kæmper med akne, tørhed, fine linjer eller blot ønsker at genfinde en sund, ungdommelig og levende glød, står vi klar til at hjælpe dig.</p><p>Vi anvender udelukkende klinisk dokumenterede hudplejeprodukter af højeste kvalitet, som nærer huden i dybden, genskaber balancen og efterlader huden synligt genopfrisket, blød og strålende.</p><h3>Professionel hudpleje tilpasset dig</h3><p>En professionel ansigtsbehandling er ikke kun ren selvforkælelse og afslapning – det er en målrettet investering i din huds langsigtede sundhed. Ved at fjerne døde hudceller, dybderense porerne og tilføre intensive serummer hjælper vi din hud med at regenerere hurtigere og beskytte sig bedre mod hverdagens påvirkninger.</p><p>Giv din hud den opmærksomhed, den fortjener. Vores dygtige kosmetologer guider dig også i den rette hjemmepleje for at bevare det smukke resultat.</p>`;
+        s.long_description = `<p>Forkæl din hud med vores skræddersyede ansigtsbehandlinger hos Skønhedsklinik Aarhus. Vi tror på, at en sund hud er en smuk hud, og vi tilpasser altid vores ansigtsbehandlinger nøje efter din specifikke hudtype, tilstand og dine personlige mål. Hvad enten du kæmper med akne, tørhed, fine linjer eller blot ønsker at genfinde en sund, ungdommelig og levende glød, står vi klar til at hjælpe dig.</p><p>Vi anvender udelukkende klinisk dokumenterede hudplejeprodukter af højeste kvalitet, som nærer huden i dybden, genskaber balancen og efterlader huden synligt genopfrisket, blød og strålende.</p><h3>Professionel hudpleje tilpasset dig</h3><p>En professionel ansigtsbehandling er ikke kun ren selvforkælelse og afslapning – det er en målrettet investering i din huds langsigtede sundhed. Ved at fjerne døde hudceller, dybderense porerne og tilføre intensive serummer hjælper vi din hud med at regenerere hurtigere og beskytte sig bedre mod hverdagens påvirkninger.</p><p>Giv din hud den opmærksomhed, den fortjener. Vores dygtige kosmetologer guider dig også i den rette hjemmepleje for at bevare det smukke resultat.</p><h3 style="margin-top:3.5rem">BB Glow – semi-permanent glød &amp; ensartet teint</h3><p>Som en del af vores ansigtsbehandlinger tilbyder vi også BB Glow – en af de mest populære hudforskønnende behandlinger. Behandlingen udføres med avanceret microneedling, hvor et specialudviklet meso-serum med naturlige farvepigmenter og intensive vitaminer sluses blidt ned i hudens øverste lag. Det giver huden en smuk, ensartet og langvarig 'BB-creme-effekt' med en naturlig glød.</p><p>Udover at give en jævn hudtone arbejder BB Glow på at reducere pigmentforandringer, solskader, fine linjer, mørke render under øjnene samt ar efter akne, mens huden boostes med fugt og kollagen indefra. Behandlingen er smertefri og kræver ingen restitutionstid – og du kan altid spørge din behandler, om BB Glow er det rette valg for netop din hud.</p>`;
       }
       if (s.benefits.length === 0) {
         s.benefits = [
@@ -210,6 +212,10 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
           {
             question: "Hvilken ansigtsbehandling skal jeg vælge?",
             answer: "<p>Du behøver ikke beslutte dig på forhånd! Vores erfarne behandler foretager altid en grundig hudanalyse ved starten af din tid og sammensætter den perfekte behandling til din hudtype og dine ønsker.</p>"
+          },
+          {
+            question: "Tilbyder I BB Glow?",
+            answer: "<p>Ja. BB Glow er en del af vores ansigtsbehandlinger. Med microneedling sluses et meso-serum med farvepigmenter og vitaminer ned i hudens øverste lag, så du får en ensartet teint og en naturlig glød. For et optimalt resultat anbefaler vi et kurforløb på 3–4 behandlinger med 2–3 ugers mellemrum. Spørg din behandler, om BB Glow passer til din hud.</p>"
           }
         ];
       }

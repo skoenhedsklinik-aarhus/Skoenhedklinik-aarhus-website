@@ -76,11 +76,19 @@ const ScrollExpandMedia = ({
   const [scrollProgress, setScrollProgress] = useState(0);   // 0→1: video expands
   const [revealProgress, setRevealProgress] = useState(0);   // 0→1: content reveals on top
   const [mediaFullyExpanded, setMediaFullyExpanded] = useState(false);
-  const [contentFullyRevealed, setContentFullyRevealed] = useState(false);
-  const [touchStartY, setTouchStartY] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
+
+  // Refs mirror the animation state so the wheel/touch listeners can be
+  // registered ONCE (instead of being torn down and re-added on every frame)
+  // and so we coalesce many input events into a single setState per frame.
+  const scrollProgressRef = useRef(0);
+  const revealProgressRef = useRef(0);
+  const mediaExpandedRef = useRef(false);
+  const contentRevealedRef = useRef(false);
+  const touchStartYRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
 
   // Tell Header when to appear (after video fully expands)
   useEffect(() => {
@@ -95,66 +103,64 @@ const ScrollExpandMedia = ({
   }, []);
 
   useEffect(() => {
-    const onWheel = (e: Event) => {
-      const we = e as unknown as WheelEvent;
+    // Flush the latest ref values into React state — scheduled at most once per
+    // animation frame, so a burst of high-frequency wheel/touch events produces
+    // a single re-render+relayout per frame instead of one per event.
+    const flush = () => {
+      rafRef.current = null;
+      setScrollProgress(scrollProgressRef.current);
+      setRevealProgress(revealProgressRef.current);
+    };
+    const schedule = () => {
+      if (rafRef.current === null) rafRef.current = requestAnimationFrame(flush);
+    };
 
-      // Phase 3: content fully revealed — allow normal page scroll
-      if (contentFullyRevealed) return;
-
-      we.preventDefault();
-
-      if (!mediaFullyExpanded) {
+    // Apply one input delta to the animation. `backwards` = the gesture was an
+    // upward/back movement (used to collapse phase 2 back into phase 1).
+    const advance = (deltaP: number, deltaR: number, backwards: boolean) => {
+      if (!mediaExpandedRef.current) {
         // Phase 1: expand video
-        const newP = Math.min(Math.max(scrollProgress + we.deltaY * 0.0009, 0), 1);
-        setScrollProgress(newP);
-        if (newP >= 1) setMediaFullyExpanded(true);
+        const newP = Math.min(Math.max(scrollProgressRef.current + deltaP, 0), 1);
+        scrollProgressRef.current = newP;
+        if (newP >= 1) { mediaExpandedRef.current = true; setMediaFullyExpanded(true); }
       } else {
         // Phase 2: blur video + reveal content on top
-        const newR = Math.min(Math.max(revealProgress + we.deltaY * 0.01, 0), 1);
-        setRevealProgress(newR);
-
-        if (newR >= 1) setContentFullyRevealed(true);
-
+        const newR = Math.min(Math.max(revealProgressRef.current + deltaR, 0), 1);
+        revealProgressRef.current = newR;
+        if (newR >= 1) contentRevealedRef.current = true;
         // Scroll back collapses to phase 1
-        if (newR <= 0 && we.deltaY < 0) {
+        if (newR <= 0 && backwards) {
+          mediaExpandedRef.current = false;
           setMediaFullyExpanded(false);
-          setScrollProgress(0.98);
+          scrollProgressRef.current = 0.98;
         }
       }
+      schedule();
     };
 
-    const onTouchStart = (e: Event) => {
-      setTouchStartY((e as unknown as TouchEvent).touches[0].clientY);
+    const onWheel = (e: WheelEvent) => {
+      // Content fully revealed — allow normal page scroll
+      if (contentRevealedRef.current) return;
+      e.preventDefault();
+      advance(e.deltaY * 0.0009, e.deltaY * 0.01, e.deltaY < 0);
     };
 
-    const onTouchMove = (e: Event) => {
-      const te = e as unknown as TouchEvent;
-      if (!touchStartY) return;
-      const dy = touchStartY - te.touches[0].clientY;
-
-      if (contentFullyRevealed) return;
-      te.preventDefault();
-
-      if (!mediaFullyExpanded) {
-        const newP = Math.min(Math.max(scrollProgress + dy * 0.005, 0), 1);
-        setScrollProgress(newP);
-        if (newP >= 1) setMediaFullyExpanded(true);
-      } else {
-        const newR = Math.min(Math.max(revealProgress + dy * 0.06, 0), 1);
-        setRevealProgress(newR);
-        if (newR >= 1) setContentFullyRevealed(true);
-        if (newR <= 0 && dy < 0) {
-          setMediaFullyExpanded(false);
-          setScrollProgress(0.98);
-        }
-      }
-      setTouchStartY(te.touches[0].clientY);
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartYRef.current = e.touches[0].clientY;
     };
 
-    const onTouchEnd = () => setTouchStartY(0);
+    const onTouchMove = (e: TouchEvent) => {
+      if (contentRevealedRef.current || !touchStartYRef.current) return;
+      const dy = touchStartYRef.current - e.touches[0].clientY;
+      e.preventDefault();
+      advance(dy * 0.005, dy * 0.06, dy < 0);
+      touchStartYRef.current = e.touches[0].clientY;
+    };
+
+    const onTouchEnd = () => { touchStartYRef.current = 0; };
 
     const onScroll = () => {
-      if (!contentFullyRevealed) window.scrollTo(0, 0);
+      if (!contentRevealedRef.current) window.scrollTo(0, 0);
     };
 
     window.addEventListener('wheel', onWheel, { passive: false });
@@ -163,13 +169,14 @@ const ScrollExpandMedia = ({
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd);
     return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [scrollProgress, revealProgress, mediaFullyExpanded, contentFullyRevealed, touchStartY]);
+  }, []);
 
   // ── Sizing (landscape start) ──────────────────────────────────────────────
   const startW = isMobile ? 340 : 640;
@@ -194,14 +201,16 @@ const ScrollExpandMedia = ({
         {/* ── Visual layer — gets blurred in phase 2 ── */}
         <div
           className="absolute inset-0"
-          style={{ filter: `blur(${blurPx}px)`, transition: 'filter 0.05s linear', willChange: 'filter' }}
+          style={{
+            // Only pay for the blur layer (and a GPU layer promotion) while the
+            // blur is actually active — during phase 1 this stays 'none'/'auto'.
+            filter: blurPx > 0 ? `blur(${blurPx}px)` : 'none',
+            transform: 'translateZ(0)',
+            willChange: blurPx > 0 ? 'filter' : 'auto',
+          }}
         >
           {/* Background image fades out as video expands */}
-          <motion.div
-            className="absolute inset-0"
-            animate={{ opacity: 1 - scrollProgress }}
-            transition={{ duration: 0.1 }}
-          >
+          <div className="absolute inset-0" style={{ opacity: 1 - scrollProgress }}>
             <Image
               src={bgImageSrc}
               alt="Background"
@@ -210,7 +219,7 @@ const ScrollExpandMedia = ({
               priority
             />
             <div className="absolute inset-0 bg-black/20" />
-          </motion.div>
+          </div>
 
           {/* Dark fill behind the video */}
           <div className="absolute inset-0 bg-black" style={{ opacity: scrollProgress * 0.7 }} />
@@ -236,19 +245,17 @@ const ScrollExpandMedia = ({
                   disablePictureInPicture
                   disableRemotePlayback
                 />
-                <motion.div
+                <div
                   className="absolute inset-0 bg-black/30"
-                  animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
-                  transition={{ duration: 0.2 }}
+                  style={{ opacity: 0.5 - scrollProgress * 0.3 }}
                 />
               </div>
             ) : (
               <div className="relative w-full h-full">
                 <Image src={mediaSrc} alt={title || ''} fill className="object-cover" />
-                <motion.div
+                <div
                   className="absolute inset-0 bg-black/50"
-                  animate={{ opacity: 0.7 - scrollProgress * 0.3 }}
-                  transition={{ duration: 0.2 }}
+                  style={{ opacity: 0.7 - scrollProgress * 0.3 }}
                 />
               </div>
             )}

@@ -25,7 +25,6 @@ const TREATMENTS = [
   { name: "Sugaring hårfjerning", slug: "sugaring" },
   { name: "Tandblegning", slug: "tandblegning" },
   { name: "Threading", slug: "threading" },
-  { name: "BB Glow behandling", slug: "bb-glow" },
   { name: "Bryn & vipper", slug: "bryn-og-vipper" },
   { name: "Wax behandling", slug: "wax-behandling" },
   { name: "Mix Sugaring & wax", slug: "mix-sugaring-og-wax" },

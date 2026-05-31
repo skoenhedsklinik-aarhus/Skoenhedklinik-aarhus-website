@@ -61,7 +61,7 @@ const AREAS: Area[] = [
         { label: "Ujævn teint, ar & struktur", value: "teint" },
       ],
     },
-    resolve: (a) => (a === "teint" ? "bb-glow" : "ansigtsbehandling"),
+    resolve: () => "ansigtsbehandling",
   },
   {
     id: "tatovering",
@@ -111,11 +111,6 @@ const TREATMENTS: Record<string, { name: string; emoji: string; blurb: string }>
     name: "Ansigtsbehandling",
     emoji: "🌿",
     blurb: "Skræddersyet behandling for glød, fugt og renere hud.",
-  },
-  "bb-glow": {
-    name: "BB Glow",
-    emoji: "✨",
-    blurb: "Jævner teint og forbedrer hudens struktur og udstråling.",
   },
   "tattoo-fjernelse": {
     name: "Tattoo-fjernelse",

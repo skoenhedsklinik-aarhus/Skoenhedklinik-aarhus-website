@@ -15,7 +15,6 @@ const SERVICES = [
   { name: "Sugaring hårfjerning", slug: "sugaring", emoji: "🍯" },
   { name: "Tandblegning", slug: "tandblegning", emoji: "💎" },
   { name: "Threading", slug: "threading", emoji: "🧵" },
-  { name: "BB Glow behandling", slug: "bb-glow", emoji: "✨" },
   { name: "Bryn & vipper", slug: "bryn-og-vipper", emoji: "👁" },
   { name: "Wax behandling", slug: "wax-behandling", emoji: "🌸" },
   { name: "Mix Sugaring & wax", slug: "mix-sugaring-og-wax", emoji: "💫" },
@@ -31,7 +30,9 @@ const slideVariants = {
 
 export function BookingFunnel() {
   const searchParams = useSearchParams();
-  const preselected = searchParams.get("service") || "";
+  // BB Glow is folded into Ansigtsbehandling — normalise any old deep-link.
+  const rawPreselected = searchParams.get("service") || "";
+  const preselected = rawPreselected === "bb-glow" ? "ansigtsbehandling" : rawPreselected;
 
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);

@@ -58,13 +58,29 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
   if (!service) notFound();
 
   const allPricingTiers = await getPricingTiers();
-  const prices = allPricingTiers.filter((p) => p.service_id === service.id);
-  const groupedPrices = prices.reduce((acc, price) => {
-    const group = price.subcategory || "Andre";
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(price);
-    return acc;
-  }, {} as Record<string, typeof prices>);
+  const isBbGlowTier = (p: { name?: string | null }) => /bb\s*glow/i.test(p.name || "");
+
+  let prices = allPricingTiers.filter((p) => p.service_id === service.id);
+  let groupedPrices: Record<string, typeof prices>;
+
+  if (service.slug === "ansigtsbehandling") {
+    // BB Glow er flettet ind under Ansigtsbehandling, men vises som en separat
+    // priskategori. BB Glow-priserne identificeres på navn, så det virker uanset
+    // hvilken service de er knyttet til i databasen.
+    const facialPrices = prices.filter((p) => !isBbGlowTier(p));
+    const bbGlowPrices = allPricingTiers.filter(isBbGlowTier);
+    prices = [...facialPrices, ...bbGlowPrices];
+    groupedPrices = {};
+    if (facialPrices.length) groupedPrices["Ansigtsbehandlinger"] = facialPrices;
+    if (bbGlowPrices.length) groupedPrices["BB Glow"] = bbGlowPrices;
+  } else {
+    groupedPrices = prices.reduce((acc, price) => {
+      const group = price.subcategory || "Andre";
+      if (!acc[group]) acc[group] = [];
+      acc[group].push(price);
+      return acc;
+    }, {} as Record<string, typeof prices>);
+  }
 
   const allServices = await getServices();
   const relatedServices = allServices
