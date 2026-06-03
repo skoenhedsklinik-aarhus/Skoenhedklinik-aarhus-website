@@ -73,6 +73,20 @@ export interface Database {
         Insert: Partial<Database['public']['Tables']['team_members']['Row']>
         Update: Partial<Database['public']['Tables']['team_members']['Row']>
       }
+      consultation_leads: {
+        Row: {
+          id: string
+          name: string
+          phone: string
+          note: string | null
+          areas: Json
+          recommendations: Json
+          handled: boolean
+          created_at: string
+        }
+        Insert: Partial<Database['public']['Tables']['consultation_leads']['Row']>
+        Update: Partial<Database['public']['Tables']['consultation_leads']['Row']>
+      }
       opening_hours: {
         Row: {
           day_of_week: number

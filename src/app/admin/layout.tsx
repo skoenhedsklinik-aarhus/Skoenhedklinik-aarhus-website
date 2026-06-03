@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogOut, Home, Settings, Clock, Users, Gift, Scissors, CreditCard } from "lucide-react";
+import { LogOut, Home, Settings, Clock, Users, Gift, Scissors, CreditCard, PhoneCall } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminLayout({
@@ -30,6 +30,9 @@ export default async function AdminLayout({
         <nav className="flex-grow p-4 space-y-1">
           <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-textPrimary hover:bg-beige rounded-lg font-medium">
             <Home className="w-5 h-5" /> Dashboard
+          </Link>
+          <Link href="/admin/henvendelser" className="flex items-center gap-3 px-4 py-3 text-textBody hover:bg-beige rounded-lg">
+            <PhoneCall className="w-5 h-5" /> Henvendelser
           </Link>
           <Link href="/admin/behandlinger" className="flex items-center gap-3 px-4 py-3 text-textBody hover:bg-beige rounded-lg">
             <Scissors className="w-5 h-5" /> Behandlinger
