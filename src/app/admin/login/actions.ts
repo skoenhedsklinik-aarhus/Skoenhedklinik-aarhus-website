@@ -15,8 +15,7 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "MANGLER";
-    return { error: `${error.message} [URL: ${url.slice(0, 40)}]` };
+    return { error: error.message };
   }
 
   redirect("/admin");
