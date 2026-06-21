@@ -17,7 +17,7 @@ const CATEGORIES = [
   { id: "bryn-vipper", label: "Bryn & vipper" },
   { id: "tand", label: "Tandblegning" },
   { id: "threading", label: "Threading" },
-  { id: "tatovering", label: "Tatovering" },
+  { id: "tatovering", label: "Tattoo fjernelse" },
   { id: "pakker", label: "Pakker" },
 ];
 

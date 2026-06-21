@@ -79,7 +79,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-cream/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-cream/60 text-sm">
-          <p>© {new Date().getFullYear()} Skønhedsklinik Aarhus · CVR: 33091982</p>
+          <p>© {new Date().getFullYear()} Skønhedsklinik Aarhus · CVR: 46525299</p>
           <p>Udviklet af Sonorous Digital</p>
         </div>
       </div>
