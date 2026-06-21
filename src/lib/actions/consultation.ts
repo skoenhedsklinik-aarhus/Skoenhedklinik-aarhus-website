@@ -46,8 +46,7 @@ export async function submitConsultationLead(
       console.error("[consultation] Supabase insert error:", error);
       return {
         ok: false,
-        error:
-          "Vi kunne desværre ikke sende din forespørgsel. Prøv igen, eller ring til os på 61 44 59 99.",
+        error: `DEBUG: ${error.message} (code: ${error.code})`,
       };
     }
 
