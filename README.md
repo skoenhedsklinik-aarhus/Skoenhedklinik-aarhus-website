@@ -20,6 +20,20 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Testing
+
+Unit tests are written with [Vitest](https://vitest.dev) and live next to the
+code they cover (`*.test.ts`). They focus on the app's business logic: the
+consultation lead validation, the Google Reviews API route (incl. its
+fallbacks), the revalidate webhook auth, the admin auth middleware, the Supabase
+query layer, and the Planway/schema.org helpers.
+
+```bash
+npm test            # run the suite once
+npm run test:watch  # watch mode while developing
+npm run test:coverage  # run with a coverage report
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
