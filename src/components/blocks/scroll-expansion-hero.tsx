@@ -189,7 +189,13 @@ const ScrollExpandMedia = ({
     window.addEventListener('resize', schedule, { passive: true });
     schedule();
     return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        // Must reset, or the next mount's schedule() thinks a frame is still
+        // pending and never re-schedules — bricking the scroll animation
+        // (hit in dev, where StrictMode mounts effects twice).
+        rafRef.current = null;
+      }
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
     };

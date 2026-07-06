@@ -5,8 +5,11 @@ import Link from "next/link";
 import { getServices, getServiceBySlug, getPricingTiers } from "@/lib/supabase-queries";
 import { enrichServiceWithFallback, getServiceThumbnail } from "@/lib/services-fallback";
 import { FinalCTA } from "@/components/shared/FinalCTA";
+import { TrustStrip } from "@/components/shared/TrustStrip";
+import { CallbackForm } from "@/components/shared/CallbackForm";
+import { StickyMobileCTA } from "@/components/shared/StickyMobileCTA";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Shield, Clock, Leaf, Star, Info } from "lucide-react";
+import { Shield, Clock, Leaf, Star, Info, Phone } from "lucide-react";
 import { medicalProcedureSchema, faqPageSchema } from "@/lib/schema";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://skoenhedsklinik-aarhus.dk";
@@ -110,6 +113,14 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
     }
   }
 
+  // Lowest price for this treatment — used as a price anchor in the hero so
+  // paid traffic gets an immediate "fra X kr." answer to the #1 question.
+  const priceValues = prices
+    .map((p) => Number(p.price_dkk))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  const minPrice = priceValues.length > 0 ? Math.min(...priceValues) : null;
+  const minPriceLabel = minPrice !== null ? minPrice.toLocaleString("da-DK") : null;
+
   const procedureJsonLd = medicalProcedureSchema(s);
   const hasFaq = s.faq && Array.isArray(s.faq) && s.faq.length > 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -155,20 +166,38 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
           <p className="text-white/70 text-lg font-light max-w-xl mb-10">
             {service.short_description}
           </p>
-          <div className="flex flex-col sm:flex-row items-start gap-4">
+          <div className="flex flex-col sm:flex-row items-start gap-4 mb-7">
             <Link href={`/book?service=${service.slug}`}>
               <button className="px-8 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors">
-                Book konsultation
+                Book gratis konsultation
               </button>
             </Link>
             <Link href="#priser">
               <button className="px-8 py-4 glass hover:bg-white/15 text-white rounded-full text-sm font-medium tracking-wide transition-all">
-                Se priser
+                {minPriceLabel ? `Se priser — fra ${minPriceLabel} kr.` : "Se priser"}
               </button>
             </Link>
           </div>
+          {/* Trust line — social proof visible before the first scroll */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-white/70 text-xs font-medium tracking-wide">
+            <span className="flex items-center gap-1.5">
+              <span className="flex gap-0.5">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star key={i} className="w-3.5 h-3.5 fill-cognac-accent text-cognac-accent" />
+                ))}
+              </span>
+              5,0 på Google
+            </span>
+            <span className="w-1 h-1 rounded-full bg-white/40" />
+            <span>Registreret hos Styrelsen for Patientsikkerhed</span>
+            <span className="w-1 h-1 rounded-full bg-white/40 hidden sm:block" />
+            <span className="hidden sm:block">Gratis & uforpligtende konsultation</span>
+          </div>
         </div>
       </section>
+
+      {/* ─── 1b. Trust strip ───────────────────────────────────────── */}
+      <TrustStrip />
 
       {/* ─── 2. Intro — Full Width Section (First Part, only if split) ─── */}
       {hasSplit && (
@@ -445,10 +474,20 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
               ))}
             </Accordion>
  
-            <div className="mt-12 text-center">
-              <Link href="/priser" className="text-cognac font-medium text-sm hover:text-cognac-hover transition-colors">
-                Se alle priser →
+            <div className="mt-10 text-center">
+              <Link href={`/book?service=${service.slug}`}>
+                <button className="px-9 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors">
+                  Book gratis konsultation
+                </button>
               </Link>
+              <p className="text-textMuted text-xs mt-3">
+                Uforpligtende — vi lægger en plan sammen, før du beslutter dig.
+              </p>
+              <div className="mt-6">
+                <Link href="/priser" className="text-cognac font-medium text-sm hover:text-cognac-hover transition-colors">
+                  Se alle priser →
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -484,7 +523,43 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
         </section>
       )}
 
-      {/* ─── 7. Related Services ───────────────────────────────────── */}
+      {/* ─── 7. Callback lead capture ──────────────────────────────── */}
+      <section className="py-20 lg:py-28 bg-beige border-t border-sand/40">
+        <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div>
+              <span className="eyebrow text-cognac mb-4 block">Ikke klar til at booke?</span>
+              <h2 className="font-heading text-3xl md:text-4xl text-textPrimary font-light mb-5 leading-tight">
+                Foretrækker du en snak først?
+              </h2>
+              <div className="w-10 h-px bg-cognac mb-6" />
+              <p className="text-textBody text-base leading-relaxed mb-6">
+                Det er helt normalt at have spørgsmål, før man går i gang. Læg
+                dit nummer, så ringer vi dig op og svarer på alt om forløb,
+                priser og forventede resultater — uden at du binder dig til
+                noget.
+              </p>
+              <ul className="space-y-2.5 text-sm text-textBody">
+                {[
+                  "Gratis og uforpligtende rådgivning",
+                  "Svar fra en erfaren behandler — ikke et callcenter",
+                  "Vi ringer inden for 24 timer på hverdage",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-cognac/10 flex items-center justify-center shrink-0">
+                      <Phone className="w-2.5 h-2.5 text-cognac" />
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <CallbackForm treatmentName={service.name} source={`behandling-${service.slug}`} />
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 8. Related Services ───────────────────────────────────── */}
       {finalRelated.length > 0 && (
         <section className="section-dark py-20 lg:py-28">
           <div className="container mx-auto px-4 lg:px-8">
@@ -524,6 +599,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
       )}
 
       <FinalCTA />
+      <StickyMobileCTA serviceSlug={service.slug} serviceName={service.name} />
     </main>
   );
 }

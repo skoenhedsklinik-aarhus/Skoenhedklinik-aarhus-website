@@ -8,6 +8,7 @@ import {
   submitConsultationLead,
   type ConsultationLeadResult,
 } from "@/lib/actions/consultation";
+import { trackPixel } from "@/lib/pixel";
 
 /* ------------------------------------------------------------------ */
 /* Data: focus areas, follow-up questions, and treatment metadata      */
@@ -246,6 +247,10 @@ export function BookingSection() {
     }
     setSubmitting(false);
     if (res.ok) {
+      trackPixel("Lead", {
+        content_name: recommendations.map((s) => TREATMENTS[s]?.name ?? s).join(", ") || "Konsultation",
+        content_category: "forside-guide",
+      });
       setDir(1);
       setPhase("done");
     } else {

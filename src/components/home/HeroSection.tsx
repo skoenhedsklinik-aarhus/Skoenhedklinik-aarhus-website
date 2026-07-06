@@ -25,18 +25,21 @@ function HeroContent() {
         <p className="text-white/70 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
           Professionelle behandlinger i hjertet af Aarhus C. Vi sætter din tryghed øverst og leverer synlige resultater med markedets bedste udstyr.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/behandlinger">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-7">
+          <Link href="/book">
             <button className="px-8 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors">
+              Book gratis konsultation
+            </button>
+          </Link>
+          <Link href="/behandlinger">
+            <button className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-full text-sm font-medium tracking-wide transition-colors backdrop-blur-sm">
               Se behandlinger
             </button>
           </Link>
-          <Link href="/om-os">
-            <button className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-full text-sm font-medium tracking-wide transition-colors backdrop-blur-sm">
-              Lær os at kende
-            </button>
-          </Link>
         </div>
+        <p className="text-white/55 text-xs font-medium tracking-wide">
+          ★★★★★ 5,0 på Google · Registreret hos Styrelsen for Patientsikkerhed
+        </p>
       </div>
     </div>
   );

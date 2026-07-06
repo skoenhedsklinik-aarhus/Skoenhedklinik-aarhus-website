@@ -150,7 +150,7 @@ export function Header() {
                       : "bg-cognac hover:bg-cognac-hover text-white"
                   }`}
                 >
-                  Book nu
+                  Book gratis konsultation
                 </button>
               </Link>
             </div>

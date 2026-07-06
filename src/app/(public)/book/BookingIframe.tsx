@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ExternalLink, Check } from "lucide-react";
 import { buildPlanwayUrl, type BookableService } from "@/lib/booking";
+import { trackPixel } from "@/lib/pixel";
 
 export function BookingIframe({
   serviceMap,
@@ -19,6 +20,15 @@ export function BookingIframe({
   // forward-compatibly while we surface the choice in-page below. See lib/booking.ts.
   const selected = serviceSlug ? serviceMap[serviceSlug] : undefined;
   const iframeUrl = buildPlanwayUrl(selected?.planwayServiceId);
+
+  // Booking calendar opened = strong mid-funnel intent signal for Meta ads.
+  const selectedName = selected?.name;
+  useEffect(() => {
+    trackPixel("InitiateCheckout", {
+      content_name: selectedName ?? "Booking",
+      content_category: "booking",
+    });
+  }, [selectedName]);
 
   return (
     <div className="w-full">
