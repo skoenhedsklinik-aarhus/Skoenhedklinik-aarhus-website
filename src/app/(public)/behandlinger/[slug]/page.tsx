@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getServices, getServiceBySlug, getPricingTiers } from "@/lib/supabase-queries";
-import { enrichServiceWithFallback, getServiceThumbnail } from "@/lib/services-fallback";
+import { enrichServiceWithFallback, getServiceThumbnail, getSkeletonService } from "@/lib/services-fallback";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { TrustStrip } from "@/components/shared/TrustStrip";
 import { CallbackForm } from "@/components/shared/CallbackForm";
 import { StickyMobileCTA } from "@/components/shared/StickyMobileCTA";
+import { AnsigtsbehandlingerSection, ANSIGTSBEHANDLING_FROM_PRICE } from "@/components/shared/AnsigtsbehandlingerSection";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Shield, Clock, Leaf, Star, Info, Phone } from "lucide-react";
 import { medicalProcedureSchema, faqPageSchema } from "@/lib/schema";
@@ -35,7 +36,7 @@ export const dynamicParams = true;
 export async function generateMetadata(
   { params }: { params: { slug: string } }
 ): Promise<Metadata> {
-  const service = await getServiceBySlug(params.slug);
+  const service = (await getServiceBySlug(params.slug)) || getSkeletonService(params.slug);
   if (!service) return { title: "Behandling ikke fundet" };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,33 +59,21 @@ export async function generateMetadata(
 }
 
 export default async function ServiceDetailPage({ params }: { params: { slug: string } }) {
-  const service = await getServiceBySlug(params.slug);
+  // Fall back to a skeleton object for known slugs when Supabase is unavailable
+  // (e.g. build without secrets, or the DB is down). enrichServiceWithFallback
+  // fills in the full content below, so the page degrades gracefully instead of 404'ing.
+  const service = (await getServiceBySlug(params.slug)) || getSkeletonService(params.slug);
   if (!service) notFound();
 
   const allPricingTiers = await getPricingTiers();
-  const isBbGlowTier = (p: { name?: string | null }) => /bb\s*glow/i.test(p.name || "");
 
-  let prices = allPricingTiers.filter((p) => p.service_id === service.id);
-  let groupedPrices: Record<string, typeof prices>;
-
-  if (service.slug === "ansigtsbehandling") {
-    // BB Glow er flettet ind under Ansigtsbehandling, men vises som en separat
-    // priskategori. BB Glow-priserne identificeres på navn, så det virker uanset
-    // hvilken service de er knyttet til i databasen.
-    const facialPrices = prices.filter((p) => !isBbGlowTier(p));
-    const bbGlowPrices = allPricingTiers.filter(isBbGlowTier);
-    prices = [...facialPrices, ...bbGlowPrices];
-    groupedPrices = {};
-    if (facialPrices.length) groupedPrices["Ansigtsbehandlinger"] = facialPrices;
-    if (bbGlowPrices.length) groupedPrices["BB Glow"] = bbGlowPrices;
-  } else {
-    groupedPrices = prices.reduce((acc, price) => {
-      const group = price.subcategory || "Andre";
-      if (!acc[group]) acc[group] = [];
-      acc[group].push(price);
-      return acc;
-    }, {} as Record<string, typeof prices>);
-  }
+  const prices = allPricingTiers.filter((p) => p.service_id === service.id);
+  const groupedPrices: Record<string, typeof prices> = prices.reduce((acc, price) => {
+    const group = price.subcategory || "Andre";
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(price);
+    return acc;
+  }, {} as Record<string, typeof prices>);
 
   const allServices = await getServices();
   const relatedServices = allServices
@@ -118,7 +107,14 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
   const priceValues = prices
     .map((p) => Number(p.price_dkk))
     .filter((n) => Number.isFinite(n) && n > 0);
-  const minPrice = priceValues.length > 0 ? Math.min(...priceValues) : null;
+  // For ansigtsbehandling er behandlingsmenuen priskilden, så vi ankrer på dens
+  // laveste pris. Øvrige behandlinger ankrer på den laveste DB-pris.
+  const minPrice =
+    service.slug === "ansigtsbehandling"
+      ? ANSIGTSBEHANDLING_FROM_PRICE
+      : priceValues.length > 0
+        ? Math.min(...priceValues)
+        : null;
   const minPriceLabel = minPrice !== null ? minPrice.toLocaleString("da-DK") : null;
 
   const procedureJsonLd = medicalProcedureSchema(s);
@@ -174,7 +170,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
             </Link>
             <Link href="#priser">
               <button className="px-8 py-4 glass hover:bg-white/15 text-white rounded-full text-sm font-medium tracking-wide transition-all">
-                {minPriceLabel ? `Se priser — fra ${minPriceLabel} kr.` : "Se priser"}
+                {minPriceLabel ? `Se priser - fra ${minPriceLabel} kr.` : "Se priser"}
               </button>
             </Link>
           </div>
@@ -271,6 +267,9 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
           </div>
         </div>
       </section>
+
+      {/* ─── 2c. Ansigtsbehandlinger menu (kun ansigtsbehandling) ────── */}
+      {service.slug === "ansigtsbehandling" && <AnsigtsbehandlingerSection />}
 
       {/* ─── 3. Benefits grid ──────────────────────────────────────── */}
       {s.benefits && Array.isArray(s.benefits) && s.benefits.length > 0 && (

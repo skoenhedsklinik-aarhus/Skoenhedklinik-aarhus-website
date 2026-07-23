@@ -12,7 +12,7 @@ type Service = Database["public"]["Tables"]["services"]["Row"];
 
 const CATEGORIES = [
   { id: "alle", label: "Alle" },
-  { id: "haarfjerning", label: "Hårfjerning" },
+  { id: "haarfjerning", label: "Laser hårfjerning" },
   { id: "ansigt", label: "Ansigt" },
   { id: "bryn-vipper", label: "Bryn & vipper" },
   { id: "sugaring", label: "Sugaring" },

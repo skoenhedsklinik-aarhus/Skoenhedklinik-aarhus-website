@@ -12,10 +12,10 @@ const createClient = () => {
   return createSupabaseClient(supabaseUrl, supabaseKey);
 };
 
-// Services that are no longer presented on their own, but folded into another
-// treatment. BB Glow lives under Ansigtsbehandling, so it must not appear as a
-// standalone card/nav item/sitemap entry. /behandlinger/bb-glow is 301-redirected
-// to /behandlinger/ansigtsbehandling in next.config.mjs.
+// Services that are no longer offered and must never surface as a card, nav
+// item or sitemap entry — even if a stale row still exists in the database.
+// BB Glow has been discontinued; /behandlinger/bb-glow is 301-redirected to
+// /behandlinger/ansigtsbehandling in next.config.mjs so old links don't 404.
 const HIDDEN_SERVICE_SLUGS = new Set(["bb-glow"]);
 
 export async function getServices(): Promise<any[]> {

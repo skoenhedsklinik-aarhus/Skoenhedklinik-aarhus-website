@@ -10,7 +10,7 @@ type PackageOffer = Database["public"]["Tables"]["packages_offers"]["Row"];
 
 const CATEGORIES = [
   { id: "alle", label: "Alle" },
-  { id: "haarfjerning", label: "Hårfjerning" },
+  { id: "haarfjerning", label: "Laser hårfjerning" },
   { id: "sugaring", label: "Sugaring" },
   { id: "wax", label: "Wax" },
   { id: "ansigt", label: "Ansigt" },

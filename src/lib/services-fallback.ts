@@ -13,7 +13,6 @@ const skeletonServices: Record<string, any> = {
   "sugaring": { name: "Sugaring hårfjerning", slug: "sugaring", category: "haarfjerning", short_description: "Naturlig og skånsom hårfjerning med sukker. Glat hud i 4–6 uger.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: true, is_active: true },
   "tandblegning": { name: "Tandblegning", slug: "tandblegning", category: "kosmetisk", short_description: "Smertefri kosmetisk tandblegning med LED-lys. 2–8 toner lysere på én behandling.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: true, is_active: true },
   "threading": { name: "Threading", slug: "threading", category: "haarfjerning", short_description: "Præcis og skånsom ansigtshårfjerning med tråd. Perfekt til brynformning og fine ansigtshår.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: false, is_active: true },
-  "bb-glow": { name: "BB Glow", slug: "bb-glow", category: "hudpleje", short_description: "Revolutionerende hudforskønnelse med microneedling. Ensartet hudtone og naturlig glød.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: false, is_active: true },
   "bryn-og-vipper": { name: "Bryn & vipper", slug: "bryn-og-vipper", category: "bryn-vipper", short_description: "Lash Lift, Brow Lamination, farvning og formning af bryn og vipper.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: true, is_active: true },
   "wax-behandling": { name: "Wax behandling", slug: "wax-behandling", category: "haarfjerning", short_description: "Professionel voksbehandling for silkeblød og hårfri hud i ugevis.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: false, is_active: true },
   "mix-sugaring-og-wax": { name: "Mix Sugaring & Wax", slug: "mix-sugaring-og-wax", category: "haarfjerning", short_description: "Det bedste fra to verdener – sugaring på de følsomme områder, voks på resten.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: false, is_active: true },
@@ -42,10 +41,7 @@ const galleryMap: Record<string, string[]> = {
     "/images/services/ansigtsbehandling-even-skin.avif",
     "/images/services/ansigtsbehandling-firm-smooth.avif",
     "/images/services/ansigtsbehandling-hydra-boost.avif",
-    // BB Glow is folded into Ansigtsbehandling — keep its imagery in the gallery.
-    "/images/services/bb-glow-2.avif",
   ],
-  "bb-glow": ["/images/services/bb-glow-2.avif"],
   "bryn-og-vipper": [
     "/images/services/bryn-og-vipper-brow-lift.avif",
     "/images/services/bryn-og-vipper-henna.avif",
@@ -71,7 +67,6 @@ const heroVideoMap: Record<string, string> = {
   "sugaring": "/videos/services/sugaring.mp4",
   "bryn-og-vipper": "/videos/services/bryn-og-vipper.mp4",
   "mix-sugaring-og-wax": "/videos/services/mix-sugaring-og-wax.mp4",
-  "bb-glow": "/videos/services/bb-glow.mp4",
   "tandblegning": "/videos/services/tandblegning.mp4",
   "tattoo-fjernelse": "/videos/services/tattoo-fjernelse.mp4",
   "wax-behandling": "/videos/services/wax-behandling.mp4",
@@ -194,7 +189,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
 
     case "ansigtsbehandling":
       if (!s.long_description || s.long_description.length < 200) {
-        s.long_description = `<p>Forkæl din hud med vores skræddersyede ansigtsbehandlinger hos Skønhedsklinik Aarhus. Vi tror på, at en sund hud er en smuk hud, og vi tilpasser altid vores ansigtsbehandlinger nøje efter din specifikke hudtype, tilstand og dine personlige mål. Hvad enten du kæmper med akne, tørhed, fine linjer eller blot ønsker at genfinde en sund, ungdommelig og levende glød, står vi klar til at hjælpe dig.</p><p>Vi anvender udelukkende klinisk dokumenterede hudplejeprodukter af højeste kvalitet, som nærer huden i dybden, genskaber balancen og efterlader huden synligt genopfrisket, blød og strålende.</p><h3>Professionel hudpleje tilpasset dig</h3><p>En professionel ansigtsbehandling er ikke kun ren selvforkælelse og afslapning – det er en målrettet investering i din huds langsigtede sundhed. Ved at fjerne døde hudceller, dybderense porerne og tilføre intensive serummer hjælper vi din hud med at regenerere hurtigere og beskytte sig bedre mod hverdagens påvirkninger.</p><p>Giv din hud den opmærksomhed, den fortjener. Vores dygtige kosmetologer guider dig også i den rette hjemmepleje for at bevare det smukke resultat.</p><h3 style="margin-top:3.5rem">BB Glow – semi-permanent glød &amp; ensartet teint</h3><p>Som en del af vores ansigtsbehandlinger tilbyder vi også BB Glow – en af de mest populære hudforskønnende behandlinger. Behandlingen udføres med avanceret microneedling, hvor et specialudviklet meso-serum med naturlige farvepigmenter og intensive vitaminer sluses blidt ned i hudens øverste lag. Det giver huden en smuk, ensartet og langvarig 'BB-creme-effekt' med en naturlig glød.</p><p>Udover at give en jævn hudtone arbejder BB Glow på at reducere pigmentforandringer, solskader, fine linjer, mørke render under øjnene samt ar efter akne, mens huden boostes med fugt og kollagen indefra. Behandlingen er smertefri og kræver ingen restitutionstid – og du kan altid spørge din behandler, om BB Glow er det rette valg for netop din hud.</p>`;
+        s.long_description = `<p>Forkæl din hud med vores skræddersyede ansigtsbehandlinger hos Skønhedsklinik Aarhus. Vi tror på, at en sund hud er en smuk hud, og vi tilpasser altid vores ansigtsbehandlinger nøje efter din specifikke hudtype, tilstand og dine personlige mål. Hvad enten du kæmper med akne, tørhed, fine linjer eller blot ønsker at genfinde en sund, ungdommelig og levende glød, står vi klar til at hjælpe dig.</p><p>Vi anvender udelukkende klinisk dokumenterede hudplejeprodukter af højeste kvalitet, som nærer huden i dybden, genskaber balancen og efterlader huden synligt genopfrisket, blød og strålende.</p><h3>Professionel hudpleje tilpasset dig</h3><p>En professionel ansigtsbehandling er ikke kun ren selvforkælelse og afslapning – det er en målrettet investering i din huds langsigtede sundhed. Ved at fjerne døde hudceller, dybderense porerne og tilføre intensive serummer hjælper vi din hud med at regenerere hurtigere og beskytte sig bedre mod hverdagens påvirkninger.</p><p>Giv din hud den opmærksomhed, den fortjener. Vores dygtige kosmetologer guider dig også i den rette hjemmepleje for at bevare det smukke resultat.</p>`;
       }
       if (s.benefits.length === 0) {
         s.benefits = [
@@ -212,10 +207,6 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
           {
             question: "Hvilken ansigtsbehandling skal jeg vælge?",
             answer: "<p>Du behøver ikke beslutte dig på forhånd! Vores erfarne behandler foretager altid en grundig hudanalyse ved starten af din tid og sammensætter den perfekte behandling til din hudtype og dine ønsker.</p>"
-          },
-          {
-            question: "Tilbyder I BB Glow?",
-            answer: "<p>Ja. BB Glow er en del af vores ansigtsbehandlinger. Med microneedling sluses et meso-serum med farvepigmenter og vitaminer ned i hudens øverste lag, så du får en ensartet teint og en naturlig glød. For et optimalt resultat anbefaler vi et kurforløb på 3–4 behandlinger med 2–3 ugers mellemrum. Spørg din behandler, om BB Glow passer til din hud.</p>"
           }
         ];
       }
@@ -357,46 +348,6 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
           "Undgå at røre ved det behandlede område de første timer for at forhindre bakterier i de åbne porer",
           "Undgå makeup, parfumerede cremer og direkte sol på området i 24 timer",
           "Brug en mild aloe vera gel eller kildevandsspray til at berolige huden, hvis der opstår let rødme"
-        ];
-      }
-      break;
-
-    case "bb-glow":
-      if (!s.long_description || s.long_description.length < 200) {
-        s.long_description = `<p>BB Glow er en af de mest populære og revolutionerende anti-aging og hudforskønnende behandlinger på markedet. Behandlingen udføres med avanceret microneedling (eller nanoneedling), hvor et specialudviklet meso-serum med naturlige farvepigmenter og intensive vitaminer sluses blidt ned i hudens øverste lag. Det giver huden en smuk, ensartet og langvarig 'BB-creme-effekt' med en uimodståelig, naturlig glød.</p><p>Udover at give en jævn hudtone arbejder BB Glow intenst på at reducere pigmentforandringer, solskader, fine linjer, mørke render under øjnene samt ar efter akne. Huden boostes med fugt og kollagen helt indefra.</p><h3>Udligner uregelmæssigheder og giver strålende glød</h3><p>BB Glow er den perfekte behandling til dig, der ønsker at vågne op hver dag med et friskt, jævnt og velplejet udseende uden at skulle lægge foundation eller pudder.</p><p>Huden efterlades med en markant mere ensartet farve og en sund udstråling. Behandlingen er smertefri og kræver ingen restitutionstid, så du kan fortsætte din dag med det samme med et strålende smil.</p>`;
-      }
-      if (s.benefits.length === 0) {
-        s.benefits = [
-          { icon: "star", title: "Ensartet hudtone", description: "Reducerer rødme, hyperpigmentering og mørke render synligt." },
-          { icon: "leaf", title: "Intens kollagen-boost", description: "Microneedling stimulerer hudens egen kollagenproduktion for øget elasticitet." },
-          { icon: "shield", title: "Langvarig glød", description: "Vågn op med en sund og strålende hud med en naturlig BB-creme-finish." }
-        ];
-      }
-      if (s.faq.length === 0) {
-        s.faq = [
-          {
-            question: "Hvor mange BB Glow behandlinger skal man have?",
-            answer: "<p>Allerede efter den første behandling vil du opleve en flot effekt. For at opnå et optimalt og langvarigt resultat (der holder i op til 6 måneder) anbefaler vi et kurforløb på 3–4 behandlinger med 2-3 ugers mellemrum.</p>"
-          },
-          {
-            question: "Er BB Glow en tatovering?",
-            answer: "<p>Nej, BB Glow er ikke en tatovering! Meso-serummet sluses kun ned i epidermis (hudens allerøverste lag) og indeholder godkendte, biologiske ingredienser, som huden gradvist og naturligt omsætter over tid.</p>"
-          }
-        ];
-      }
-      if (s.pre_instructions.length === 0) {
-        s.pre_instructions = [
-          "Undgå solbadning og solarium i minimum 7 dage før behandlingen",
-          "Undgå aktive hudplejeprodukter (retinol, syrer) 3-5 dage før",
-          "Huden skal være intakt og må ikke have aktive udbrud af akne eller herpes på dagen"
-        ];
-      }
-      if (s.post_instructions.length === 0) {
-        s.post_instructions = [
-          "Undgå at vaske ansigtet med vand de første 24 timer for at lade serummet virke fuldt ud",
-          "Undgå makeup de første 24–48 timer efter behandlingen",
-          "Brug altid en god solcreme (SPF 50) i ugerne efter for at beskytte mod nye pigmentpletter",
-          "Undgå sauna, dampbad, varme bade og hård svedfremkaldende træning i 3 dage"
         ];
       }
       break;

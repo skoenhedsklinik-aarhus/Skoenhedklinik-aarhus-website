@@ -30,7 +30,7 @@ const slideVariants = {
 
 export function BookingFunnel() {
   const searchParams = useSearchParams();
-  // BB Glow is folded into Ansigtsbehandling — normalise any old deep-link.
+  // BB Glow is discontinued — normalise any old deep-link to Ansigtsbehandling.
   const rawPreselected = searchParams.get("service") || "";
   const preselected = rawPreselected === "bb-glow" ? "ansigtsbehandling" : rawPreselected;
 

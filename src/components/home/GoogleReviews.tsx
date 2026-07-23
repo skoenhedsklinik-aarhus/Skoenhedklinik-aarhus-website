@@ -29,7 +29,7 @@ const MOCK_REVIEWS = [
     name: "Lotte P.",
     rating: 5,
     text: "Endelig fundet en klinik jeg kan stole på. Grundig konsultation, synlige resultater og fair priser. Kommer igen og igen!",
-    service: "BB Glow",
+    service: "Microneedling",
     timeAgo: "1 uge siden",
   },
 ];

@@ -54,8 +54,8 @@ const nextConfig = {
         permanent: true,
       },
       {
-        // BB Glow is no longer a standalone treatment — it's presented as part
-        // of Ansigtsbehandling. Redirect the old page to preserve links/SEO.
+        // BB Glow is discontinued. Redirect the old page to Ansigtsbehandling
+        // so existing links / search rankings don't 404.
         source: "/behandlinger/bb-glow",
         destination: "/behandlinger/ansigtsbehandling",
         permanent: true,
