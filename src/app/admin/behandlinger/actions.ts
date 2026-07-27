@@ -3,6 +3,25 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Oversæt databasefejl til noget, klinikken kan handle på.
+ * `services.slug` har en UNIQUE-constraint, og den rå Postgres-besked
+ * ("duplicate key value violates unique constraint services_slug_key")
+ * siger intet til en ikke-teknisk bruger.
+ */
+function friendlyError(message: string): string {
+  if (message.includes("services_slug_key") || message.includes("duplicate key")) {
+    return "Der findes allerede en behandling med den URL (slug). Ret slug-feltet til noget unikt, f.eks. ved at tilføje et ord mere.";
+  }
+  if (message.includes("services_category_check")) {
+    return "Kategorien er ikke gyldig. Vælg en fra listen.";
+  }
+  if (message.includes("violates not-null")) {
+    return "Navn, slug og kategori skal alle være udfyldt.";
+  }
+  return message;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createService(data: any) {
   const supabase = createClient();
@@ -33,7 +52,7 @@ export async function createService(data: any) {
     ]);
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: friendlyError(error.message) };
   }
 
   revalidatePath("/admin/behandlinger");
@@ -71,7 +90,7 @@ export async function updateService(id: string, data: any) {
     .eq("id", id);
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: friendlyError(error.message) };
   }
 
   revalidatePath("/admin/behandlinger");
@@ -89,7 +108,7 @@ export async function deleteService(id: string) {
     .eq("id", id);
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: friendlyError(error.message) };
   }
 
   revalidatePath("/admin/behandlinger");

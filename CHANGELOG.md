@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-27 (4) — Admin: nemmere at oprette behandlinger
+
+- **Slug udfyldes automatisk** ud fra navnet, med dansk translitteration
+  (æ→ae, ø→oe, å→aa), så "Laser hårfjerning" bliver til "laser-haarfjerning".
+  Auto-udfyldningen stopper, så snart brugeren selv retter feltet, og den er helt
+  slået fra ved redigering, hvor en ændret slug ville bryde eksisterende links.
+- **Forklaring på slug-feltet** med live forhåndsvisning af den færdige URL, plus
+  en advarsel ved redigering.
+- **Kategori-dropdownen viser læsbare navne** ("Laser hårfjerning" i stedet for
+  "haarfjerning"). Værdierne er uændrede, da de er låst af en CHECK-constraint
+  i databasen.
+- **Påkrævede felter er markeret** med *, og "Kort beskrivelse" er nu påkrævet i
+  formularen, fordi den vises på alle behandlingskort.
+- **Forståelige fejlbeskeder**: en dublet-slug gav før den rå Postgres-fejl
+  "duplicate key value violates unique constraint services_slug_key".
+- **"Opret behandling"-knappen lå uden for kortet.** Årsag: Button-komponenten
+  har `shrink-0` i sine basisklasser, så to `w-full`-knapper i en flex-række
+  ikke kunne krympe. Footeren bruger nu grid.
+
 ## 2026-07-27 (3) — Anmeldelseskarrusel + Place ID-fælden
 
 ### Anmeldelser som karrusel

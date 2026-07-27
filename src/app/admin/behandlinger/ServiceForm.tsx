@@ -15,15 +15,49 @@ interface ServiceFormProps {
   initialData?: Service;
 }
 
-const CATEGORIES = [
-  "haarfjerning", "sugaring", "wax", "ansigt",
-  "bryn-vipper", "tand", "threading", "tatovering", "andet"
+/**
+ * Kategorierne er låst af en CHECK-constraint i databasen (services_category_check),
+ * så værdierne må ikke ændres. Etiketterne er kun til admin-brugeren.
+ */
+const CATEGORIES: { value: string; label: string }[] = [
+  { value: "haarfjerning", label: "Laser hårfjerning" },
+  { value: "sugaring", label: "Sugaring" },
+  { value: "wax", label: "Wax" },
+  { value: "ansigt", label: "Ansigtsbehandling" },
+  { value: "bryn-vipper", label: "Bryn & vipper" },
+  { value: "tand", label: "Tandblegning" },
+  { value: "threading", label: "Threading" },
+  { value: "tatovering", label: "Tattoo fjernelse" },
+  { value: "andet", label: "Andet" },
 ];
+
+/**
+ * Lav en URL-venlig slug ud fra behandlingens navn.
+ * Danske tegn translittereres, så "Laser hårfjerning" bliver til
+ * "laser-haarfjerning" og ikke "laser-hrfjerning".
+ */
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/æ/g, "ae")
+    .replace(/ø/g, "oe")
+    .replace(/å/g, "aa")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export function ServiceForm({ initialData }: ServiceFormProps) {
   const router = useRouter();
   const isEditing = !!initialData;
   const [loading, setLoading] = useState(false);
+  /**
+   * Slug'en genereres automatisk ud fra navnet, indtil brugeren selv retter
+   * feltet. Ved redigering røres den aldrig: en ændret slug ændrer sidens URL
+   * og bryder alle eksisterende links til behandlingen.
+   */
+  const [slugTouched, setSlugTouched] = useState(isEditing);
 
   const [formData, setFormData] = useState({
     slug: initialData?.slug || "",
@@ -118,25 +152,62 @@ export function ServiceForm({ initialData }: ServiceFormProps) {
         <h2 className="text-xl font-heading text-cognac border-b border-sand pb-2">Basis information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-textPrimary">Navn</label>
+            <label className="text-sm font-medium text-textPrimary">
+              Navn <span className="text-cognac">*</span>
+            </label>
             <input
               type="text"
               required
+              placeholder="F.eks. Laser hårfjerning"
               value={formData.name}
-              onChange={(e) => handleChange("name", e.target.value)}
+              onChange={(e) => {
+                const name = e.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  name,
+                  // Følg med, indtil brugeren selv har rørt slug-feltet.
+                  slug: slugTouched ? prev.slug : slugify(name),
+                }));
+              }}
               className="w-full px-3 py-2 border border-sand rounded-md focus:outline-none focus:ring-1 focus:ring-cognac"
             />
+            <p className="text-xs text-textMuted">Navnet kunden ser på sitet.</p>
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium text-textPrimary">Slug (URL)</label>
+            <label className="text-sm font-medium text-textPrimary">
+              Slug (URL) <span className="text-cognac">*</span>
+            </label>
             <input
               type="text"
               required
               value={formData.slug}
-              onChange={(e) => handleChange("slug", e.target.value)}
+              onChange={(e) => {
+                setSlugTouched(true);
+                handleChange("slug", slugify(e.target.value));
+              }}
               className="w-full px-3 py-2 border border-sand rounded-md focus:outline-none focus:ring-1 focus:ring-cognac"
             />
+            <p className="text-xs text-textMuted">
+              Udfyldes automatisk ud fra navnet. Det er den adresse, behandlingen
+              får på sitet:
+              <br />
+              <span className="text-textBody">
+                skoenhedsklinik-aarhus.dk/behandlinger/
+                <span className="font-medium text-cognac">
+                  {formData.slug || "…"}
+                </span>
+              </span>
+              {isEditing && (
+                <>
+                  <br />
+                  <span className="text-sale">
+                    Ret den kun hvis du er sikker — en ændring bryder alle
+                    eksisterende links til siden.
+                  </span>
+                </>
+              )}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -146,8 +217,10 @@ export function ServiceForm({ initialData }: ServiceFormProps) {
               onChange={(e) => handleChange("category", e.target.value)}
               className="w-full px-3 py-2 border border-sand rounded-md focus:outline-none focus:ring-1 focus:ring-cognac"
             >
-              {CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
               ))}
             </select>
           </div>
@@ -160,6 +233,9 @@ export function ServiceForm({ initialData }: ServiceFormProps) {
               onChange={(e) => handleChange("display_order", e.target.value)}
               className="w-full px-3 py-2 border border-sand rounded-md focus:outline-none focus:ring-1 focus:ring-cognac"
             />
+            <p className="text-xs text-textMuted">
+              Laveste tal vises først i oversigten. 0 er fint, hvis du er i tvivl.
+            </p>
           </div>
         </div>
 
@@ -204,9 +280,13 @@ export function ServiceForm({ initialData }: ServiceFormProps) {
         <h2 className="text-xl font-heading text-cognac border-b border-sand pb-2">Indhold</h2>
         
         <div className="space-y-2">
-          <label className="text-sm font-medium text-textPrimary">Kort beskrivelse (vises på kort)</label>
+          <label className="text-sm font-medium text-textPrimary">
+            Kort beskrivelse (vises på kort) <span className="text-cognac">*</span>
+          </label>
           <textarea
             rows={2}
+            required
+            placeholder="Én til to sætninger. Vises på behandlingskortene og i oversigten."
             value={formData.short_description}
             onChange={(e) => handleChange("short_description", e.target.value)}
             className="w-full px-3 py-2 border border-sand rounded-md focus:outline-none focus:ring-1 focus:ring-cognac"
@@ -367,7 +447,12 @@ export function ServiceForm({ initialData }: ServiceFormProps) {
         </div>
       </div>
 
-      <div className="flex gap-4 pt-4 border-t border-sand">
+      {/*
+        Grid, ikke flex: Button-komponenten har `shrink-0` i sine basisklasser,
+        så to `w-full`-knapper i en flex-række ikke kan krympe — den ene flød ud
+        af kortet og landede ved siden af formularen.
+      */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-sand">
         <Button
           type="button"
           variant="outline"
