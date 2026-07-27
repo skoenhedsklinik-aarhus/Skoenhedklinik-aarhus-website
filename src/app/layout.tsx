@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { PlausibleScript } from "@/components/shared/PlausibleScript";
 import { MetaPixel } from "@/components/shared/MetaPixel";
+import { AttributionCapture } from "@/components/shared/AttributionCapture";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -86,6 +87,7 @@ export default function RootLayout({
         <Toaster />
         <PlausibleScript />
         <MetaPixel />
+        <AttributionCapture />
       </body>
     </html>
   );

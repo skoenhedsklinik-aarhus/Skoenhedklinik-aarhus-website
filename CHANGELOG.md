@@ -1,5 +1,84 @@
 # Changelog
 
+## 2026-07-27 — Ægte Google-anmeldelser + fuld Meta/Planway-måling
+
+Mål: måle det, der rent faktisk sker (særligt gennemførte bookinger), og vise
+ægte anmeldelser i stedet for pladsholdere.
+
+Opsætningsguide: `OPSAETNING-tracking-og-anmeldelser.md`.
+
+### Google-anmeldelser er nu live-data
+- Ny `src/lib/reviews.ts` — én delt Places API (New)-henter, cachet 24 timer,
+  fejler altid blødt til klientudtalelser (aldrig en tom side).
+- `GoogleReviews` er splittet i en server-komponent (henter data) og
+  `GoogleReviewsClient` (animation). API-nøglen når aldrig browseren.
+- Rating og antal anmeldelser er ikke længere hardkodet "5,0" — de kommer fra
+  Google, med link til klinikkens Google-profil.
+- Annonce-landingssiderne (`/lp/*`) bruger nu de samme ægte anmeldelser.
+  De opdigtede citater er kun fallback og er mærket "Klientudtalelse".
+- Forsiden udsender `aggregateRating` + `Review` som strukturerede data — men
+  **kun** når anmeldelserne er ægte. Ellers ville det være i strid med Googles
+  regler for strukturerede data.
+- `/api/reviews` er nu en tynd wrapper og den hurtigste måde at verificere
+  opsætningen: `"source": "google"` = det virker.
+- Nyt script `scripts/find-place-id.mjs` (`npm run find-place-id`): finder
+  klinikkens Place ID og tester i samme kørsel, om nøglen må hente anmeldelser.
+  Googles egen Place ID Finder virker ikke længere — søgefeltet ligger i en
+  `display:none`-container, og demo-kortet indlæser ikke.
+
+### Meta Conversions API (server-side tracking)
+- Ny `src/lib/meta/capi.ts` — sender events server-til-server med SHA-256-hashet
+  telefon og navn, plus `_fbc`/`_fbp`, IP og user agent.
+- Ny `/api/meta/track` — bro fra browseren, så alle konverteringer sendes begge
+  veje. Kun kendte event-navne og felter forwardes.
+- Alle konverteringer bærer nu et delt `event_id`, så browser- og
+  server-hændelsen dedupliceres i stedet for at tælle dobbelt.
+- Uden `META_CAPI_ACCESS_TOKEN` er hele laget en no-op — siden kører uændret.
+
+### Booking bliver målt for første gang
+- Ny side `/tak` — Planways "Ekstern bekræftelsesside". Bryder ud af
+  booking-iframen, fyrer `Schedule` til både pixel og CAPI, og navngiver
+  konverteringen med den behandling kunden valgte (cookie sat på /book).
+  `noindex` + blokeret i robots.txt.
+- `Schedule` sendes med en DKK-værdi: laveste listepris for den valgte
+  behandling, slået op i prislisten via behandlingens slug. Bevidst laveste og
+  ikke gennemsnit — en booking er ikke betalt endnu, og nogle bliver no-shows.
+  Fallback kan sættes med `BOOKING_DEFAULT_VALUE_DKK`.
+  Bevidst *ikke* `Purchase`: fiktiv omsætning i Ads Manager kan aldrig afstemmes
+  mod Dinero.
+- Nyt custom-event `PlanwayEngaged`: Planway-widgeten kører på deres domæne, så
+  vi kan ikke se klik inde i den. Det ene signal en cross-origin-iframe lækker
+  er fokus — det bruges nu som "er faktisk begyndt at booke".
+
+### Attribution pr. lead (rigtige kolonner)
+- Ny `src/lib/attribution.ts` + `AttributionCapture` i root layout:
+  gemmer `fbclid` og `utm_*` for hele sessionen, og skriver `_fbc`/`_fbp`-cookies
+  selv, når pixlen er blokeret (løfter Event Match Quality).
+- Ny migration `supabase/migrations/add_lead_attribution.sql`: `consultation_leads`
+  får kolonnerne `source`, `utm_source`, `utm_medium`, `utm_campaign`,
+  `utm_content`, `utm_term`, `fbclid`, `landing_page` og `referrer`, plus indeks
+  på kampagne og kilde.
+- `submitConsultationLead` skriver kolonnerne — og opdager selv, hvis
+  migrationen ikke er kørt endnu: så gentages insert uden dem, og attributionen
+  skrives i noten i stedet. Et lead går aldrig tabt over en manglende kolonne.
+- Admin → Henvendelser har fået en "Kilde"-kolonne med kanal, kampagne,
+  annoncenavn og hvilken formular leadet kom fra.
+
+### Flere målepunkter
+- Telefonklik i footer og på begge landingssider måles nu som `Contact`
+  (ny `TrackedPhoneLink`) — før blev kun sticky-CTA og FinalCTA målt.
+- `ViewContent`, `InitiateCheckout` og `Contact` sendes nu også server-side.
+
+### Konfiguration
+- `.env.example` udvidet med alle nye variabler og dansk forklaring på hver.
+- Planway-bookinglinket kan nu overskrives med
+  `NEXT_PUBLIC_PLANWAY_BOOKING_URL` uden kodeændring.
+
+### Stadig udestående (kræver svar fra Planway)
+Service-dyblink til en bestemt behandling. Planways dokumentation beskriver
+ingen URL-parametre, og widgetens kode læser ingen. Koden er forberedt —
+se spørgsmålet til deres support i opsætningsguiden.
+
 ## 2026-07-06 — Konverteringsoptimering + fejlrettelser
 
 Mål: flere leads og bookinger fra samme trafik — særligt Facebook-annoncer

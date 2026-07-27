@@ -8,7 +8,8 @@ import {
   submitConsultationLead,
   type ConsultationLeadResult,
 } from "@/lib/actions/consultation";
-import { trackPixel } from "@/lib/pixel";
+import { trackPixel, newEventId } from "@/lib/pixel";
+import { getAttribution } from "@/lib/attribution";
 
 /* ------------------------------------------------------------------ */
 /* Data: focus areas, follow-up questions, and treatment metadata      */
@@ -233,6 +234,9 @@ export function BookingSection() {
   const handleSubmitPhone = async () => {
     setSubmitting(true);
     setSubmitError(null);
+    // Shared id so the server-side (Conversions API) and browser Lead events
+    // are deduplicated instead of double-counted.
+    const eventId = newEventId();
     let res: ConsultationLeadResult;
     try {
       res = await submitConsultationLead({
@@ -241,16 +245,26 @@ export function BookingSection() {
         note,
         areas: AREAS.filter((a) => selected.includes(a.id)).map((a) => a.label),
         recommendations: recommendations.map((s) => TREATMENTS[s]?.name ?? s),
+        source: "forside-guide",
+        eventId,
+        attribution: getAttribution(),
+        sourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
       });
     } catch {
       res = { ok: false, error: "Noget gik galt. Prøv igen." };
     }
     setSubmitting(false);
     if (res.ok) {
-      trackPixel("Lead", {
-        content_name: recommendations.map((s) => TREATMENTS[s]?.name ?? s).join(", ") || "Konsultation",
-        content_category: "forside-guide",
-      });
+      trackPixel(
+        "Lead",
+        {
+          content_name:
+            recommendations.map((s) => TREATMENTS[s]?.name ?? s).join(", ") ||
+            "Konsultation",
+          content_category: "forside-guide",
+        },
+        eventId,
+      );
       setDir(1);
       setPhase("done");
     } else {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Phone } from "lucide-react";
-import { trackPixel } from "@/lib/pixel";
+import { trackConversion } from "@/lib/pixel";
 
 /**
  * Mobile-only sticky booking bar for treatment pages — the pages Facebook
@@ -11,8 +11,9 @@ import { trackPixel } from "@/lib/pixel";
  * the visitor scrolls. Appears after the hero so it never covers the first
  * impression.
  *
- * Also fires the Meta Pixel `ViewContent` event on mount, tagging which
- * treatment was viewed (feeds remarketing audiences + campaign optimization).
+ * Also fires `ViewContent` on mount, tagging which treatment was viewed (feeds
+ * remarketing audiences + campaign optimization). Sent through both the browser
+ * pixel and the Conversions API on one shared event id.
  */
 export function StickyMobileCTA({
   serviceSlug,
@@ -31,7 +32,7 @@ export function StickyMobileCTA({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    trackPixel("ViewContent", {
+    trackConversion("ViewContent", {
       content_name: serviceName,
       content_category: contentCategory,
     });
@@ -61,7 +62,7 @@ export function StickyMobileCTA({
           <a
             href="tel:+4561445999"
             aria-label="Ring til os"
-            onClick={() => trackPixel("Contact", { content_name: serviceName })}
+            onClick={() => trackConversion("Contact", { content_name: serviceName })}
             className="w-12 h-12 shrink-0 rounded-full border border-cognac/40 bg-white/70 flex items-center justify-center text-cognac hover:bg-cognac/5 transition-colors"
           >
             <Phone className="w-5 h-5" />

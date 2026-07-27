@@ -9,7 +9,8 @@ import { GoogleReviews } from "@/components/home/GoogleReviews";
 import { TeamSection } from "@/components/home/TeamSection";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { getServices, getTeamMembers } from "@/lib/supabase-queries";
-import { localBusinessSchema } from "@/lib/schema";
+import { getGoogleReviews } from "@/lib/reviews";
+import { localBusinessSchema, reviewsSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Skønhedsklinik Aarhus — Certificeret skønhedsbehandling i Aarhus C",
@@ -27,7 +28,36 @@ export const metadata: Metadata = {
 export default async function Home() {
   const services = await getServices();
   const teamMembers = await getTeamMembers();
-  const jsonLd = localBusinessSchema();
+  const googleReviews = await getGoogleReviews(4);
+
+  // Rich results (stars in Google) — only ever emitted from real Google data.
+  // Marking up fallback testimonials would be a structured-data policy breach.
+  const hasRealReviews =
+    googleReviews.source === "google" &&
+    googleReviews.rating != null &&
+    googleReviews.totalCount != null;
+
+  const jsonLd = localBusinessSchema(
+    hasRealReviews
+      ? {
+          aggregateRating: {
+            ratingValue: googleReviews.rating as number,
+            reviewCount: googleReviews.totalCount as number,
+          },
+        }
+      : undefined,
+  );
+
+  const reviewJsonLd = hasRealReviews
+    ? reviewsSchema(
+        googleReviews.reviews.map((r) => ({
+          author: r.author,
+          text: r.text,
+          rating: r.rating,
+          time: r.time ?? undefined,
+        })),
+      )
+    : [];
 
   return (
     <main className="flex flex-col min-h-screen">
@@ -35,6 +65,12 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {reviewJsonLd.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewJsonLd) }}
+        />
+      )}
       <HeroSection />
       <PopularTreatments services={services} />
       <ParallaxFloating />

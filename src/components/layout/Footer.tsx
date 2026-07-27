@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrackedPhoneLink } from "@/components/shared/TrackedPhoneLink";
 
 export function Footer() {
   return (
@@ -49,9 +50,9 @@ export function Footer() {
               <li>Tordenskjoldsgade 61, st. th.</li>
               <li>8000 Aarhus C</li>
               <li>
-                <a href="tel:+4561445999" className="hover:text-cream transition-colors">
+                <TrackedPhoneLink contentCategory="footer" className="hover:text-cream transition-colors">
                   +45 61 44 59 99
-                </a>
+                </TrackedPhoneLink>
               </li>
               <li>
                 <a href="mailto:info@skoenhedsklinik-aarhus.dk" className="hover:text-cream transition-colors">

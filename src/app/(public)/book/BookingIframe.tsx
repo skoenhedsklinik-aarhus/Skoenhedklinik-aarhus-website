@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ExternalLink, Check } from "lucide-react";
 import { buildPlanwayUrl, type BookableService } from "@/lib/booking";
-import { trackPixel } from "@/lib/pixel";
+import { trackConversion } from "@/lib/pixel";
+
+/** How long the picked treatment is remembered for the /tak conversion. */
+const BOOKING_COOKIE_MAX_AGE = 60 * 60 * 6; // 6 hours
 
 export function BookingIframe({
   serviceMap,
@@ -14,20 +17,66 @@ export function BookingIframe({
   const searchParams = useSearchParams();
   const serviceSlug = searchParams.get("service");
   const [loaded, setLoaded] = useState(false);
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const engagedRef = useRef(false);
 
   // Resolve the deep-linked service (if any) and build the Planway URL centrally.
   // Note: Planway's widget doesn't currently read the param, so this deep-links
   // forward-compatibly while we surface the choice in-page below. See lib/booking.ts.
   const selected = serviceSlug ? serviceMap[serviceSlug] : undefined;
   const iframeUrl = buildPlanwayUrl(selected?.planwayServiceId);
+  const selectedName = selected?.name;
 
   // Booking calendar opened = strong mid-funnel intent signal for Meta ads.
-  const selectedName = selected?.name;
+  // Sent both browser-side and server-side (deduplicated on a shared event id).
   useEffect(() => {
-    trackPixel("InitiateCheckout", {
+    trackConversion("InitiateCheckout", {
       content_name: selectedName ?? "Booking",
       content_category: "booking",
     });
+  }, [selectedName]);
+
+  // Remember the treatment so /tak — the page Planway redirects to after a
+  // completed booking — can label the Schedule conversion with it. Planway
+  // passes nothing back to us, so this cookie is the only link between the two.
+  useEffect(() => {
+    // Fall back to the slug when the service isn't in the CMS map, so the
+    // conversion still carries something more useful than "Booking".
+    const label =
+      selectedName ??
+      (serviceSlug ? serviceSlug.replace(/-/g, " ") : "Booking");
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    const write = (name: string, raw: string) => {
+      document.cookie =
+        `${name}=${encodeURIComponent(raw)}; Max-Age=${BOOKING_COOKIE_MAX_AGE}` +
+        `; Path=/; SameSite=Lax${secure}`;
+    };
+    write("sk_booking_service", label);
+    // The slug lets /tak look up the treatment's price and put a DKK value on
+    // the Schedule conversion.
+    write("sk_booking_slug", serviceSlug ?? "");
+  }, [selectedName, serviceSlug]);
+
+  // The Planway widget runs on its own domain, so we cannot see clicks inside
+  // it. The one signal a cross-origin iframe does leak: when the visitor clicks
+  // into it, the window blurs and document.activeElement becomes the iframe.
+  // That's a reliable "actually started booking" signal — fired once per page.
+  useEffect(() => {
+    const onBlur = () => {
+      if (engagedRef.current) return;
+      if (document.activeElement !== frameRef.current) return;
+      engagedRef.current = true;
+      trackConversion(
+        "PlanwayEngaged",
+        {
+          content_name: selectedName ?? "Booking",
+          content_category: "planway-widget",
+        },
+        { custom: true },
+      );
+    };
+    window.addEventListener("blur", onBlur);
+    return () => window.removeEventListener("blur", onBlur);
   }, [selectedName]);
 
   return (
@@ -55,6 +104,7 @@ export function BookingIframe({
           </div>
         )}
         <iframe
+          ref={frameRef}
           src={iframeUrl}
           width="100%"
           style={{ minHeight: "900px", border: 0 }}

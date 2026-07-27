@@ -7,6 +7,8 @@ import { getServiceBySlug, getPricingTiers } from "@/lib/supabase-queries";
 import { CallbackForm } from "@/components/shared/CallbackForm";
 import { StickyMobileCTA } from "@/components/shared/StickyMobileCTA";
 import { TrustStrip } from "@/components/shared/TrustStrip";
+import { TrackedPhoneLink } from "@/components/shared/TrackedPhoneLink";
+import { getGoogleReviews } from "@/lib/reviews";
 
 /**
  * Dedicated ad landing pages (Facebook/Instagram traffic).
@@ -142,6 +144,22 @@ export default async function AdLandingPage({ params }: { params: { slug: string
   const minPrice = priceValues.length > 0 ? Math.min(...priceValues) : null;
   const minPriceLabel = minPrice !== null ? minPrice.toLocaleString("da-DK") : null;
 
+  // Real Google reviews when available — the placeholder quotes in LP_CONTENT
+  // are only a stopgap, and running paid traffic against invented reviews is a
+  // markedsføringslov problem.
+  const googleReviews = await getGoogleReviews(3);
+  const reviewCards =
+    googleReviews.source === "google"
+      ? googleReviews.reviews.map((r) => ({
+          name: r.author,
+          text: r.text,
+          service: r.relativeTime
+            ? `Google-anmeldelse · ${r.relativeTime}`
+            : "Google-anmeldelse",
+        }))
+      : lp.reviews;
+  const ratingLabel = (googleReviews.rating ?? 5).toFixed(1).replace(".", ",");
+
   return (
     <main className="flex flex-col min-h-screen bg-cream">
       {/* ─── Minimal top bar — logo + phone, no navigation ─────────── */}
@@ -150,12 +168,13 @@ export default async function AdLandingPage({ params }: { params: { slug: string
           <span className="font-heading text-lg font-medium tracking-tight">
             Skønhedsklinik Aarhus
           </span>
-          <a
-            href="tel:+4561445999"
+          <TrackedPhoneLink
+            contentCategory={`lp-${params.slug}`}
+            contentName={service.name}
             className="flex items-center gap-2 text-cream/80 hover:text-cream text-sm font-medium transition-colors"
           >
             <Phone className="w-4 h-4" /> 61 44 59 99
-          </a>
+          </TrackedPhoneLink>
         </div>
       </div>
 
@@ -187,7 +206,7 @@ export default async function AdLandingPage({ params }: { params: { slug: string
               </ul>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-white/60 text-xs font-medium tracking-wide">
                 <span className="flex items-center gap-1.5">
-                  <Stars /> 5,0 på Google
+                  <Stars /> {ratingLabel} på Google
                 </span>
                 {minPriceLabel && (
                   <>
@@ -264,17 +283,23 @@ export default async function AdLandingPage({ params }: { params: { slug: string
               </h2>
             </div>
             <div className="glass-cream rounded-xl px-5 py-3.5 flex items-center gap-3 shrink-0 self-start md:self-auto">
-              <p className="text-2xl font-heading font-light text-textPrimary leading-none">5,0</p>
+              <p className="text-2xl font-heading font-light text-textPrimary leading-none">
+                {ratingLabel}
+              </p>
               <div className="w-px h-8 bg-sand" />
               <div>
                 <Stars />
-                <p className="text-xs text-textMuted mt-0.5">Google Anmeldelser</p>
+                <p className="text-xs text-textMuted mt-0.5">
+                  {googleReviews.totalCount
+                    ? `${googleReviews.totalCount} Google-anmeldelser`
+                    : "Google Anmeldelser"}
+                </p>
               </div>
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
-            {lp.reviews.map((r) => (
-              <div key={r.name} className="glass-cream rounded-xl p-6 flex flex-col gap-4">
+            {reviewCards.map((r, i) => (
+              <div key={`${r.name}-${i}`} className="glass-cream rounded-xl p-6 flex flex-col gap-4">
                 <Stars />
                 <p className="text-textBody text-sm leading-relaxed flex-grow">&ldquo;{r.text}&rdquo;</p>
                 <div className="border-t border-sand/60 pt-3">
@@ -325,12 +350,13 @@ export default async function AdLandingPage({ params }: { params: { slug: string
             >
               Bliv ringet op — gratis
             </a>
-            <a
-              href="tel:+4561445999"
+            <TrackedPhoneLink
+              contentCategory={`lp-${params.slug}-final`}
+              contentName={service.name}
               className="px-9 py-4 glass hover:bg-white/15 text-cream rounded-full text-sm font-medium tracking-wide transition-all"
             >
               Ring nu — 61 44 59 99
-            </a>
+            </TrackedPhoneLink>
           </div>
           <p className="flex items-center justify-center gap-2 text-cream/40 text-xs">
             <MapPin className="w-3.5 h-3.5" /> Tordenskjoldsgade 61, 8000 Aarhus C

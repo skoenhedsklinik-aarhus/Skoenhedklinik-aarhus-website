@@ -6,7 +6,8 @@ import {
   submitConsultationLead,
   type ConsultationLeadResult,
 } from "@/lib/actions/consultation";
-import { trackPixel } from "@/lib/pixel";
+import { trackPixel, newEventId } from "@/lib/pixel";
+import { getAttribution } from "@/lib/attribution";
 
 /**
  * Compact 2-field callback lead form ("Ring mig op").
@@ -41,24 +42,36 @@ export function CallbackForm({
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    // One id for both halves of the Lead conversion: the server action sends it
+    // to the Conversions API (with hashed phone/name), the browser fires the
+    // pixel below. Meta deduplicates on the shared id.
+    const eventId = newEventId();
     let res: ConsultationLeadResult;
     try {
       res = await submitConsultationLead({
         name,
         phone,
-        note: `Ønsker opkald (${source})`,
+        note: "Ønsker opkald",
         areas: [],
         recommendations: treatmentName ? [treatmentName] : [],
+        source,
+        eventId,
+        attribution: getAttribution(),
+        sourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
       });
     } catch {
       res = { ok: false, error: "Noget gik galt. Prøv igen." };
     }
     setSubmitting(false);
     if (res.ok) {
-      trackPixel("Lead", {
-        content_name: treatmentName ?? "Konsultation",
-        content_category: source,
-      });
+      trackPixel(
+        "Lead",
+        {
+          content_name: treatmentName ?? "Konsultation",
+          content_category: source,
+        },
+        eventId,
+      );
       setDone(true);
     } else {
       setError(res.error);

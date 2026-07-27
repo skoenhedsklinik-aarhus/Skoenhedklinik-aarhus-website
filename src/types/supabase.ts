@@ -83,6 +83,18 @@ export interface Database {
           recommendations: Json
           handled: boolean
           created_at: string
+          // Annonce-attribution. Tilføjet af
+          // supabase/migrations/add_lead_attribution.sql — optional her, fordi
+          // koden også skal virke, før migrationen er kørt.
+          source?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_term?: string | null
+          fbclid?: string | null
+          landing_page?: string | null
+          referrer?: string | null
         }
         Insert: Partial<Database['public']['Tables']['consultation_leads']['Row']>
         Update: Partial<Database['public']['Tables']['consultation_leads']['Row']>

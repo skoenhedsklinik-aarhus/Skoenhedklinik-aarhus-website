@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { trackPixel } from "@/lib/pixel";
+import { trackConversion } from "@/lib/pixel";
 
 export function FinalCTA() {
   return (
@@ -46,7 +46,7 @@ export function FinalCTA() {
                 Book konsultation
               </motion.button>
             </Link>
-            <Link href="tel:+4561445999" onClick={() => trackPixel("Contact", { content_category: "final-cta" })}>
+            <Link href="tel:+4561445999" onClick={() => trackConversion("Contact", { content_category: "final-cta" })}>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

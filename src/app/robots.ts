@@ -8,7 +8,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/api/", "/lp/"],
+        // /tak is the post-booking confirmation page — never crawl it.
+        disallow: ["/admin/", "/api/", "/lp/", "/tak"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

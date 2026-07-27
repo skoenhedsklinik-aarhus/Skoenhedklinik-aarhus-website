@@ -18,7 +18,16 @@
  * buildPlanwayUrl falls back to the plain base URL automatically.
  */
 
-export const PLANWAY_BASE_URL = "https://skonhedsklinik-aarhus.planway.com/";
+/**
+ * The clinic's Planway booking page.
+ *
+ * Override with NEXT_PUBLIC_PLANWAY_BOOKING_URL in Vercel if Planway ever hands
+ * out a different "Direkte link" (Indstillinger → Online booking → Bookingside),
+ * so swapping it needs no code change.
+ */
+export const PLANWAY_BASE_URL =
+  process.env.NEXT_PUBLIC_PLANWAY_BOOKING_URL ||
+  "https://skonhedsklinik-aarhus.planway.com/";
 
 /**
  * Query param Planway would use to pre-select a service.

@@ -32,6 +32,44 @@ function formatDate(iso: string): string {
   }
 }
 
+/**
+ * Where the lead came from. Reads the attribution columns added by
+ * supabase/migrations/add_lead_attribution.sql. Leads created before the
+ * migration have the same information appended to their note instead, so this
+ * cell simply shows "—" for those.
+ */
+function AttributionCell({ lead }: { lead: Lead }) {
+  const campaign = lead.utm_campaign;
+  const ad = lead.utm_content;
+  const channel =
+    lead.utm_source ?? (lead.fbclid ? "Meta-annonce" : null);
+
+  const hasAny = campaign || ad || channel || lead.source;
+  if (!hasAny) return <span className="text-textMuted">—</span>;
+
+  return (
+    <div className="space-y-0.5">
+      {channel && (
+        <div className="text-sm text-textPrimary capitalize">
+          {channel}
+          {lead.utm_medium ? (
+            <span className="text-textMuted normal-case"> / {lead.utm_medium}</span>
+          ) : null}
+        </div>
+      )}
+      {campaign && (
+        <div className="text-xs text-textBody break-words">{campaign}</div>
+      )}
+      {ad && (
+        <div className="text-xs text-textMuted break-words">Annonce: {ad}</div>
+      )}
+      {lead.source && (
+        <div className="text-xs text-textMuted">Formular: {lead.source}</div>
+      )}
+    </div>
+  );
+}
+
 export function LeadsList({ initialData }: LeadsListProps) {
   const router = useRouter();
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -78,6 +116,7 @@ export function LeadsList({ initialData }: LeadsListProps) {
             <th className="p-4 font-medium text-textPrimary">Navn</th>
             <th className="p-4 font-medium text-textPrimary">Telefon</th>
             <th className="p-4 font-medium text-textPrimary">Ønsker</th>
+            <th className="p-4 font-medium text-textPrimary">Kilde</th>
             <th className="p-4 font-medium text-textPrimary">Status</th>
             <th className="p-4 font-medium text-textPrimary text-right">Handlinger</th>
           </tr>
@@ -122,6 +161,9 @@ export function LeadsList({ initialData }: LeadsListProps) {
                   {areas.length === 0 && recs.length === 0 && !lead.note && (
                     <span className="text-textMuted">—</span>
                   )}
+                </td>
+                <td className="p-4 text-textBody max-w-[16rem]">
+                  <AttributionCell lead={lead} />
                 </td>
                 <td className="p-4">
                   <span
