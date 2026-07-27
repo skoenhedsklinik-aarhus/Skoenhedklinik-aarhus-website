@@ -45,7 +45,7 @@ export default function TermsPage() {
             Betaling for behandlinger sker typisk i klinikken efter endt behandling (medmindre forudbetaling er valgt via Planway). Gavekort købes og betales online via Planway.
           </p>
           <p>
-            <strong>Studierabat:</strong> Vi tilbyder 10% i studierabat i HELE åbningstiden mod fremvisning af gyldigt studiekort. Bemærk at studierabatten ikke kan kombineres med i forvejen nedsatte priser eller pakkeløsninger.
+            <strong>Studierabat:</strong> Vi tilbyder 10% i studierabat i hele åbningstiden mod fremvisning af gyldigt studiekort. Fra 1. august 2026 gælder studierabatten alene på behandlinger til 400 kr. og derover. Studierabatten kan ikke kombineres med kampagner, pakkeløsninger eller i forvejen nedsatte priser.
           </p>
 
           <h2>4. Gavekort</h2>

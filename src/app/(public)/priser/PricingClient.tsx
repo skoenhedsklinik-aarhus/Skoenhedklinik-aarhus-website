@@ -125,9 +125,12 @@ export function PricingClient({ pricingTiers, packagesOffers }: PricingClientPro
             <div>
               <h3 className="font-heading text-xl text-textPrimary mb-2">Studierabat</h3>
               <p className="text-textBody">
-                Vi tilbyder altid <strong>10% i studierabat</strong> i HELE åbningstiden, mod fremvisning af gyldigt studiekort. 
+                Vi tilbyder <strong>10% i studierabat</strong> i hele åbningstiden, mod
+                fremvisning af gyldigt studiekort.{" "}
                 <br className="hidden sm:block" />
-                (Gælder ikke pakker og i forvejen nedsatte priser).
+                Fra <strong>1. august 2026</strong> gælder rabatten på behandlinger fra{" "}
+                <strong>400 kr.</strong> og op. Den kan ikke kombineres med kampagner,
+                pakker eller i forvejen nedsatte priser.
               </p>
             </div>
           </div>

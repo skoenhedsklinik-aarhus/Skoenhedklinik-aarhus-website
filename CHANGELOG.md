@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-07-27 (2) — Ansigtsbehandlinger, booking-flow og studierabat
+
+### Ansigtsbehandlinger
+- Aloe-billedet fra Firm & Smooth er flyttet til Glow & Renew. Det erstatter et
+  sløret 6,5 KB-billede og passer langt bedre til behandlingen.
+- Firm & Smooth har fået et nyt portræt af en kvinde i tresserne, genereret til
+  formålet og beskåret til kortets 4:5-format. Kæbelinje og hals er synlige,
+  hvilket er det en opstrammende anti-age-behandling faktisk adresserer.
+
+### Lettere at booke
+- **Book-knap i mobil-headeren.** Booking lå før gemt bag hamburgermenuen på
+  telefonen, hvor størstedelen af trafikken kommer fra.
+- **Ny `StickyBookBar`** i (public)-layoutet: sticky bookingbjælke på mobil på
+  alle offentlige sider. Særligt vigtigt på forsiden, hvor scroll-hero'en holder
+  både header og hero-CTA skjult, indtil animationen er kørt færdig — der var
+  ingen synlig måde at booke på ved første visning.
+- Bjælken holder sig væk fra behandlingssider og annonce-landingssider, som
+  allerede har `StickyMobileCTA` med behandlingskontekst. Verificeret: præcis én
+  bjælke pr. side, aldrig to, og ingen på /book og /tak.
+- Telefonknappen i bjælken måles som `Contact`.
+
+### Studierabat
+Fra 1. august 2026 gælder studierabatten kun på behandlinger fra 400 kr. og op,
+og den kan ikke kombineres med kampagner, pakker eller i forvejen nedsatte
+priser. Opdateret på prissiden, i handelsbetingelserne og i sidens metadata.
+
 ## 2026-07-27 — Ægte Google-anmeldelser + fuld Meta/Planway-måling
 
 Mål: måle det, der rent faktisk sker (særligt gennemførte bookinger), og vise

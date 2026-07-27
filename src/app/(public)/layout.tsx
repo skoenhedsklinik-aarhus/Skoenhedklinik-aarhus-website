@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { StickyBookBar } from "@/components/shared/StickyBookBar";
 
 export default function PublicLayout({
   children,
@@ -20,6 +21,7 @@ export default function PublicLayout({
         {children}
       </div>
       <Footer />
+      <StickyBookBar />
     </>
   );
 }

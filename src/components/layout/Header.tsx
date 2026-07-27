@@ -155,7 +155,21 @@ export function Header() {
               </Link>
             </div>
 
-            {/* Mobile hamburger */}
+            {/* Mobile: book-knap + hamburger. Uden knappen her lå booking
+                gemt bag menuen på telefonen, hvor størstedelen af trafikken er. */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <Link
+                href="/book"
+                className={`rounded-full px-4 py-2 text-xs font-medium tracking-wide transition-all duration-300 ${
+                  atTop
+                    ? "bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-sm"
+                    : "bg-cognac hover:bg-cognac-hover text-white"
+                }`}
+              >
+                Book tid
+              </Link>
+            </div>
+
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger>
                 <button
