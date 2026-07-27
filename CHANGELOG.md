@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-07-27 (3) — Anmeldelseskarrusel + Place ID-fælden
+
+### Anmeldelser som karrusel
+- `GoogleReviewsClient` er nu en vandret scroll-snap-karrusel i stedet for et
+  fast grid: swipe på touch, pile på desktop, og den skalerer af sig selv, hvis
+  antallet af anmeldelser vokser.
+- Sidste kort linker til hele Google-profilen med det rigtige samlede antal.
+- Forsiden henter nu alle 5 (før 4), og tekstfilteret er løsnet fra 40 til 25
+  tegn. Med højst 5 tilgængelige er hver kasseret anmeldelse 20% af det, vi
+  overhovedet kan vise.
+- **Google returnerer højst 5 anmeldelser pr. sted og har ingen paginering.**
+  Det er en hård API-grænse, uanset hvor mange klinikken har.
+
+### Place ID-fælden
+Live-sitet viste stadig klientudtalelser, selv om `/api/reviews` svarede 200.
+Årsag: `GOOGLE_PLACE_ID` i Vercel var et *adresse*-ID (`Ej…`), ikke
+virksomhedens (`ChIJ…`). Det dekodede til "Tordenskjoldsgade 61, st th, 8200
+Aarhus" — forkert type og forkert postnummer. Adresser har ingen anmeldelser, så
+API'et svarer tomt og koden falder pænt tilbage uden at fejle.
+
+- `scripts/find-place-id.mjs` markerer nu hvert resultat som ✅ virksomhed eller
+  ⚠️ ADRESSE, og vælger automatisk virksomheds-ID'et.
+- Nyt `--verify <place_id>` til at teste et ID, der allerede ligger i Vercel.
+- Fælden og fejlsøgningen er dokumenteret i opsætningsguiden.
+
 ## 2026-07-27 (2) — Ansigtsbehandlinger, booking-flow og studierabat
 
 ### Ansigtsbehandlinger

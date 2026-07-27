@@ -117,9 +117,11 @@ export function googleProfileUrl(placeId: string): string {
 /**
  * Fetch the clinic's Google reviews.
  *
- * @param limit  max number of reviews to return (Google returns at most 5)
+ * @param limit  max number of reviews to return. Google's Places API
+ *                returns at most 5 per place, and offers no pagination, so 5
+ *                is the hard ceiling regardless of how many the clinic has.
  */
-export async function getGoogleReviews(limit = 4): Promise<ReviewsResult> {
+export async function getGoogleReviews(limit = 5): Promise<ReviewsResult> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
   const placeId = process.env.GOOGLE_PLACE_ID;
 
@@ -156,7 +158,9 @@ export async function getGoogleReviews(limit = 4): Promise<ReviewsResult> {
     const reviews: ReviewData[] = (data.reviews ?? [])
       .filter((r) => {
         const text = r.text?.text ?? r.originalText?.text ?? "";
-        return r.rating === 5 && text.trim().length > 40;
+        // Google returnerer højst 5 anmeldelser i alt, så filteret skal være
+        // løst: hver kasseret anmeldelse er 20% af det, vi overhovedet kan vise.
+        return r.rating === 5 && text.trim().length > 25;
       })
       .sort((a, b) => {
         const aTime = a.publishTime ? Date.parse(a.publishTime) : 0;

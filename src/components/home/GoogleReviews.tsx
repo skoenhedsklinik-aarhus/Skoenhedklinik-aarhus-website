@@ -11,7 +11,7 @@ import { GoogleReviewsClient } from "./GoogleReviewsClient";
  */
 export async function GoogleReviews() {
   const { reviews, rating, totalCount, source, profileUrl } =
-    await getGoogleReviews(4);
+    await getGoogleReviews(5);
 
   return (
     <GoogleReviewsClient

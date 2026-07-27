@@ -8,9 +8,9 @@
  * pålidelige vej.
  *
  * Brug:
- *   node scripts/find-place-id.mjs
- *   node scripts/find-place-id.mjs "Skønhedsklinik Aarhus, Tordenskjoldsgade 61"
- *   GOOGLE_PLACES_API_KEY=AIza... node scripts/find-place-id.mjs
+ *   npm run find-place-id -- --key AIza...
+ *   npm run find-place-id -- --key AIza... "Skønhedsklinik Aarhus"
+ *   npm run find-place-id -- --key AIza... --verify ChIJ...   (test et ID du bruger)
  *
  * Nøglen findes i denne rækkefølge: --key <nøgle> → miljøvariabel
  * GOOGLE_PLACES_API_KEY → .env.local i projektroden.
@@ -22,6 +22,16 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_QUERY = "Skønhedsklinik Aarhus, Tordenskjoldsgade 61, 8000 Aarhus C";
+
+/**
+ * Virksomheders Place ID starter med "ChIJ". Starter det med "Ej"/"Ei", er det
+ * en geokodet ADRESSE. Adresser har ingen anmeldelser, så siden falder tilbage
+ * til klientudtalelser uden at fejle. Det er den nemmeste fejl at lave, fordi
+ * begge dele ser ud som et helt gyldigt Place ID.
+ */
+function isBusinessId(id) {
+  return typeof id === "string" && id.startsWith("ChIJ");
+}
 
 function readKeyFromEnvFile() {
   for (const file of [".env.local", ".env"]) {
@@ -44,28 +54,87 @@ function fail(message) {
   process.exit(1);
 }
 
-const args = process.argv.slice(2);
-const keyFlagIndex = args.indexOf("--key");
-let apiKey = null;
-if (keyFlagIndex !== -1) {
-  apiKey = args[keyFlagIndex + 1];
-  args.splice(keyFlagIndex, 2);
+function takeFlag(args, name) {
+  const i = args.indexOf(name);
+  if (i === -1) return null;
+  const value = args[i + 1];
+  args.splice(i, 2);
+  return value ?? null;
 }
-apiKey ||= process.env.GOOGLE_PLACES_API_KEY || readKeyFromEnvFile();
 
+// --- argumenter -------------------------------------------------------------
+const args = process.argv.slice(2);
+const keyArg = takeFlag(args, "--key");
+const verifyId = takeFlag(args, "--verify");
+const apiKey = keyArg || process.env.GOOGLE_PLACES_API_KEY || readKeyFromEnvFile();
 const query = args.join(" ").trim() || DEFAULT_QUERY;
 
 if (!apiKey) {
   fail(
     "Ingen API-nøgle fundet.\n" +
-      "   Kør: node scripts/find-place-id.mjs --key AIza...\n" +
+      "   Kør: npm run find-place-id -- --key AIza...\n" +
       "   eller læg GOOGLE_PLACES_API_KEY i .env.local",
   );
 }
 
-// ---------------------------------------------------------------------------
-// 1) Text Search → find Place ID
-// ---------------------------------------------------------------------------
+/** Hent anmeldelser for ét Place ID og rapportér, hvad siden vil vise. */
+async function verifyPlace(placeId) {
+  const response = await fetch(
+    `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}` +
+      `?fields=displayName,formattedAddress,reviews,rating,userRatingCount` +
+      `&languageCode=da&regionCode=DK`,
+    { headers: { "X-Goog-Api-Key": apiKey } },
+  );
+
+  if (!response.ok) {
+    console.error(`❌ Kunne ikke hente stedet (HTTP ${response.status}):\n`);
+    console.error(await response.text());
+    process.exit(1);
+  }
+
+  const details = await response.json();
+  const reviews = details.reviews ?? [];
+
+  console.log(`   Navn:    ${details.displayName?.text ?? "—"}`);
+  console.log(`   Adresse: ${details.formattedAddress ?? "—"}`);
+  console.log(`   Rating:  ${details.rating ?? "—"}`);
+  console.log(`   Antal anmeldelser i alt: ${details.userRatingCount ?? "—"}`);
+  console.log(`   Anmeldelser returneret af API'et: ${reviews.length}  (Google giver højst 5)`);
+
+  // Samme filter som src/lib/reviews.ts bruger.
+  const usable = reviews.filter(
+    (r) => r.rating === 5 && (r.text?.text ?? r.originalText?.text ?? "").trim().length > 25,
+  );
+  console.log(`   Heraf brugbare på sitet (5 stjerner + tekst): ${usable.length}\n`);
+
+  if (usable.length === 0) {
+    console.log(
+      "⚠️  Siden vil vise generiske klientudtalelser, ikke Google-anmeldelser.\n" +
+        (isBusinessId(placeId)
+          ? "   Stedet har ingen 5-stjernede anmeldelser med tekst.\n"
+          : "   Årsag: Place ID'et er en adresse, ikke virksomheden.\n"),
+    );
+    return false;
+  }
+
+  console.log("✅ Klar. Siden vil vise ægte Google-anmeldelser med dette ID.\n");
+  return true;
+}
+
+// --- verify-mode ------------------------------------------------------------
+if (verifyId) {
+  console.log(`\n🔍  Tester eksisterende Place ID: ${verifyId}\n`);
+  if (!isBusinessId(verifyId)) {
+    console.log(
+      "⚠️  ID'et starter ikke med 'ChIJ'. Det er sandsynligvis en geokodet\n" +
+        "   ADRESSE og ikke virksomheden. Adresser har ingen anmeldelser.\n",
+    );
+  }
+  const ok = await verifyPlace(verifyId);
+  process.exit(ok ? 0 : 1);
+}
+
+// --- søgning ----------------------------------------------------------------
 console.log(`\n🔎  Søger efter: ${query}\n`);
 
 const searchResponse = await fetch(
@@ -104,7 +173,10 @@ if (places.length === 0) {
 
 console.log("Resultater:\n");
 places.slice(0, 5).forEach((place, i) => {
-  console.log(`  ${i + 1}. ${place.displayName?.text ?? "(uden navn)"}`);
+  const flag = isBusinessId(place.id)
+    ? "✅ virksomhed"
+    : "⚠️  ADRESSE — har ingen anmeldelser";
+  console.log(`  ${i + 1}. ${place.displayName?.text ?? "(uden navn)"}   [${flag}]`);
   console.log(`     ${place.formattedAddress ?? ""}`);
   console.log(`     Place ID: ${place.id}`);
   console.log(
@@ -112,46 +184,20 @@ places.slice(0, 5).forEach((place, i) => {
   );
 });
 
-const best = places[0];
+// Foretræk altid et virksomheds-ID frem for en adresse.
+const best = places.find((p) => isBusinessId(p.id)) ?? places[0];
 
-// ---------------------------------------------------------------------------
-// 2) Place Details → verificér at anmeldelser rent faktisk kan hentes
-// ---------------------------------------------------------------------------
-console.log("🔐  Tester om nøglen må hente anmeldelser (Enterprise + Atmosphere)…\n");
-
-const detailsResponse = await fetch(
-  `https://places.googleapis.com/v1/places/${encodeURIComponent(best.id)}` +
-    `?fields=reviews,rating,userRatingCount&languageCode=da&regionCode=DK`,
-  { headers: { "X-Goog-Api-Key": apiKey } },
-);
-
-if (!detailsResponse.ok) {
-  const body = await detailsResponse.text();
-  console.error(`❌ Kunne ikke hente anmeldelser (HTTP ${detailsResponse.status}):\n`);
-  console.error(body);
-  process.exit(1);
-}
-
-const details = await detailsResponse.json();
-const reviewCount = (details.reviews ?? []).length;
-
-console.log(`✅  Rating: ${details.rating ?? "—"}`);
-console.log(`✅  Antal anmeldelser i alt: ${details.userRatingCount ?? "—"}`);
-console.log(`✅  Anmeldelser returneret af API'et: ${reviewCount}`);
-
-const fiveStar = (details.reviews ?? []).filter(
-  (r) => r.rating === 5 && (r.text?.text ?? "").trim().length > 40,
-);
-console.log(`✅  Heraf 5-stjernede med tekst (dem sitet viser): ${fiveStar.length}\n`);
-
-if (fiveStar.length === 0) {
+if (!isBusinessId(best.id)) {
   console.log(
-    "⚠️  Ingen af anmeldelserne passerer sitets filter (5 stjerner + over 40 tegn).\n" +
-      "   Siden vil vise generiske klientudtalelser i stedet.\n",
+    "⚠️  Ingen af resultaterne er en virksomhed — kun adresser.\n" +
+      "   Prøv en mere præcis søgning, fx blot klinikkens navn:\n" +
+      '   npm run find-place-id -- --key DIN_NOEGLE "Skønhedsklinik Aarhus"\n',
   );
 }
 
+console.log("🔐  Tester om nøglen må hente anmeldelser (Enterprise + Atmosphere)…\n");
+await verifyPlace(best.id);
+
 console.log("─".repeat(70));
-console.log("\nIndsæt disse to i Vercel → Settings → Environment Variables:\n");
-console.log(`GOOGLE_PLACE_ID       = ${best.id}`);
-console.log(`GOOGLE_PLACES_API_KEY = ${apiKey.slice(0, 8)}…  (den nøgle du brugte her)\n`);
+console.log("\nIndsæt denne i Vercel → Settings → Environment Variables:\n");
+console.log(`GOOGLE_PLACE_ID = ${best.id}\n`);

@@ -290,6 +290,29 @@ npm run find-place-id -- --key DIN_API_NOEGLE "Skønhedsklinik Aarhus C"
 **Verificér altid** ved at åbne "Tjek på kortet"-linket. Åbner det den rigtige
 klinik på Google Maps, er Place ID'et rigtigt.
 
+> ### ⚠️ Den fælde, der koster mest tid
+>
+> **Virksomheders Place ID starter med `ChIJ`.** Starter dit ID med `Ej` eller
+> `Ei`, er det en *geokodet adresse* og ikke virksomheden. En adresse har ingen
+> anmeldelser knyttet til sig, så API'et svarer pænt med 200 OK og et tomt
+> resultat, og siden falder tilbage til klientudtalelser uden at fejle.
+>
+> Det skete i første opsætning her: ID'et dekodede til
+> "Tordenskjoldsgade 61, st th, 8200 Aarhus" — både en adresse i stedet for
+> klinikken, og med forkert postnummer (klinikken ligger i 8000 Aarhus C).
+>
+> Scriptet markerer nu hvert resultat med ✅ virksomhed eller ⚠️ ADRESSE, og
+> vælger automatisk virksomheds-ID'et.
+
+**Test et ID, du allerede har lagt i Vercel:**
+
+```bash
+npm run find-place-id -- --key DIN_API_NOEGLE --verify DIT_PLACE_ID
+```
+
+Den viser navn, adresse, rating, det samlede antal anmeldelser, og hvor mange
+der rent faktisk vil blive vist på sitet.
+
 <details>
 <summary>Uden scriptet: samme opslag med curl</summary>
 
@@ -323,14 +346,21 @@ Redeploy bagefter (Deployments → seneste → ⋯ → Redeploy).
 - `"source": "google"` → det virker. Forsiden viser nu ægte anmeldelser.
 - `"source": "fallback"` → noget mangler. Se tabellen nedenfor.
 
-Anmeldelserne hentes forfra hvert døgn. Nye 5-stjernede anmeldelser med mere end
-40 tegns tekst dukker automatisk op inden for et døgn.
+Anmeldelserne hentes forfra hvert døgn. Nye 5-stjernede anmeldelser med tekst
+dukker automatisk op inden for et døgn.
+
+> **Google returnerer højst 5 anmeldelser pr. sted.** Det er en hård grænse i
+> Places API, og der findes ingen paginering — uanset om klinikken har 30 eller
+> 300 anmeldelser. Forsiden viser derfor alle 5 i en karrusel plus et kort, der
+> linker til hele profilen på Google, hvor det rigtige samlede antal står.
 
 ### 2.11 Fejlsøgning
 
 | Symptom | Årsag | Løsning |
 |---|---|---|
 | `"source": "fallback"` | En af de to variabler mangler eller er tom i Vercel | Tjek stavning, og at der er redeployet bagefter |
+| `"source": "fallback"`, men nøglerne ser rigtige ud | Place ID'et er en adresse (`Ej…`), ikke virksomheden (`ChIJ…`) | Kør `--verify` (trin 2.8) og find det rigtige ID |
+| `"totalCount": null` sammen med `"source": "fallback"` | Google svarede slet ikke med data for stedet | Samme som ovenfor |
 | `API key not valid` | Nøglen er kopieret forkert | Kopiér den igen fra Credentials |
 | `PERMISSION_DENIED` / `SERVICE_DISABLED` | Places API (New) er ikke slået til | Trin 2.6 — husk at det skal være "(New)" |
 | `This API method requires billing to be enabled` | Ingen faktureringskonto på projektet | Trin 2.3 |
