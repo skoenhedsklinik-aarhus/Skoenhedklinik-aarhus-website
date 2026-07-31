@@ -21,7 +21,7 @@
  * - PlanwayEngaged   → custom: visitor interacted inside the Planway widget
  */
 
-import { getAttribution } from "@/lib/attribution";
+import { captureAttribution, getAttribution } from "@/lib/attribution";
 
 export type PixelParams = Record<
   string,
@@ -93,6 +93,13 @@ export function sendToCapi(
 ) {
   if (typeof window === "undefined") return;
   try {
+    // Sørg for at _fbp/_fbc findes, FØR eventet sendes. <AttributionCapture />
+    // skriver dem også, men begge kører i en useEffect, og rækkefølgen mellem
+    // to komponenters effects er ikke garanteret. Uden det her afsendes en del
+    // events før cookien er skrevet, og så mangler Meta et browser-id at matche
+    // på (målt: fbp-dækning på 77% for ViewContent). Kaldet er idempotent.
+    captureAttribution();
+
     const body = JSON.stringify({
       event,
       eventId,

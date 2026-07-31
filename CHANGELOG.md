@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-07-27 (5) — Rettelse: fbp-cookien manglede på en fjerdedel af events
+
+Målt i Events Manager havde `ViewContent` kun 77,3 % dækning på `fbp`, altså
+manglede hver fjerde event et browser-id at matche på.
+
+Årsag: `ViewContent` fyrer i en `useEffect` når komponenten mounter, og
+`AttributionCapture` skriver `_fbp`-cookien i sin egen `useEffect`. Rækkefølgen
+mellem to komponenters effects er ikke garanteret, så en del events blev afsendt,
+før cookien fandtes.
+
+`sendToCapi` kalder nu `captureAttribution()` som det første, så cookien altid
+findes inden afsendelse. Kaldet er idempotent og bevarer first-touch-attribution.
+
 ## 2026-07-27 (4) — Admin: nemmere at oprette behandlinger
 
 - **Slug udfyldes automatisk** ud fra navnet, med dansk translitteration
