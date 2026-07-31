@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-07-31 (3) — Nyt billede til Firm & Smooth
+
+Kunden kunne ikke lide det gamle billede. Erstattet med et profilportræt, hvor
+kæbelinjen og kantlyset er motivet, i stedet for et ansigt set forfra.
+
+Beskåret til 4:5 og ikke 3:4. Boksen på behandlingssiden er `aspect-[4/5]` med
+`object-cover`, så et 3:4-billede blev beskåret af browseren, og hvad der røg
+var op til viewporten. Nu passer kildefilen præcis, og der skæres intet væk.
+
+1200x1500, AVIF, 88 KB. Samme filnavn, så ingen kodeændring.
+
 ## 2026-07-31 (2) — Admin: kategorinavne i prislisten
 
 Under **Priser** stod kategorien som den rå databaseværdi: "Haarfjerning" i
