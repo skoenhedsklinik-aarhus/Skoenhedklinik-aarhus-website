@@ -18,7 +18,6 @@
  * - InitiateCheckout → booking calendar opened on /book
  * - Schedule         → booking completed (Planway confirmation page /tak)
  * - Contact          → phone number tapped
- * - PlanwayEngaged   → custom: visitor interacted inside the Planway widget
  */
 
 import { captureAttribution, getAttribution } from "@/lib/attribution";
@@ -53,26 +52,6 @@ export function trackPixel(
   try {
     window.fbq(
       "track",
-      event,
-      params,
-      eventId ? { eventID: eventId } : undefined,
-    );
-  } catch {
-    // Never let tracking break the UI.
-  }
-}
-
-/** Fire a custom (non-standard) browser-side pixel event. */
-export function trackPixelCustom(
-  event: string,
-  params?: PixelParams,
-  eventId?: string,
-) {
-  if (typeof window === "undefined") return;
-  if (typeof window.fbq !== "function") return;
-  try {
-    window.fbq(
-      "trackCustom",
       event,
       params,
       eventId ? { eventID: eventId } : undefined,
@@ -131,14 +110,10 @@ export function sendToCapi(
 export function trackConversion(
   event: string,
   params?: PixelParams,
-  options?: { eventId?: string; custom?: boolean; skipServer?: boolean },
+  options?: { eventId?: string; skipServer?: boolean },
 ): string {
   const eventId = options?.eventId ?? newEventId();
-  if (options?.custom) {
-    trackPixelCustom(event, params, eventId);
-  } else {
-    trackPixel(event, params, eventId);
-  }
+  trackPixel(event, params, eventId);
   if (!options?.skipServer) sendToCapi(event, eventId, params);
   return eventId;
 }

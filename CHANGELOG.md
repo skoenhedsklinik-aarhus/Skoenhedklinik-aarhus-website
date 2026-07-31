@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-07-27 (6) — PlanwayEngaged fjernet
+
+Målt over syv dage: **nul** `PlanwayEngaged`-events, mod 50-100
+`InitiateCheckout` i samme periode. Nogle af de besøgende, der åbnede
+bookingkalenderen, må have klikket ind i widgeten, så heuristikken virkede ikke.
+
+Den byggede på det eneste signal en cross-origin-iframe lækker: at vinduet
+mister fokus og `document.activeElement` bliver iframen. Det viste sig ikke at
+være pålideligt mod Planways widget.
+
+Fjernet fra `BookingIframe`, fra allowlisten i `/api/meta/track` og fra
+opsætningsguiden. `trackPixelCustom` og `custom`-flaget i `trackConversion` er
+fjernet med, da de kun fandtes til dette ene event.
+
 ## 2026-07-27 (5) — Rettelse: fbp-cookien manglede på en fjerdedel af events
 
 Målt i Events Manager havde `ViewContent` kun 77,3 % dækning på `fbp`, altså

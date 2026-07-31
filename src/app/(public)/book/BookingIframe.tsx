@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ExternalLink, Check } from "lucide-react";
 import { buildPlanwayUrl, type BookableService } from "@/lib/booking";
@@ -17,8 +17,6 @@ export function BookingIframe({
   const searchParams = useSearchParams();
   const serviceSlug = searchParams.get("service");
   const [loaded, setLoaded] = useState(false);
-  const frameRef = useRef<HTMLIFrameElement | null>(null);
-  const engagedRef = useRef(false);
 
   // Resolve the deep-linked service (if any) and build the Planway URL centrally.
   // Note: Planway's widget doesn't currently read the param, so this deep-links
@@ -57,28 +55,6 @@ export function BookingIframe({
     write("sk_booking_slug", serviceSlug ?? "");
   }, [selectedName, serviceSlug]);
 
-  // The Planway widget runs on its own domain, so we cannot see clicks inside
-  // it. The one signal a cross-origin iframe does leak: when the visitor clicks
-  // into it, the window blurs and document.activeElement becomes the iframe.
-  // That's a reliable "actually started booking" signal — fired once per page.
-  useEffect(() => {
-    const onBlur = () => {
-      if (engagedRef.current) return;
-      if (document.activeElement !== frameRef.current) return;
-      engagedRef.current = true;
-      trackConversion(
-        "PlanwayEngaged",
-        {
-          content_name: selectedName ?? "Booking",
-          content_category: "planway-widget",
-        },
-        { custom: true },
-      );
-    };
-    window.addEventListener("blur", onBlur);
-    return () => window.removeEventListener("blur", onBlur);
-  }, [selectedName]);
-
   return (
     <div className="w-full">
       {selected && (
@@ -104,7 +80,6 @@ export function BookingIframe({
           </div>
         )}
         <iframe
-          ref={frameRef}
           src={iframeUrl}
           width="100%"
           style={{ minHeight: "900px", border: 0 }}

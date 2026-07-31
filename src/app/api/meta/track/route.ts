@@ -23,7 +23,6 @@ const ALLOWED_EVENTS = new Set([
   "InitiateCheckout",
   "ViewContent",
   "Contact",
-  "PlanwayEngaged",
 ]);
 
 /** Only these custom_data keys are passed on to Meta. */

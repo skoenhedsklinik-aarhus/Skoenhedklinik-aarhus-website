@@ -16,7 +16,6 @@ før resten er på plads.
 | Behandlingsside vist | `ViewContent` | ✅ | ✅ |
 | "Ring mig op"-formular sendt | `Lead` | ✅ | ✅ + hashet navn/telefon |
 | Bookingkalender åbnet på /book | `InitiateCheckout` | ✅ | ✅ |
-| Klik ind i Planway-widgeten | `PlanwayEngaged` (custom) | ✅ | ✅ |
 | **Booking gennemført** | `Schedule` (med DKK-værdi) | ✅ | ✅ |
 | Telefonnummer trykket | `Contact` | ✅ | ✅ |
 
