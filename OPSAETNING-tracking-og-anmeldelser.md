@@ -399,6 +399,69 @@ Mens I er inde i Planway, så tag også:
 
 ---
 
+## 3b. Mailnotifikation ved nye henvendelser (15 min)
+
+I dag lander en henvendelse i databasen og vises under **Admin → Henvendelser**,
+men ingen får besked. Med det her sender sitet en mail til klinikken, hver gang
+nogen udfylder "Ring mig op" eller booking-guiden på forsiden.
+
+Mailen indeholder navn, telefonnummer som et klikbart link, hvad hun ønsker
+hjælp til, hendes besked, og hvilken annonce eller kampagne hun kom fra.
+
+### 3b.1 Opret en Resend-konto
+
+1. Gå til [resend.com](https://resend.com) og opret en gratis konto.
+   Gratisplanen dækker 3.000 mails om måneden — rigeligt.
+2. **Domains** → **Add Domain** → indtast `skoenhedsklinik-aarhus.dk`.
+3. Resend viser 3 DNS-poster (en MX og to TXT). De skal ind hos den, der
+   hoster domænets DNS. Klik **Verify** bagefter — der går typisk 5-30 minutter,
+   før den skifter til grøn.
+
+**Domænet skal verificeres.** Uden det afviser Resend afsendelsen, og
+notifikationen kommer aldrig frem. Vil I teste med det samme, kan I midlertidigt
+sætte `RESEND_FROM = onboarding@resend.dev` — den virker uden verificering, men
+kun til jeres egen testadresse.
+
+### 3b.2 Lav en API-nøgle
+
+1. **API Keys** → **Create API Key**.
+2. Navn: `skoenhedsklinik-web`. Permission: **Sending access**.
+3. Kopiér nøglen med det samme — den vises kun én gang.
+
+### 3b.3 Læg dem i Vercel
+
+Vercel → projektet → **Settings** → **Environment Variables**. Tilføj til
+Production, Preview og Development:
+
+| Variabel | Værdi |
+|---|---|
+| `RESEND_API_KEY` | nøglen fra 3b.2 |
+| `LEAD_NOTIFICATION_TO` | klinikkens mailadresse |
+| `RESEND_FROM` | `Skønhedsklinik Aarhus <henvendelser@skoenhedsklinik-aarhus.dk>` |
+
+`RESEND_FROM` er valgfri — udelades den, bruges præcis den adresse ovenfor.
+Skal flere have besked, adskilles adresserne i `LEAD_NOTIFICATION_TO` med komma:
+`info@…dk, ejer@…dk`.
+
+**Redeploy** bagefter. Miljøvariabler slår først igennem ved næste deploy.
+
+### 3b.4 Test
+
+Udfyld "Ring mig op" på sitet med jeres eget navn og telefonnummer. Mailen bør
+være fremme inden for et halvt minut. Kom den ikke:
+
+- Resend → **Logs** viser hver eneste afsendelse og præcis hvorfor den fejlede.
+- Står der intet i loggen, er `RESEND_API_KEY` eller `LEAD_NOTIFICATION_TO`
+  ikke sat, eller der er ikke redeployet efter de blev tilføjet.
+- `403 domain not verified` → DNS-posterne fra 3b.1 er ikke på plads endnu.
+- Tjek spamfilteret første gang.
+
+Uden nøglerne fungerer formularen fuldstændig som før — leadet bliver gemt, der
+sendes bare ingen mail. En mailfejl kan aldrig ramme den besøgende eller koste
+jer et lead.
+
+---
+
 ## 4. Test at det hele virker (10 min)
 
 1. Events Manager → **Testhændelser** → kopiér testkoden (`TEST12345`).
@@ -514,3 +577,6 @@ behandlingen i kalenderen nedenfor").
 | `BOOKING_DEFAULT_VALUE_DKK` | — | Nej (fallback-værdi på bookinger) |
 | `NEXT_PUBLIC_SITE_URL` | — | Ja (bør allerede være sat) |
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Plausible | Nej |
+| `RESEND_API_KEY` | Resend → API Keys | Ja, til mailnotifikationer |
+| `LEAD_NOTIFICATION_TO` | — (klinikkens mailadresse) | Ja, til mailnotifikationer |
+| `RESEND_FROM` | — | Nej (standard: henvendelser@…) |

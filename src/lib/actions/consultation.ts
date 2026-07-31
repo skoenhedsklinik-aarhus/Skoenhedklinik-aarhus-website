@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { sendMetaEvent } from "@/lib/meta/capi";
+import { sendLeadNotification } from "@/lib/email/lead-notification";
 import type { Attribution } from "@/lib/attribution";
 
 export type ConsultationLeadInput = {
@@ -147,6 +148,20 @@ export async function submitConsultationLead(
         "Der opstod en uventet fejl. Prøv igen, eller ring til os på 61 44 59 99.",
     };
   }
+
+  // Mailnotifikation til klinikken. Kører først når leadet er gemt, og en
+  // fejl her må aldrig ramme den besøgende — derfor .catch(). Uden
+  // RESEND_API_KEY + LEAD_NOTIFICATION_TO er kaldet en no-op.
+  await sendLeadNotification({
+    name,
+    phone,
+    areas,
+    recommendations,
+    note: note || null,
+    source: input.source ?? null,
+    attribution: attr,
+    sourceUrl: input.sourceUrl,
+  }).catch(() => false);
 
   // Server-side Lead event. Runs after the lead is safely stored, and its
   // failure can never affect the visitor. Name and phone are hashed inside

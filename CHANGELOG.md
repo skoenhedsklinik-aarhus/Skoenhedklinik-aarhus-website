@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-07-31 (1) — Mailnotifikation ved nye henvendelser
+
+Leads landede i databasen og på **Admin → Henvendelser**, men ingen fik besked.
+En henvendelse kl. 14 skal ringes op samme dag, ikke opdages tre dage senere.
+
+`submitConsultationLead` sender nu en mail via Resend, når leadet er gemt.
+Mailen indeholder navn, telefonnummer som klikbart `tel:`-link, ønskede områder,
+anbefalet behandling, fri besked og hele annonce-attributionen (kampagne,
+annonce, landingsside), så det er til at se med det samme, hvilken annonce der
+leverede henvendelsen.
+
+Afsendelsen ligger efter databaseindsættelsen og fanger sine egne fejl, så en
+mailfejl aldrig kan koste et lead. Uden `RESEND_API_KEY` og
+`LEAD_NOTIFICATION_TO` er kaldet en no-op, præcis som Conversions API'et uden
+token — formularen fungerer uændret, indtil nøglerne er sat.
+
+Opsætning: se afsnit 3b i `OPSAETNING-tracking-og-anmeldelser.md`.
+
 ## 2026-07-27 (6) — PlanwayEngaged fjernet
 
 Målt over syv dage: **nul** `PlanwayEngaged`-events, mod 50-100
