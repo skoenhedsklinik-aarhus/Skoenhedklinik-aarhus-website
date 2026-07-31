@@ -8,6 +8,7 @@ import { deletePricingTier } from "./actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { categoryLabel } from "@/lib/service-categories";
 
 // The fetch query includes the joined service name
 type PricingTier = Database["public"]["Tables"]["pricing_tiers"]["Row"] & {
@@ -58,7 +59,7 @@ export function PricingList({ initialData }: PricingListProps) {
       {Object.entries(grouped).map(([category, tiers]) => (
         <div key={category} className="mb-8 last:mb-0">
           <div className="bg-beige px-4 py-2 border-y border-sand">
-            <h3 className="font-heading text-lg text-cognac capitalize">{category.replace("-", " ")}</h3>
+            <h3 className="font-heading text-lg text-cognac">{categoryLabel(category)}</h3>
           </div>
           <table className="w-full text-left border-collapse">
             <thead>

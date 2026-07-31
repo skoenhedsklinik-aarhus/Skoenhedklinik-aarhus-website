@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-07-31 (2) — Admin: kategorinavne i prislisten
+
+Under **Priser** stod kategorien som den rå databaseværdi: "Haarfjerning" i
+gruppeoverskrifterne og `haarfjerning` i dropdownen. Behandlinger havde allerede
+fået læsbare navne, men prislisten var ikke rettet med.
+
+Listen af kategorier ligger nu ét sted, `src/lib/service-categories.ts`, og
+bruges af både behandlinger og priser — så de to sider ikke kan komme til at
+vise forskellige navne for den samme kategori igen. Værdierne er uændrede, da de
+er låst af CHECK-constraints i databasen.
+
+Gruppeoverskrifterne gik før gennem `capitalize` og en enkelt `replace("-", " ")`,
+så "bryn-vipper" blev til "Bryn vipper". Nu står der "Bryn & vipper".
+
 ## 2026-07-31 (1) — Mailnotifikation ved nye henvendelser
 
 Leads landede i databasen og på **Admin → Henvendelser**, men ingen fik besked.

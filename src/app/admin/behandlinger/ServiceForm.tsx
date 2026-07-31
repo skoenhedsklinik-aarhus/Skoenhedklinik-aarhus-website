@@ -8,28 +8,13 @@ import { toast } from "sonner";
 import { createService, updateService } from "./actions";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Plus, Trash2 } from "lucide-react";
+import { SERVICE_CATEGORIES as CATEGORIES } from "@/lib/service-categories";
 
 type Service = Database["public"]["Tables"]["services"]["Row"];
 
 interface ServiceFormProps {
   initialData?: Service;
 }
-
-/**
- * Kategorierne er låst af en CHECK-constraint i databasen (services_category_check),
- * så værdierne må ikke ændres. Etiketterne er kun til admin-brugeren.
- */
-const CATEGORIES: { value: string; label: string }[] = [
-  { value: "haarfjerning", label: "Laser hårfjerning" },
-  { value: "sugaring", label: "Sugaring" },
-  { value: "wax", label: "Wax" },
-  { value: "ansigt", label: "Ansigtsbehandling" },
-  { value: "bryn-vipper", label: "Bryn & vipper" },
-  { value: "tand", label: "Tandblegning" },
-  { value: "threading", label: "Threading" },
-  { value: "tatovering", label: "Tattoo fjernelse" },
-  { value: "andet", label: "Andet" },
-];
 
 /**
  * Lav en URL-venlig slug ud fra behandlingens navn.

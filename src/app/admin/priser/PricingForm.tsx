@@ -6,6 +6,7 @@ import { Database } from "@/types/supabase";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createPricingTier, updatePricingTier } from "./actions";
+import { SERVICE_CATEGORIES } from "@/lib/service-categories";
 
 type PricingTier = Database["public"]["Tables"]["pricing_tiers"]["Row"];
 type Service = Database["public"]["Tables"]["services"]["Row"];
@@ -14,11 +15,6 @@ interface PricingFormProps {
   initialData?: PricingTier;
   services: Service[];
 }
-
-const CATEGORIES = [
-  "haarfjerning", "sugaring", "wax", "ansigt",
-  "bryn-vipper", "tand", "threading", "tatovering", "andet"
-];
 
 export function PricingForm({ initialData, services }: PricingFormProps) {
   const router = useRouter();
@@ -103,8 +99,8 @@ export function PricingForm({ initialData, services }: PricingFormProps) {
             className="w-full px-3 py-2 border border-sand rounded-md focus:outline-none focus:ring-1 focus:ring-cognac"
           >
             <option value="">Vælg kategori</option>
-            {CATEGORIES.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {SERVICE_CATEGORIES.map(cat => (
+              <option key={cat.value} value={cat.value}>{cat.label}</option>
             ))}
           </select>
         </div>
