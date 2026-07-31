@@ -415,23 +415,66 @@ Mens I er inde i Planway, så tag også:
 
 ---
 
-## 5. Efter lancering — det der faktisk sænker prisen
+## 5. Efter lancering — annoncerne
 
-1. **Vent på data.** Cirka 50 `Lead`-events pr. uge, før optimering giver mening.
-2. **Skift kampagnemål** i Ads Manager fra "Trafik" til **"Kundeemner (Leads)"**,
-   og vælg `Lead` som konverteringshændelse.
-3. Når der er nok bookinger, kan I lave en separat kampagne optimeret mod
-   `Schedule` — det er den hændelse, der ligger tættest på omsætning.
-4. **Tjek Event Match Quality** i Events Manager (mål: 6,0+). Den er høj her,
-   fordi vi sender hashet telefonnummer og navn med hvert lead.
-5. **Brug UTM-tags i annoncerne.** Koden gemmer `utm_source`, `utm_campaign` og
-   `utm_content` og skriver dem på hvert lead under **Admin → Henvendelser**, så
-   I kan se præcis hvilken annonce der skabte hvilket lead. Anbefalet skabelon i
-   annoncens URL-parametre:
+Klinikken har ikke tid til at ringe leads op, så **alt optimeres mod bookinger**,
+ikke mod "Ring mig op"-formularen.
 
-   ```
-   utm_source=meta&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}
-   ```
+### Trappen
+
+1. **Nu:** Mål **Kundeemner**, konverteringssted Website, konverteringshændelse
+   **`InitiateCheckout`** (bookingkalenderen åbnet). Den ligger på 50-100 om ugen,
+   altså rigeligt til at Meta kan komme ud af indlæringsfasen, og den betyder
+   ægte bookingintention.
+2. **Efter 2-4 uger:** Når `Schedule` passerer cirka 50 om ugen, skiftes
+   konverteringshændelsen på det **eksisterende** annoncesæt til `Schedule`.
+   Lav ikke en ny kampagne — det nulstiller indlæringen.
+3. **Senere:** Når Schedule-volumen er stabil, kan der lægges værdibaseret
+   budgivning på, fordi vi sender DKK-værdi med hver booking.
+
+Struktur: én bred kampagne, ét annoncesæt, Advantage+ placeringer, attribution
+7 dages klik og 1 dags visning.
+
+### Optimér ikke mod `Purchase`
+
+`Purchase` kommer fra Planway, ikke fra vores kode. Målt over en uge kom
+**8 ud af 12** fra `app.planway.com`, altså klinikkens eget personale der
+opretter bookinger i backoffice. Den er desuden browser-only, uden Conversions
+API, uden deduplikering og uden værdi, og den fyrer på et domæne klinikken ikke
+kan verificere. Planway kan ikke begrænse pixlen til bookingsiden, så støjen
+bliver liggende. Brug `Schedule` i stedet.
+
+Bemærk også: én kundebooking kan udløse **både** Planways `Purchase` og vores
+`Schedule`. De dedupliceres ikke, da det er to forskellige eventnavne. Tæl derfor
+ikke begge som bookinger i rapportering.
+
+### Domæneverificering
+
+Verificér `skoenhedsklinik-aarhus.dk` i Business Manager → Brand Safety →
+Domæner. Uden den er målingen på iPhone kraftigt beskåret.
+
+> **Prioritering af hændelser findes ikke længere.** Meta fjernede den manuelle
+> 8-hændelsers rangering under Aggregeret hændelsesmåling i midten af 2025 og
+> aggregerer nu alle egnede web-hændelser automatisk. Leder du efter fanen,
+> findes den ikke — der er ikke noget at gøre. Domæneverificering er dermed det
+> eneste, der skal på plads.
+
+### Løbende
+
+- **Tjek Event Match Quality** i Events Manager. Mål: 6,0+. Lav `fbc`-dækning er
+  normalt, når der ikke kører annoncer — `fbc` findes kun ved annonceklik og
+  stiger af sig selv, når kampagnen starter.
+- **Brug UTM-tags i annoncerne.** Koden gemmer `utm_source`, `utm_campaign` og
+  `utm_content` og skriver dem på hvert lead under **Admin → Henvendelser**.
+  Skabelon til annoncens URL-parametre:
+
+  ```
+  utm_source=meta&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}
+  ```
+
+- **Send annoncetrafikken til landingssiderne** `/lp/laser-haarfjerning` og
+  `/lp/tattoo-fjernelse`. De har ingen navigation, så folk ikke falder ud af
+  funnelen, og deres leads tagges separat.
 
 ---
 
