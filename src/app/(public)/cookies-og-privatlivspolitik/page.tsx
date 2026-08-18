@@ -68,7 +68,7 @@ export default function PrivacyPolicyPage() {
           <h2>6. Kontakt</h2>
           <p>
             Skønhedsklinik Aarhus<br />
-            Tordenskjoldsgade 61, st. th.<br />
+            Åboulevarden 39, 5. sal th.<br />
             8000 Aarhus C<br />
             CVR: 46525299<br />
             E-mail: info@skoenhedsklinik-aarhus.dk

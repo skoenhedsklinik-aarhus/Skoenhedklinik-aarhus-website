@@ -8,6 +8,7 @@ import { BookingSection } from "@/components/home/BookingSection";
 import { GoogleReviews } from "@/components/home/GoogleReviews";
 import { TeamSection } from "@/components/home/TeamSection";
 import { FinalCTA } from "@/components/shared/FinalCTA";
+import { AnnouncementPopup } from "@/components/shared/AnnouncementPopup";
 import { getServices, getTeamMembers } from "@/lib/supabase-queries";
 import { getGoogleReviews } from "@/lib/reviews";
 import { localBusinessSchema, reviewsSchema } from "@/lib/schema";
@@ -71,6 +72,7 @@ export default async function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewJsonLd) }}
         />
       )}
+      <AnnouncementPopup />
       <HeroSection />
       <PopularTreatments services={services} />
       <ParallaxFloating />

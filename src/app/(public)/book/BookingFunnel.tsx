@@ -78,7 +78,7 @@ export function BookingFunnel() {
               <div className="w-8 h-px bg-cognac mb-5" />
               <div className="space-y-3">
                 {[
-                  { icon: MapPin, text: "Tordenskjoldsgade 61, 8000 Aarhus C" },
+                  { icon: MapPin, text: "Åboulevarden 39, 5. sal th., 8000 Aarhus C" },
                   { icon: Phone, text: "61 44 59 99" },
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-3">
@@ -183,7 +183,7 @@ export function BookingFunnel() {
                           title: "Fysisk besøg",
                           desc: "Besøg os i klinikken. Vi sidder ned og taler om dine ønsker og gennemgår din hud.",
                           icon: "🏡",
-                          detail: "Tordenskjoldsgade 61, 8000 Aarhus C",
+                          detail: "Åboulevarden 39, 5. sal th., 8000 Aarhus C",
                         },
                         {
                           id: "phone" as const,

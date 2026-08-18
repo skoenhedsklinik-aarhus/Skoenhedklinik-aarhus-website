@@ -21,7 +21,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const DEFAULT_QUERY = "Skønhedsklinik Aarhus, Tordenskjoldsgade 61, 8000 Aarhus C";
+const DEFAULT_QUERY = "Skønhedsklinik Aarhus, Åboulevarden 39, 8000 Aarhus C";
 
 /**
  * Virksomheders Place ID starter med "ChIJ". Starter det med "Ej"/"Ei", er det

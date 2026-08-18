@@ -8,7 +8,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://skoenhedsklinik-aa
 const CLINIC_NAME = "Skønhedsklinik Aarhus";
 const CLINIC_ADDRESS = {
   "@type": "PostalAddress",
-  streetAddress: "Tordenskjoldsgade 61, st. th.",
+  streetAddress: "Åboulevarden 39, 5. sal th.",
   addressLocality: "Aarhus C",
   postalCode: "8000",
   addressCountry: "DK",
@@ -34,8 +34,8 @@ export function localBusinessSchema(options?: {
     address: CLINIC_ADDRESS,
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 56.1611,
-      longitude: 10.2081,
+      latitude: 56.1565,
+      longitude: 10.2074,
     },
     openingHoursSpecification: [
       {

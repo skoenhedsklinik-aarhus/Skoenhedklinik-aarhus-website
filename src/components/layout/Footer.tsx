@@ -47,7 +47,7 @@ export function Footer() {
           <div>
             <h4 className="font-medium mb-6 tracking-wide uppercase text-sm">Kontakt</h4>
             <ul className="space-y-3 text-cream/80 mb-6">
-              <li>Tordenskjoldsgade 61, st. th.</li>
+              <li>Åboulevarden 39, 5. sal th.</li>
               <li>8000 Aarhus C</li>
               <li>
                 <TrackedPhoneLink contentCategory="footer" className="hover:text-cream transition-colors">

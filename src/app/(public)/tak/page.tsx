@@ -122,7 +122,7 @@ export default async function BookingThankYouPage({
               },
               {
                 icon: MapPin,
-                title: "Tordenskjoldsgade 61, st. th., 8000 Aarhus C",
+                title: "Åboulevarden 39, 5. sal th., 8000 Aarhus C",
                 text: "Der er offentlig parkering i området. Mød gerne op 5 minutter før din tid.",
               },
               {

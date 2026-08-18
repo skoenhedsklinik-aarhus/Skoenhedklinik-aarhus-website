@@ -6,7 +6,7 @@ import { MapPin, Phone, Mail, Car, Bus, Clock } from "lucide-react";
 export const metadata: Metadata = {
   title: "Kontakt — Skønhedsklinik Aarhus",
   description:
-    "Find os på Tordenskjoldsgade 61, 8000 Aarhus C. Ring på +45 61 44 59 99 eller skriv til info@skoenhedsklinik-aarhus.dk. Se åbningstider og kort.",
+    "Find os på Åboulevarden 39, 5. sal th., 8000 Aarhus C. Ring på +45 61 44 59 99 eller skriv til info@skoenhedsklinik-aarhus.dk. Se åbningstider og kort.",
   alternates: { canonical: "/kontakt" },
   openGraph: {
     title: "Kontakt — Skønhedsklinik Aarhus",
@@ -47,7 +47,7 @@ export default async function ContactPage() {
           </h1>
           <p className="text-lg text-textBody leading-relaxed">
             Vi står altid klar til at besvare dine spørgsmål. Ring til os,
-            eller kig forbi klinikken på Tordenskjoldsgade i Aarhus C.
+            eller kig forbi klinikken på Åboulevarden i Aarhus C.
           </p>
         </div>
       </section>
@@ -70,7 +70,7 @@ export default async function ContactPage() {
                     <h3 className="font-heading text-xl text-textPrimary mb-1">Adresse</h3>
                     <p className="text-textBody">
                       Skønhedsklinik Aarhus<br />
-                      {siteSettings.address_line_1 || "Tordenskjoldsgade 61, st. th."}<br />
+                      {siteSettings.address_line_1 || "Åboulevarden 39, 5. sal th."}<br />
                       {siteSettings.address_line_2 || "8000 Aarhus C"}
                     </p>
                   </div>
@@ -107,7 +107,7 @@ export default async function ContactPage() {
                   <div>
                     <h3 className="font-heading text-xl text-textPrimary mb-1">Parkering</h3>
                     <p className="text-textBody">
-                      Der er én times gratis parkering i gaderne omkring klinikken. Husk p-skiven.
+                      Klinikken ligger i betalingszonen i midtbyen, og der er flere p-huse inden for få minutters gang.
                     </p>
                   </div>
                 </div>
@@ -119,7 +119,7 @@ export default async function ContactPage() {
                   <div>
                     <h3 className="font-heading text-xl text-textPrimary mb-1">Offentlig transport</h3>
                     <p className="text-textBody">
-                      Buslinje 1A stopper lige rundt om hjørnet på Tordenskjoldsgade.
+                      Klinikken ligger midt i Aarhus C med busstoppesteder få minutters gang væk.
                     </p>
                   </div>
                 </div>
@@ -151,7 +151,7 @@ export default async function ContactPage() {
             {/* Right Col: Map */}
             <div className="h-[500px] lg:h-auto w-full min-h-[500px] rounded-2xl overflow-hidden border border-sand bg-cream">
               <iframe 
-                src={siteSettings.google_maps_embed_src || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2221.7589139688463!2d10.208118077583681!3d56.161173973167195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x464c3f915cb17c5b%3A0xeab78f04c6328cba!2sSk%C3%B8nhedsklinik%20Aarhus!5e0!3m2!1sda!2sdk!4v1715160000000!5m2!1sda!2sdk"} 
+                src={siteSettings.google_maps_embed_src || "https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s%C3%85boulevarden+39,+8000+Aarhus+C!6i16!3m1!1sda!5m1!1sda"} 
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 

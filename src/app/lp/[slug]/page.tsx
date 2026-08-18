@@ -359,7 +359,7 @@ export default async function AdLandingPage({ params }: { params: { slug: string
             </TrackedPhoneLink>
           </div>
           <p className="flex items-center justify-center gap-2 text-cream/40 text-xs">
-            <MapPin className="w-3.5 h-3.5" /> Tordenskjoldsgade 61, 8000 Aarhus C
+            <MapPin className="w-3.5 h-3.5" /> Åboulevarden 39, 5. sal th., 8000 Aarhus C
           </p>
         </div>
       </section>
