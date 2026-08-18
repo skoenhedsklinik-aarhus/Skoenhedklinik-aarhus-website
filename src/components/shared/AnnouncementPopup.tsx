@@ -6,59 +6,102 @@ import { MapPin, X } from "lucide-react";
 import { TrackedPhoneLink } from "@/components/shared/TrackedPhoneLink";
 
 /**
- * Driftsbesked på forsiden: klinikken holder lukket og åbner igen den
- * 24. august på den nye adresse på Åboulevarden.
+ * Driftsbesked på forsiden. Den skifter selv indhold undervejs:
  *
- * Beskeden skjuler sig selv efter `SKJUL_EFTER`, så ingen skal huske at fjerne
- * komponenten manuelt. Skal den vises længere (eller kortere), er datoen
- * herunder det eneste, der skal rettes. Skal den væk helt, fjernes
- * <AnnouncementPopup /> fra src/app/(public)/page.tsx.
+ *   indtil 23. august   "Vi holder lukket indtil den 24. august"
+ *   24. aug – 21. sep   "Husk, vi er flyttet"
+ *   derefter            ingenting
+ *
+ * Ingen skal altså huske at redigere eller fjerne noget på dagen. Skal
+ * perioderne flyttes, er de to datoer herunder det eneste, der skal rettes.
+ * Skal beskeden væk før tid, fjernes <AnnouncementPopup /> fra
+ * src/app/(public)/page.tsx.
  */
 
-/**
- * Sidste øjeblik beskeden vises. Klinikken åbner igen den 24., så beskeden
- * stopper natten mellem den 23. og den 24. Efter dette renderer komponenten
- * ingenting.
- */
-const SKJUL_EFTER = new Date("2026-08-23T23:59:59+02:00");
+/** Klinikken åbner igen. Fra dette tidspunkt vises flyttebeskeden. */
+const GENAABNER = new Date("2026-08-24T00:00:00+02:00");
 
-/** Lukker besøgende beskeden, holder den sig lukket resten af besøget. */
-const STORAGE_KEY = "ska-besked-lukket-2026-08";
+/** Sidste øjeblik flyttebeskeden vises. Derefter renderer komponenten intet. */
+const SKJUL_EFTER = new Date("2026-09-21T23:59:59+02:00");
 
 /** Forsiden har en scroll-hero. Vent, til den er malet, før beskeden kommer. */
 const FORSINKELSE_MS = 900;
 
+type Besked = {
+  /** Indgår i storage-nøglen, så de to beskeder lukkes hver for sig. */
+  id: string;
+  eyebrow: string;
+  titel: string;
+  tekst: string;
+  adresseLabel: string;
+};
+
+const LUKKET: Besked = {
+  id: "lukket-aug-2026",
+  eyebrow: "Vigtig besked",
+  titel: "Vi holder lukket indtil den 24. august",
+  tekst:
+    "Klinikken er lukket i en kort periode. Den 24. august åbner vi igen på vores nye adresse. Du er meget velkommen til at skrive eller ringe imens.",
+  adresseLabel: "Ny adresse fra 24. august",
+};
+
+const FLYTTET: Besked = {
+  id: "flyttet-2026",
+  eyebrow: "Vi er flyttet",
+  titel: "Husk, vi er flyttet",
+  tekst:
+    "Klinikken er åben igen på vores nye adresse midt i Aarhus C. Samme team og samme telefonnummer, det er kun adressen, der er ny.",
+  adresseLabel: "Vores nye adresse",
+};
+
+/** Nøglen er beskedspecifik, så en lukket lukkebesked ikke skjuler flyttebeskeden. */
+function storageKey(besked: Besked): string {
+  return `ska-besked-${besked.id}`;
+}
+
+/** Hvilken besked hører til dette tidspunkt? `null` betyder: vis ingenting. */
+function aktuelBesked(nu: number): Besked | null {
+  if (nu > SKJUL_EFTER.getTime()) return null;
+  return nu < GENAABNER.getTime() ? LUKKET : FLYTTET;
+}
+
 export function AnnouncementPopup() {
-  const [open, setOpen] = useState(false);
+  // Beskeden vælges først i en effect. Serveren og den besøgendes maskine kan
+  // stå på hver sin side af midnat, og et valg truffet under render ville give
+  // hydration-fejl netop den nat, hvor beskeden skifter.
+  const [besked, setBesked] = useState<Besked | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const close = useCallback(() => {
-    setOpen(false);
-    try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      // Privat browsing kan blokere sessionStorage. Beskeden må gerne komme
-      // igen ved næste sidevisning, men den må aldrig crashe siden.
+    if (besked) {
+      try {
+        sessionStorage.setItem(storageKey(besked), "1");
+      } catch {
+        // Privat browsing kan blokere sessionStorage. Beskeden må gerne komme
+        // igen ved næste sidevisning, men den må aldrig crashe siden.
+      }
     }
-  }, []);
+    setBesked(null);
+  }, [besked]);
 
   useEffect(() => {
-    if (Date.now() > SKJUL_EFTER.getTime()) return;
+    const valgt = aktuelBesked(Date.now());
+    if (!valgt) return;
 
     try {
-      if (sessionStorage.getItem(STORAGE_KEY)) return;
+      if (sessionStorage.getItem(storageKey(valgt))) return;
     } catch {
       // Ingen storage: vis beskeden alligevel.
     }
 
-    const timer = window.setTimeout(() => setOpen(true), FORSINKELSE_MS);
+    const timer = window.setTimeout(() => setBesked(valgt), FORSINKELSE_MS);
     return () => window.clearTimeout(timer);
   }, []);
 
   // Escape lukker, Tab holdes inde i dialogen, og siden bag må ikke scrolle.
   useEffect(() => {
-    if (!open) return;
+    if (!besked) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -92,9 +135,9 @@ export function AnnouncementPopup() {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, close]);
+  }, [besked, close]);
 
-  if (!open) return null;
+  if (!besked) return null;
 
   return (
     <div
@@ -126,27 +169,23 @@ export function AnnouncementPopup() {
           <X className="w-4 h-4" />
         </button>
 
-        <span className="eyebrow text-cognac block mb-4">Vigtig besked</span>
+        <span className="eyebrow text-cognac block mb-4">{besked.eyebrow}</span>
 
         <h2
           id="besked-titel"
           className="font-heading text-3xl sm:text-[34px] leading-tight font-light text-textPrimary text-balance mb-4"
         >
-          Vi holder lukket indtil den 24. august
+          {besked.titel}
         </h2>
 
-        <p className="text-textBody leading-relaxed mb-7">
-          Klinikken er lukket i en kort periode. Den 24. august åbner vi igen
-          på vores nye adresse. Du er meget velkommen til at skrive eller ringe
-          imens.
-        </p>
+        <p className="text-textBody leading-relaxed mb-7">{besked.tekst}</p>
 
         <div className="rounded-2xl border border-sand bg-beige/60 px-5 py-5 mb-8">
           <div className="flex gap-3.5">
             <MapPin className="w-5 h-5 text-cognac shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-textMuted mb-2">
-                Ny adresse fra 24. august
+                {besked.adresseLabel}
               </p>
               <p className="text-textPrimary font-medium leading-snug">
                 Åboulevarden 39, 5. sal th.
