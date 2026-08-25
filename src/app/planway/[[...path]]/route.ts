@@ -72,11 +72,20 @@ function rewriteBody(body: string): string {
   // ville den almindelige erstatning nedenfor efterlade ødelagte escapes.
   const escapedUpstream = UPSTREAM.replace(/\//g, "\\/");
   const escapedPrefix = PREFIX.replace(/\//g, "\\/");
-  return body
-    .split(escapedUpstream)
-    .join(escapedPrefix)
-    .split(UPSTREAM)
-    .join(PREFIX);
+  return (
+    body
+      .split(escapedUpstream)
+      .join(escapedPrefix)
+      .split(UPSTREAM)
+      .join(PREFIX)
+      // Bookingformularen sender til Planways rod, som bliver til "/planway/".
+      // Next svarer 308 på den skråstreg. En 308 bevarer godt nok metode og
+      // krop, så browseren gentager sin POST, men det er et unødigt ekstra hop
+      // på den vigtigste request i hele forløbet. Uden skråstreg rammer den
+      // route-handleren direkte.
+      .split('action="' + PREFIX + '/"')
+      .join('action="' + PREFIX + '"')
+  );
 }
 
 async function proxy(request: NextRequest, path: string[] | undefined) {
