@@ -98,31 +98,40 @@ export function BookingIframe({
           </div>
         )}
         {/*
-          Fast højde pr. skærmbredde, målt på Planways egen side EFTER at
-          kortet i sidepanelet er indlæst. Det er pointen: måler man for tidligt,
-          får man et tal der er 40-60px for lavt, og så ruller embedden alligevel.
+          Højden er sat til Planways FAKTISKE indholdshøjde, ikke mere.
 
-          Målt, stabilt over 7 sekunder:
-            375px     indhold 2137px    sidepanel under, ét felt pr. række
-            800px     indhold 1723px    to felter pr. række
-            992px+    indhold  995px    sidepanel ved siden af
-                                        (samme tal ved 992, 1100 og 1431px)
+          Planways widget.css har denne regel:
 
-          992px er Bootstrap 3's breakpoint, som Planway er bygget på.
+              #widget .booking { min-height: calc(100vh - 40px) }
 
-          Højderne har ~150px luft med vilje. Skriftrendering, scrollbar-bredde
-          og zoom flytter sig fra maskine til maskine, og en højde der passer
-          præcist på én skærm giver en scrollbar på den næste. Luften er cream
-          ligesom Planways egen baggrund, så den ser ud som bundpadding.
+          Den hvide bookingkolonne strækker sig altså altid til iframens egen
+          højde. Og da kolonnen starter 135px nede i dokumentet, bliver siden
+          ALTID 95px højere end den plads vi giver den:
 
-          Senere trin med lange behandlingslister (laser hårfjerning fylder
-          2921px på desktop) ruller stadig indeni. Det kan ikke fikses med en
-          fast højde: at dække alt ville kræve ~3000px på desktop og ~5000px på
-          mobil, altså tusindvis af pixels tom plads på første trin. Den eneste
-          fuldstændige løsning er at proxy'e Planway gennem vores eget domæne,
-          så iframen bliver same-origin og højden kan aflæses direkte. Fravalgt,
-          fordi Planways session-cookies så ville høre til det forkerte domæne,
-          og en fejl dér koster bookinger.
+              vh 900   -> dokument 995
+              vh 1150  -> dokument 1245
+              vh 1600  -> dokument 1695
+
+          Slår man reglen fra, er kolonnen 821px og indholdet slutter i 956px.
+
+          Konsekvensen: der findes ingen højde uden scrollbar. Giver vi mere
+          plads, bliver den hvide blok bare højere, og de 95px følger med. Så
+          højden her er sat til indholdshøjden, hverken mere eller mindre. Det
+          giver nul tomt hvidt felt, og de 95px der kan scrolles, er tom
+          strækplads under indholdet, ikke noget man går glip af.
+
+          Målte indholdshøjder (efter at kortet i sidepanelet er indlæst):
+            under 768px   2137px   sidepanel under, ét felt pr. række
+            768-991px     1723px   to felter pr. række
+            992px og op    956px   sidepanel ved siden af
+
+          992px er Bootstrap 3's breakpoint, som Planway bygger på.
+
+          Den rigtige løsning er at Planway ændrer min-height til noget
+          iframe-venligt. Det er én linje i deres widget.css. Alternativt kan
+          man proxy'e Planway gennem vores eget domæne og selv overskrive
+          reglen, men så ligger deres session-cookies på det forkerte domæne,
+          og det koster bookinger. Lad være uden grundig test.
         */}
         <iframe
           src={iframeUrl}
@@ -130,7 +139,7 @@ export function BookingIframe({
           loading="lazy"
           allow="payment"
           onLoad={() => setLoaded(true)}
-          className="relative z-10 block w-full border-0 h-[2300px] md:h-[1880px] min-[992px]:h-[1150px]"
+          className="relative z-10 block w-full border-0 h-[2160px] md:h-[1740px] min-[992px]:h-[970px]"
         />
       </div>
 
