@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ExternalLink, Check } from "lucide-react";
 import { buildPlanwayUrl, type BookableService } from "@/lib/booking";
@@ -8,6 +8,15 @@ import { trackConversion } from "@/lib/pixel";
 
 /** How long the picked treatment is remembered for the /tak conversion. */
 const BOOKING_COOKIE_MAX_AGE = 60 * 60 * 6; // 6 hours
+
+/**
+ * Planway serveret fra vores eget domæne, så iframen er same-origin.
+ * Se `src/app/planway/[[...path]]/route.ts` for hvorfor.
+ */
+const PROXY_PATH = "/planway";
+
+/** Højde indtil den første måling er kørt. Fra første trin på desktop. */
+const FALLBACK_HEIGHT = 970;
 
 export function BookingIframe({
   serviceMap,
@@ -22,8 +31,90 @@ export function BookingIframe({
   // Note: Planway's widget doesn't currently read the param, so this deep-links
   // forward-compatibly while we surface the choice in-page below. See lib/booking.ts.
   const selected = serviceSlug ? serviceMap[serviceSlug] : undefined;
-  const iframeUrl = buildPlanwayUrl(selected?.planwayServiceId);
+  // Fallback-linket ("Åbn i nyt vindue") peger med vilje på Planways rigtige
+  // domæne. Går proxyen ned, skal nødudgangen ikke gå gennem den samme proxy.
+  const directUrl = buildPlanwayUrl(selected?.planwayServiceId);
+  const iframeUrl = selected?.planwayServiceId
+    ? `${PROXY_PATH}/?service=${encodeURIComponent(selected.planwayServiceId)}`
+    : `${PROXY_PATH}/`;
   const selectedName = selected?.name;
+
+  const frameRef = useRef<HTMLIFrameElement>(null);
+
+  /**
+   * Sæt rammen til Planways faktiske indholdshøjde.
+   *
+   * Iframen er same-origin gennem proxyen, så vi kan gøre to ting, der ellers
+   * er umulige på tværs af domæner: slå `min-height: calc(100vh - 40px)` fra,
+   * som ellers strækker den hvide kolonne til rammens højde og altid giver
+   * 95px overskydende, og måle det rigtige indhold på hvert trin.
+   *
+   * Fejler noget af det, bliver rammen stående på fallback-højden og opfører
+   * sig som før. Ingen fejl i konsollen, ingen tom side.
+   */
+  useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+
+    let observer: ResizeObserver | undefined;
+
+    const sync = () => {
+      let doc: Document | null = null;
+      try {
+        doc = frame.contentDocument;
+      } catch {
+        return; // ikke same-origin (fx hvis proxyen er slået fra)
+      }
+      // Kun Planways egen side. Efter en gennemført booking navigerer iframen
+      // til vores /tak, og den skal ikke have injiceret noget.
+      if (!doc?.body || !doc.getElementById("widget")) return;
+
+      if (!doc.getElementById("sk-embed-fit")) {
+        const style = doc.createElement("style");
+        style.id = "sk-embed-fit";
+        style.textContent =
+          "#widget .booking{min-height:0 !important}" +
+          "html,body{height:auto !important;overflow:hidden !important}";
+        doc.head.appendChild(style);
+      }
+
+      // Bevidst IKKE documentElement.scrollHeight. Den er aldrig mindre end
+      // iframens egen højde, så målingen ville låse sig fast på den højde vi
+      // lige har sat og kun kunne vokse. `body` med `height:auto` giver det
+      // rigtige tal: målt 956px her, hvor documentElement sagde 970px.
+      const height = Math.max(
+        doc.body.getBoundingClientRect().height,
+        doc.body.scrollHeight,
+      );
+      if (height > 100) frame.style.height = `${Math.ceil(height)}px`;
+    };
+
+    const attach = () => {
+      sync();
+      try {
+        const body = frame.contentDocument?.body;
+        if (body && "ResizeObserver" in window) {
+          observer?.disconnect();
+          observer = new ResizeObserver(sync);
+          observer.observe(body);
+        }
+      } catch {
+        // ignoreres — pollingen nedenfor dækker os
+      }
+    };
+
+    frame.addEventListener("load", attach);
+    attach();
+    // Planway skifter trin med AJAX. Body'ens boks ændrer sig ikke altid
+    // synligt for ResizeObserver, så vi måler også med et fast interval.
+    const poll = window.setInterval(sync, 400);
+
+    return () => {
+      frame.removeEventListener("load", attach);
+      observer?.disconnect();
+      window.clearInterval(poll);
+    };
+  }, [iframeUrl]);
 
   // Booking calendar opened = strong mid-funnel intent signal for Meta ads.
   // Sent both browser-side and server-side (deduplicated on a shared event id).
@@ -98,54 +189,27 @@ export function BookingIframe({
           </div>
         )}
         {/*
-          Højden er sat til Planways FAKTISKE indholdshøjde, ikke mere.
-
-          Planways widget.css har denne regel:
-
-              #widget .booking { min-height: calc(100vh - 40px) }
-
-          Den hvide bookingkolonne strækker sig altså altid til iframens egen
-          højde. Og da kolonnen starter 135px nede i dokumentet, bliver siden
-          ALTID 95px højere end den plads vi giver den:
-
-              vh 900   -> dokument 995
-              vh 1150  -> dokument 1245
-              vh 1600  -> dokument 1695
-
-          Slår man reglen fra, er kolonnen 821px og indholdet slutter i 956px.
-
-          Konsekvensen: der findes ingen højde uden scrollbar. Giver vi mere
-          plads, bliver den hvide blok bare højere, og de 95px følger med. Så
-          højden her er sat til indholdshøjden, hverken mere eller mindre. Det
-          giver nul tomt hvidt felt, og de 95px der kan scrolles, er tom
-          strækplads under indholdet, ikke noget man går glip af.
-
-          Målte indholdshøjder (efter at kortet i sidepanelet er indlæst):
-            under 768px   2137px   sidepanel under, ét felt pr. række
-            768-991px     1723px   to felter pr. række
-            992px og op    956px   sidepanel ved siden af
-
-          992px er Bootstrap 3's breakpoint, som Planway bygger på.
-
-          Den rigtige løsning er at Planway ændrer min-height til noget
-          iframe-venligt. Det er én linje i deres widget.css. Alternativt kan
-          man proxy'e Planway gennem vores eget domæne og selv overskrive
-          reglen, men så ligger deres session-cookies på det forkerte domæne,
-          og det koster bookinger. Lad være uden grundig test.
+          Ingen fast højde. Effekten ovenfor måler Planways rigtige indhold og
+          sætter højden på hvert trin, fordi iframen er same-origin gennem
+          /planway. `scrolling="no"` er med, fordi rammen altid passer: er der
+          en scrollbar, er det en fejl i målingen, ikke noget brugeren skal
+          rydde op i. Fallback-højden gælder indtil første måling er kørt.
         */}
         <iframe
+          ref={frameRef}
           src={iframeUrl}
           title="Book behandling hos Skønhedsklinik Aarhus"
-          loading="lazy"
           allow="payment"
+          scrolling="no"
           onLoad={() => setLoaded(true)}
-          className="relative z-10 block w-full border-0 h-[2160px] md:h-[1740px] min-[992px]:h-[970px]"
+          style={{ height: `${FALLBACK_HEIGHT}px` }}
+          className="relative z-10 block w-full border-0"
         />
       </div>
 
       <div className="flex justify-center mt-5">
         <a
-          href={iframeUrl}
+          href={directUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-textMuted hover:text-cognac transition-colors text-sm"
