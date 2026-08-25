@@ -141,7 +141,18 @@ function buildUserData(userData?: CapiUserData, identity?: CapiIdentity) {
   if (userData?.firstName) payload.fn = [sha256(normaliseName(userData.firstName))];
   if (userData?.lastName) payload.ln = [sha256(normaliseName(userData.lastName))];
   if (userData?.city) payload.ct = [sha256(normaliseName(userData.city).replace(/\s/g, ""))];
-  if (userData?.country) payload.country = [sha256(userData.country.trim().toLowerCase())];
+
+  // country: taget fra Vercels geo-header, ellers fra det kaldet selv oplyser.
+  // Landeopslag på IP er præcist nok til at bruges (modsat by og region, der
+  // ofte peger på teleudbyderens knudepunkt frem for den besøgende). Meta
+  // tæller country som en match key, den er på 100% af events, og den koster
+  // ingen personoplysninger. Se `docs`-noten i CHANGELOG for hvorfor ct/st/zp
+  // bevidst IKKE udledes af IP her.
+  const geoCountry = h.get("x-vercel-ip-country")?.trim().toLowerCase();
+  const country =
+    userData?.country?.trim().toLowerCase() ||
+    (geoCountry && /^[a-z]{2}$/.test(geoCountry) ? geoCountry : undefined);
+  if (country) payload.country = [sha256(country)];
 
   return payload;
 }
