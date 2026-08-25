@@ -98,23 +98,31 @@ export function BookingIframe({
           </div>
         )}
         {/*
-          Fast højde pr. skærmbredde, målt på Planways egen side.
-          Planway sender ingen postMessage med indholdshøjden, og iframen er på
-          et andet domæne, så højden kan hverken aflæses eller sættes
-          automatisk. Tallene her er første trin ("Vælg service"), som er det
-          alle ser, plus lidt luft:
+          Fast højde pr. skærmbredde, målt på Planways egen side EFTER at
+          kortet i sidepanelet er indlæst. Det er pointen: måler man for tidligt,
+          får man et tal der er 40-60px for lavt, og så ruller embedden alligevel.
 
-            under 768px   indhold 2137px   sidepanelet ligger under, ét felt pr. række
-            768-991px     indhold 1684px   to felter pr. række
-            992px og op   indhold  956px   sidepanelet ligger ved siden af
+          Målt, stabilt over 7 sekunder:
+            375px     indhold 2137px    sidepanel under, ét felt pr. række
+            800px     indhold 1723px    to felter pr. række
+            992px+    indhold  995px    sidepanel ved siden af
+                                        (samme tal ved 992, 1100 og 1431px)
 
-          992px er Bootstrap 3's breakpoint, som Planway bruger. Det er verificeret:
-          991px giver 1684px, 992px giver 956px.
+          992px er Bootstrap 3's breakpoint, som Planway er bygget på.
 
-          Senere trin med lange behandlingslister (fx laser hårfjerning, 2921px
-          på desktop) ruller stadig inde i iframen. At undgå det ville kræve
-          ~3000px på desktop og ~5000px på mobil, altså flere tusinde pixels
-          tom plads på første trin. Det er værre end en scrollbar.
+          Højderne har ~150px luft med vilje. Skriftrendering, scrollbar-bredde
+          og zoom flytter sig fra maskine til maskine, og en højde der passer
+          præcist på én skærm giver en scrollbar på den næste. Luften er cream
+          ligesom Planways egen baggrund, så den ser ud som bundpadding.
+
+          Senere trin med lange behandlingslister (laser hårfjerning fylder
+          2921px på desktop) ruller stadig indeni. Det kan ikke fikses med en
+          fast højde: at dække alt ville kræve ~3000px på desktop og ~5000px på
+          mobil, altså tusindvis af pixels tom plads på første trin. Den eneste
+          fuldstændige løsning er at proxy'e Planway gennem vores eget domæne,
+          så iframen bliver same-origin og højden kan aflæses direkte. Fravalgt,
+          fordi Planways session-cookies så ville høre til det forkerte domæne,
+          og en fejl dér koster bookinger.
         */}
         <iframe
           src={iframeUrl}
@@ -122,7 +130,7 @@ export function BookingIframe({
           loading="lazy"
           allow="payment"
           onLoad={() => setLoaded(true)}
-          className="relative z-10 block w-full border-0 h-[2200px] md:h-[1750px] min-[992px]:h-[1000px]"
+          className="relative z-10 block w-full border-0 h-[2300px] md:h-[1880px] min-[992px]:h-[1150px]"
         />
       </div>
 
