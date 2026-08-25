@@ -86,24 +86,43 @@ export function BookingIframe({
         </div>
       )}
 
-      <div className="relative w-full bg-white rounded-3xl border border-sand/70 overflow-hidden min-h-[900px]">
+      <div className="relative w-full bg-cream rounded-3xl border border-sand/70 overflow-hidden">
         {!loaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          // Kun i toppen. Rammen er op til 2200px høj på mobil, og en spinner
+          // centreret i hele den højde ville stå langt under skærmkanten.
+          <div className="absolute inset-x-0 top-0 h-[600px] flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 border-2 border-cognac border-t-transparent rounded-full animate-spin" />
               <p className="text-textMuted text-sm">Indlæser booking…</p>
             </div>
           </div>
         )}
+        {/*
+          Fast højde pr. skærmbredde, målt på Planways egen side.
+          Planway sender ingen postMessage med indholdshøjden, og iframen er på
+          et andet domæne, så højden kan hverken aflæses eller sættes
+          automatisk. Tallene her er første trin ("Vælg service"), som er det
+          alle ser, plus lidt luft:
+
+            under 768px   indhold 2137px   sidepanelet ligger under, ét felt pr. række
+            768-991px     indhold 1684px   to felter pr. række
+            992px og op   indhold  956px   sidepanelet ligger ved siden af
+
+          992px er Bootstrap 3's breakpoint, som Planway bruger. Det er verificeret:
+          991px giver 1684px, 992px giver 956px.
+
+          Senere trin med lange behandlingslister (fx laser hårfjerning, 2921px
+          på desktop) ruller stadig inde i iframen. At undgå det ville kræve
+          ~3000px på desktop og ~5000px på mobil, altså flere tusinde pixels
+          tom plads på første trin. Det er værre end en scrollbar.
+        */}
         <iframe
           src={iframeUrl}
-          width="100%"
-          style={{ minHeight: "900px", border: 0 }}
           title="Book behandling hos Skønhedsklinik Aarhus"
           loading="lazy"
           allow="payment"
           onLoad={() => setLoaded(true)}
-          className="relative z-10 block w-full"
+          className="relative z-10 block w-full border-0 h-[2200px] md:h-[1750px] min-[992px]:h-[1000px]"
         />
       </div>
 
