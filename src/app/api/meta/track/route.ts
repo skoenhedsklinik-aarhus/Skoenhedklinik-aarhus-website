@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { sendMetaEvent } from "@/lib/meta/capi";
+import { CONSENT_COOKIE, parseConsent } from "@/lib/consent";
 
 /**
  * Browser → Conversions API bridge.
@@ -9,8 +10,14 @@ import { sendMetaEvent } from "@/lib/meta/capi";
  * deduplicates the pair on the event id.
  *
  * Deliberately narrow: only known event names are forwarded, only same-origin
- * requests are accepted, and no personal data is accepted from the client —
- * matching is done server-side from the _fbc/_fbp cookies, IP and user agent.
+ * requests are accepted, and no personal data is accepted from the client.
+ * Matching is done server-side from the cnc_uid/_fbc/_fbp cookies, IP and user
+ * agent. The client may supply fbc/fbp/external_id as a FALLBACK only — those
+ * are ad ids, not personal data, they are format-checked before use, and a real
+ * cookie always wins. That fallback exists so a value the browser restored from
+ * its localStorage mirror still reaches Meta after ITP evicted the cookie.
+ *
+ * Refuses to forward anything without marketing consent.
  */
 
 export const runtime = "nodejs";
@@ -53,11 +60,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 403 });
   }
 
+  // The browser already gates on consent; this is the server-side backstop.
+  if (parseConsent(request.cookies.get(CONSENT_COOKIE)?.value) !== "granted") {
+    return NextResponse.json({ ok: false, ignored: true });
+  }
+
   let payload: {
     event?: string;
     eventId?: string;
     eventSourceUrl?: string;
     params?: Record<string, unknown>;
+    attribution?: { fbc?: unknown; fbp?: unknown; externalId?: unknown };
   };
 
   try {
@@ -82,10 +95,20 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  const str = (value: unknown): string | undefined =>
+    typeof value === "string" && value.length > 0 && value.length <= 300
+      ? value
+      : undefined;
+
   const sent = await sendMetaEvent({
     eventName: event,
     eventId: String(eventId).slice(0, 100),
     eventSourceUrl: payload.eventSourceUrl?.slice(0, 500),
+    identity: {
+      fbc: str(payload.attribution?.fbc),
+      fbp: str(payload.attribution?.fbp),
+      externalId: str(payload.attribution?.externalId),
+    },
     customData,
   });
 

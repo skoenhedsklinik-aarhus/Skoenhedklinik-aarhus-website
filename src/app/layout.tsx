@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { PlausibleScript } from "@/components/shared/PlausibleScript";
 import { MetaPixel } from "@/components/shared/MetaPixel";
 import { AttributionCapture } from "@/components/shared/AttributionCapture";
+import { ConsentBanner } from "@/components/shared/ConsentBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -88,6 +89,7 @@ export default function RootLayout({
         <PlausibleScript />
         <MetaPixel />
         <AttributionCapture />
+        <ConsentBanner />
       </body>
     </html>
   );

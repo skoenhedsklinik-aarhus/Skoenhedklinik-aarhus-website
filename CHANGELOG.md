@@ -1,5 +1,56 @@
 # Changelog
 
+## 2026-08-25 — Samtykke, external_id og stop for falske bookinger
+
+Event Match Quality på `Schedule` lå på 5,3/10. Tre ting lå bag, og de er
+rettet hver for sig.
+
+**`/tak` sendte en booking af sted ved hvert eneste sidevisning.** Planways
+"Ekstern bekræftelsesside" er en helt bar `/tak` uden et eneste parameter: intet
+booking-id, intet navn, ingen pris. Siden kunne derfor ikke kende forskel på en
+gennemført booking og en, der trykkede opdatér, gik tilbage eller skrev adressen
+direkte. Den eneste spærring var en `useRef`, som nulstilles ved hver indlæsning.
+Resultatet var bookinger, der aldrig havde fundet sted. De trak både antallet op
+og matchkvaliteten ned, fordi de ikke havde noget klik-id med.
+
+Der bruges nu tre signaler, som Planway rent faktisk efterlader: at siden ligger
+i bookingens iframe, at henvisningen kommer fra `*.planway.com`, og et mærke sat
+på `/book` i samme fane. Et enkelt sessionsmærke sikrer, at én booking giver ét
+event, uanset hvor mange gange siden indlæses. Bookingens `event_id` dannes i
+iframen og genbruges efter udbruddet, så pixel og Conversions API lander på det
+samme id i stedet for at tælle dobbelt.
+
+**`external_id` manglede helt.** Der ligger nu et førsteparts-id, `cnc_uid`, som
+følger med hvert event. Det er en UUID uden personoplysninger, og det er den
+billigste forbedring af matchkvaliteten, der findes, netop fordi det er der på
+alle events og ikke kræver noget af den besøgende.
+
+**Cookies blev skrevet fra JavaScript.** Safari ITP skærer den slags ned til 7
+dage, så et annonceklik var væk, længe før en booking nåede at ske. `cnc_uid`,
+`_fbc` og `_fbp` sættes nu server-side med rigtige `Set-Cookie`-headere fra
+`src/middleware.ts` og `/api/consent`. Samtidig løser det en fejl, ingen havde
+set: vi skrev `_fbc` og `_fbp` på `www.`, mens Metas eget script skrev de samme
+navne på `.skoenhedsklinik-aarhus.dk`. Browseren havde altså to cookies med
+samme navn, og serveren læste den, der tilfældigvis kom først. Nu skrives de på
+registreringsdomænet, præcis som Meta selv gør. Værdierne spejles desuden i
+localStorage og lægges tilbage, hvis en cookie forsvinder.
+
+`_fbc` overskrives kun ved et nyt klik. Skrev vi det samme klik-id igen, ville
+tidsstemplet blive nulstillet, og Meta læser det som det tidspunkt, annoncen
+blev klikket.
+
+**Der er kommet en cookiedialog.** Sitet havde ingen. Pixel og Conversions API
+kørte for alle. Indtil den besøgende siger ja, indlæses `fbevents.js` slet ikke,
+Conversions API afviser serverside, og ingen af de tre cookies skrives. Siger
+den besøgende nej, ryddes de. Plausible er ikke omfattet: det sætter ingen
+cookies. Bookingmodulet fra Planway har sin egen dialog, som vi ikke styrer.
+
+Bemærk, at målte konverteringer falder, når en dialog sættes op. Det er de
+besøgende, der siger nej, ikke et måletab.
+
+E-mail og telefon sendes fortsat ikke på `Schedule`. Planway giver os dem ikke
+tilbage, og de skal ikke indsamles et sted, hvor vi ikke allerede har dem.
+
 ## 2026-07-31 (3) — Nyt billede til Firm & Smooth
 
 Kunden kunne ikke lide det gamle billede. Erstattet med et profilportræt, hvor

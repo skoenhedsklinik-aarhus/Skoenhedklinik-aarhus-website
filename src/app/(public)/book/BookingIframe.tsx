@@ -34,6 +34,22 @@ export function BookingIframe({
     });
   }, [selectedName]);
 
+  // Prove this tab opened the booking widget. /tak needs it: Planway's
+  // confirmation URL carries no parameters at all, so when the redirect is
+  // neither framed nor sends a referrer, this marker is the only thing left
+  // that separates a real booking from someone typing /tak into the address
+  // bar. See <BookingConfirmed />.
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem(
+        "sk_booking_started",
+        JSON.stringify({ ts: Date.now() }),
+      );
+    } catch {
+      // Private mode — the framing and referrer signals still apply.
+    }
+  }, []);
+
   // Remember the treatment so /tak — the page Planway redirects to after a
   // completed booking — can label the Schedule conversion with it. Planway
   // passes nothing back to us, so this cookie is the only link between the two.

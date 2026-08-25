@@ -20,7 +20,8 @@
  * - Contact          → phone number tapped
  */
 
-import { captureAttribution, getAttribution } from "@/lib/attribution";
+import { captureAttribution, getAttribution, getExternalId } from "@/lib/attribution";
+import { hasMarketingConsent } from "@/lib/consent";
 
 export type PixelParams = Record<
   string,
@@ -48,8 +49,20 @@ export function trackPixel(
   eventId?: string,
 ) {
   if (typeof window === "undefined") return;
+  if (!hasMarketingConsent()) return;
   if (typeof window.fbq !== "function") return;
   try {
+    // Re-assert external_id on every event. <MetaPixel /> sets it at init, but
+    // the cookie may have been written by the server on a later request than
+    // the one that loaded the pixel, so init can have run without it.
+    const externalId = getExternalId();
+    const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+    if (externalId && pixelId) {
+      // Re-initialising the same pixel id is Meta's documented way to update
+      // Advanced Matching. It does not fire a second PageView.
+      window.fbq("init", pixelId, { external_id: externalId });
+    }
+
     window.fbq(
       "track",
       event,
@@ -71,12 +84,13 @@ export function sendToCapi(
   params?: PixelParams,
 ) {
   if (typeof window === "undefined") return;
+  if (!hasMarketingConsent()) return;
   try {
-    // Sørg for at _fbp/_fbc findes, FØR eventet sendes. <AttributionCapture />
-    // skriver dem også, men begge kører i en useEffect, og rækkefølgen mellem
-    // to komponenters effects er ikke garanteret. Uden det her afsendes en del
-    // events før cookien er skrevet, og så mangler Meta et browser-id at matche
-    // på (målt: fbp-dækning på 77% for ViewContent). Kaldet er idempotent.
+    // Make sure the identity values are in place BEFORE the event is sent.
+    // The server writes cnc_uid/_fbc/_fbp, but a cookie evicted by ITP is only
+    // restored from the localStorage mirror here. <AttributionCapture /> also
+    // calls this, but both run in a useEffect and the order between two
+    // components' effects is not guaranteed. Idempotent.
     captureAttribution();
 
     const body = JSON.stringify({
@@ -113,6 +127,7 @@ export function trackConversion(
   options?: { eventId?: string; skipServer?: boolean },
 ): string {
   const eventId = options?.eventId ?? newEventId();
+  if (typeof window !== "undefined" && !hasMarketingConsent()) return eventId;
   trackPixel(event, params, eventId);
   if (!options?.skipServer) sendToCapi(event, eventId, params);
   return eventId;

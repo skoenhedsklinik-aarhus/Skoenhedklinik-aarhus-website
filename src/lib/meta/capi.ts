@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { headers, cookies } from "next/headers";
+import { CONSENT_COOKIE, parseConsent } from "@/lib/consent";
 
 /**
  * Meta Conversions API (CAPI) — server-side conversion tracking.
@@ -35,6 +36,18 @@ export type CapiUserData = {
   country?: string | null;
 };
 
+/**
+ * Identity values recovered by the browser when the cookie itself was gone
+ * (evicted by ITP and restored from the localStorage mirror). Used only as a
+ * fallback: a real cookie always wins, because the server is the source of
+ * truth for all three.
+ */
+export type CapiIdentity = {
+  fbc?: string | null;
+  fbp?: string | null;
+  externalId?: string | null;
+};
+
 export type CapiEventInput = {
   /** Standard event name, e.g. "Lead", "Schedule", "InitiateCheckout". */
   eventName: string;
@@ -44,6 +57,8 @@ export type CapiEventInput = {
   eventSourceUrl?: string;
   /** Personal details to hash for matching (optional but improves match rate). */
   userData?: CapiUserData;
+  /** Browser-recovered fbc/fbp/external_id, used when the cookies are missing. */
+  identity?: CapiIdentity;
   /** Meta's custom_data block: content_name, value, currency, … */
   customData?: Record<string, string | number | string[] | undefined>;
   /** Unix seconds. Defaults to now. Must be within the last 7 days. */
@@ -77,17 +92,37 @@ function normaliseName(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-function buildUserData(userData?: CapiUserData) {
+/** Meta's fbc/fbp shape, so a corrupt client value is never forwarded. */
+const FB_VALUE = /^fb\.\d\.\d+\..+$/;
+
+function pickFbValue(
+  cookieValue: string | undefined,
+  fallback: string | null | undefined,
+): string | undefined {
+  if (cookieValue && FB_VALUE.test(cookieValue)) return cookieValue;
+  if (fallback && FB_VALUE.test(fallback)) return fallback;
+  return undefined;
+}
+
+function buildUserData(userData?: CapiUserData, identity?: CapiIdentity) {
   const h = headers();
   const c = cookies();
 
   const payload: Record<string, string | string[]> = {};
 
   // Click id + browser id — the highest-signal identifiers Meta has.
-  const fbc = c.get("_fbc")?.value;
-  const fbp = c.get("_fbp")?.value;
+  const fbc = pickFbValue(c.get("_fbc")?.value, identity?.fbc);
+  const fbp = pickFbValue(c.get("_fbp")?.value, identity?.fbp);
   if (fbc) payload.fbc = fbc;
   if (fbp) payload.fbp = fbp;
+
+  // external_id: our own first-party visitor id (cnc_uid). Present on every
+  // event, personal-data-free, and the browser half sends the same value
+  // through Advanced Matching, so the two deduplicate cleanly. Hashed here
+  // because the pixel hashes its Advanced Matching parameters client-side, and
+  // the two halves have to arrive at Meta as the same string.
+  const uid = c.get("cnc_uid")?.value || identity?.externalId || undefined;
+  if (uid) payload.external_id = [sha256(uid.trim().toLowerCase())];
 
   const ip =
     h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -122,6 +157,13 @@ export async function sendMetaEvent(input: CapiEventInput): Promise<boolean> {
 
   if (!pixelId || !accessToken) return false;
 
+  // The authoritative consent gate. Every server-side caller goes through
+  // here — the /api/meta/track bridge and the lead server action alike — so
+  // this is the one place that has to be right.
+  if (parseConsent(cookies().get(CONSENT_COOKIE)?.value) !== "granted") {
+    return false;
+  }
+
   const body: Record<string, unknown> = {
     data: [
       {
@@ -130,7 +172,7 @@ export async function sendMetaEvent(input: CapiEventInput): Promise<boolean> {
         event_id: input.eventId,
         action_source: "website",
         ...(input.eventSourceUrl && { event_source_url: input.eventSourceUrl }),
-        user_data: buildUserData(input.userData),
+        user_data: buildUserData(input.userData, input.identity),
         ...(input.customData && { custom_data: cleanCustomData(input.customData) }),
       },
     ],

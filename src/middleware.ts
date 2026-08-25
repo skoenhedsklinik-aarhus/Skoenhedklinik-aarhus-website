@@ -1,8 +1,21 @@
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { applyIdentityCookies } from "@/lib/identity";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  const response = await updateSession(request);
+
+  // Must run on the response updateSession actually returns. The Supabase
+  // cookie adapter swaps `supabaseResponse` for a fresh NextResponse.next()
+  // every time it writes a cookie, so anything set before that call would be
+  // silently thrown away.
+  //
+  // Skips itself without marketing consent, and skips itself when the visitor
+  // already has all three cookies — that keeps Set-Cookie off the response for
+  // returning visitors so the static pages stay CDN-cacheable.
+  applyIdentityCookies(request, response as NextResponse);
+
+  return response;
 }
 
 export const config = {
