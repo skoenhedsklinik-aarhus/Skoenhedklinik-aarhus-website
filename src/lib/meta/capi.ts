@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { headers, cookies } from "next/headers";
 import { CONSENT_COOKIE, parseConsent } from "@/lib/consent";
+import { TEST_MODE_COOKIE } from "@/lib/identity";
 
 /**
  * Meta Conversions API (CAPI) — server-side conversion tracking.
@@ -178,7 +179,14 @@ export async function sendMetaEvent(input: CapiEventInput): Promise<boolean> {
     ],
   };
 
-  if (process.env.META_TEST_EVENT_CODE) {
+  // Only for a browser that opted in with ?metatest=1. Stamping every
+  // visitor's events with the test code would push real conversions into the
+  // Test Events tool, where Meta does not count them for delivery or
+  // reporting. See applyTestModeCookie in src/lib/identity.ts.
+  if (
+    process.env.META_TEST_EVENT_CODE &&
+    cookies().get(TEST_MODE_COOKIE)?.value === "1"
+  ) {
     body.test_event_code = process.env.META_TEST_EVENT_CODE;
   }
 

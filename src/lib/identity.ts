@@ -106,6 +106,42 @@ export function fbclidOf(fbc: string | undefined | null): string | null {
   return match ? match[2] : null;
 }
 
+/** Opt-in flag for Meta's Test Events tool. See `applyTestModeCookie`. */
+export const TEST_MODE_COOKIE = "sk_metatest";
+const TEST_MODE_MAX_AGE = 60 * 60 * 12; // 12 hours, enough for one test round
+
+/**
+ * Route ONLY this browser's events into Meta's Test Events tool.
+ *
+ * Turn on with `?metatest=1` on any page, off with `?metatest=0`.
+ *
+ * Without this, setting META_TEST_EVENT_CODE would stamp every visitor's
+ * events with the test code, and Meta excludes test events from ads delivery
+ * and reporting. A real booking made while someone was testing would simply
+ * not count. The env var can now stay set permanently and costs nothing until
+ * a tester opts in.
+ *
+ * Not consent-gated: it writes no identifier and only takes effect for someone
+ * who deliberately put the parameter in the URL.
+ */
+export function applyTestModeCookie(
+  request: NextRequest,
+  response: NextResponse,
+): void {
+  const flag = request.nextUrl.searchParams.get("metatest");
+  if (flag !== "1" && flag !== "0") return;
+
+  response.cookies.set({
+    name: TEST_MODE_COOKIE,
+    value: flag === "1" ? "1" : "",
+    maxAge: flag === "1" ? TEST_MODE_MAX_AGE : 0,
+    path: "/",
+    sameSite: "lax",
+    secure: isSecureRequest(request),
+    httpOnly: false,
+  });
+}
+
 export type IdentityDecision = {
   /** Cookies that still need writing. Empty when nothing changed. */
   cookies: Array<{ name: string; value: string; maxAge: number }>;

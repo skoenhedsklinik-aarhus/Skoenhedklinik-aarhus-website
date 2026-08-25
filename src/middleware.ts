@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
-import { applyIdentityCookies } from "@/lib/identity";
+import { applyIdentityCookies, applyTestModeCookie } from "@/lib/identity";
 
 export async function middleware(request: NextRequest) {
   const response = await updateSession(request);
@@ -14,6 +14,9 @@ export async function middleware(request: NextRequest) {
   // already has all three cookies — that keeps Set-Cookie off the response for
   // returning visitors so the static pages stay CDN-cacheable.
   applyIdentityCookies(request, response as NextResponse);
+
+  // ?metatest=1 opts this browser alone into Meta's Test Events tool.
+  applyTestModeCookie(request, response as NextResponse);
 
   return response;
 }
