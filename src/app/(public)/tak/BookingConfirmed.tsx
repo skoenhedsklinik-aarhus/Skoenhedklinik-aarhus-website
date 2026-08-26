@@ -73,6 +73,32 @@ function isFresh(ts: number | undefined): boolean {
   return typeof ts === "number" && Date.now() - ts < MAX_AGE_MS;
 }
 
+/**
+ * Planways egen dom over bookingen, læst af adressen.
+ *
+ * Planway sender `?c=1&a=0` med, når den sender den besøgende videre hertil.
+ * Det står ikke i "Ekstern bekræftelsesside"-feltet i deres admin, hvor der
+ * kun står den nøgne URL, så det blev først opdaget på en rigtig booking.
+ *
+ * `c` læses som confirmed. Er den til stede, er den svaret:
+ *   c=1  bookingen er gennemført
+ *   c=0  den er det ikke, så vi rapporterer ingenting
+ * Mangler den helt, falder vi tilbage på signalerne nedenfor, så en ændring
+ * hos Planway ikke lydløst slukker for målingen.
+ *
+ * Betydningen af `a` er ukendt. Den var 0 på en gennemført booking, så den
+ * bruges ikke til noget.
+ */
+function planwayVerdict(): boolean | null {
+  try {
+    const value = new URLSearchParams(window.location.search).get("c");
+    if (value === null) return null;
+    return value === "1";
+  } catch {
+    return null;
+  }
+}
+
 /** True when the document was reached from Planway's booking system. */
 function cameFromPlanway(): boolean {
   try {
@@ -134,10 +160,15 @@ export function BookingConfirmed({
     const started = readJson<{ ts: number }>(STARTED_KEY);
 
     if (marker?.fired) return; // already reported: refresh or back-navigation
+
+    // Siger Planway det selv, er det svaret. Både når det er et ja og et nej.
+    const verdict = planwayVerdict();
     const genuine =
-      (marker !== null && isFresh(marker.ts)) ||
-      cameFromPlanway() ||
-      (started !== null && isFresh(started.ts));
+      verdict !== null
+        ? verdict
+        : (marker !== null && isFresh(marker.ts)) ||
+          cameFromPlanway() ||
+          (started !== null && isFresh(started.ts));
 
     if (!genuine) return; // direct visit, crawler, or a stale tab
 

@@ -42,7 +42,30 @@ export function newEventId(): string {
   return `evt-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-/** Fire a browser-side pixel event. Safe to call anywhere. */
+/**
+ * Kør `fn`, så snart fbevents.js er indlæst.
+ *
+ * Uden det her tabte vi browserhalvdelen af konverteringer på sider, der
+ * indlæses forfra. `/tak` er det værste tilfælde: Planways bekræftelse bryder
+ * ud af iframen med en helt ny sideindlæsning, <BookingConfirmed /> fyrer sit
+ * event i en mount-effect, og <MetaPixel /> indsætter først scriptet ét
+ * render senere, fordi den skal tjekke samtykke først. Effekten vandt hver
+ * gang, `window.fbq` fandtes ikke endnu, og eventet blev droppet lydløst. Det
+ * viste sig i Testhændelser som en Planlægning, der kun kom fra Server.
+ *
+ * Vi venter i stedet i op til ti sekunder. Event-id'et er det samme, så Meta
+ * deduplikerer stadig mod serverhalvdelen, selv om browserhalvdelen kommer
+ * et øjeblik senere.
+ */
+function whenPixelReady(fn: () => void, attempt = 0) {
+  if (typeof window.fbq === "function") {
+    fn();
+    return;
+  }
+  if (attempt >= 50) return; // ~10 sekunder, så giver vi op i stilhed
+  window.setTimeout(() => whenPixelReady(fn, attempt + 1), 200);
+}
+
 export function trackPixel(
   event: string,
   params?: PixelParams,
@@ -50,7 +73,12 @@ export function trackPixel(
 ) {
   if (typeof window === "undefined") return;
   if (!hasMarketingConsent()) return;
-  if (typeof window.fbq !== "function") return;
+  whenPixelReady(() => sendPixel(event, params, eventId));
+}
+
+function sendPixel(event: string, params?: PixelParams, eventId?: string) {
+  const fbq = window.fbq;
+  if (typeof fbq !== "function") return;
   try {
     // Re-assert external_id on every event. <MetaPixel /> sets it at init, but
     // the cookie may have been written by the server on a later request than
@@ -60,15 +88,10 @@ export function trackPixel(
     if (externalId && pixelId) {
       // Re-initialising the same pixel id is Meta's documented way to update
       // Advanced Matching. It does not fire a second PageView.
-      window.fbq("init", pixelId, { external_id: externalId });
+      fbq("init", pixelId, { external_id: externalId });
     }
 
-    window.fbq(
-      "track",
-      event,
-      params,
-      eventId ? { eventID: eventId } : undefined,
-    );
+    fbq("track", event, params, eventId ? { eventID: eventId } : undefined);
   } catch {
     // Never let tracking break the UI.
   }
