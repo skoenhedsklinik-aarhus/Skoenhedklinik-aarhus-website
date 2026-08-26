@@ -1,4 +1,12 @@
 import { type NextRequest } from "next/server";
+import { CONSENT_COOKIE, parseConsent } from "@/lib/consent";
+import { cookieDomain, isSecureRequest } from "@/lib/identity";
+import {
+  MATCH_COOKIE,
+  MATCH_MAX_AGE,
+  hashBookingIdentity,
+  serialiseMatchedIdentity,
+} from "@/lib/meta/matched-identity";
 
 /**
  * Reverse proxy for Planways bookingwidget.
@@ -88,6 +96,64 @@ function rewriteBody(body: string): string {
   );
 }
 
+/**
+ * Læs kontaktoplysningerne ud af bookingens POST, hash dem, og læg hashet i en
+ * httpOnly-cookie, som Conversions API kan hænge på `Schedule` og alle senere
+ * events fra samme browser.
+ *
+ * Uden det her har `Schedule` intet at matche på ud over IP og browser, fordi
+ * Planways bekræftelses-URL er tom. Se `src/lib/meta/matched-identity.ts` for
+ * spillereglerne: kun hashes, aldrig rå værdier, kun med samtykke.
+ *
+ * Alt herinde er pakket ind. En booking må ikke kunne fejle, fordi vi ville
+ * måle på den.
+ */
+function captureBookingIdentity(
+  request: NextRequest,
+  outHeaders: Headers,
+  body: Buffer | undefined,
+  contentType: string,
+): void {
+  try {
+    if (!body || !/application\/x-www-form-urlencoded/i.test(contentType)) return;
+    if (parseConsent(request.cookies.get(CONSENT_COOKIE)?.value) !== "granted") {
+      return;
+    }
+
+    const fields = new URLSearchParams(body.toString("utf8"));
+    const name = fields.get("info_name");
+    const email = fields.get("info_email");
+    const phone = fields.get("phonenumber");
+    // Ikke bookingformularen. Rør ikke cookien.
+    if (!name && !email && !phone) return;
+
+    const identity = hashBookingIdentity({
+      name,
+      email,
+      phone,
+      countryCode: fields.get("countrycode"),
+    });
+    if (!identity) return;
+
+    const domain = cookieDomain(request.headers.get("host"));
+    const attributes = [
+      `${MATCH_COOKIE}=${encodeURIComponent(serialiseMatchedIdentity(identity))}`,
+      `Max-Age=${MATCH_MAX_AGE}`,
+      "Path=/",
+      "SameSite=Lax",
+      // httpOnly er kritisk her, ikke kosmetisk. Et SHA-256 af et dansk
+      // 8-cifret nummer kan brute-forces på sekunder, så en hash der kan læses
+      // fra JavaScript ville i praksis være selve telefonnummeret.
+      "HttpOnly",
+      ...(isSecureRequest(request) ? ["Secure"] : []),
+      ...(domain ? [`Domain=${domain}`] : []),
+    ];
+    outHeaders.append("set-cookie", attributes.join("; "));
+  } catch {
+    // Måling må aldrig vælte en booking.
+  }
+}
+
 async function proxy(request: NextRequest, path: string[] | undefined) {
   const headers = new Headers();
   request.headers.forEach((value, key) => {
@@ -136,6 +202,15 @@ async function proxy(request: NextRequest, path: string[] | undefined) {
   // adskilt, og det betyder noget, fordi Planway sætter mere end én.
   const cookies = upstream.headers.getSetCookie?.() ?? [];
   for (const cookie of cookies) outHeaders.append("set-cookie", cookie);
+
+  // Var det her bookingens indsendelse? Så hash kontaktoplysningerne, mens de
+  // passerer, og giv Conversions API noget at matche `Schedule` på.
+  captureBookingIdentity(
+    request,
+    outHeaders,
+    body,
+    request.headers.get("content-type") ?? "",
+  );
 
   const contentType = upstream.headers.get("content-type") ?? "";
   if (!REWRITABLE.test(contentType)) {

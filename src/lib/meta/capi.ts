@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { headers, cookies } from "next/headers";
 import { CONSENT_COOKIE, parseConsent } from "@/lib/consent";
 import { TEST_MODE_COOKIE } from "@/lib/identity";
+import { readMatchedIdentity } from "@/lib/meta/matched-identity";
 
 /**
  * Meta Conversions API (CAPI) — server-side conversion tracking.
@@ -140,6 +141,18 @@ function buildUserData(userData?: CapiUserData, identity?: CapiIdentity) {
   }
   if (userData?.firstName) payload.fn = [sha256(normaliseName(userData.firstName))];
   if (userData?.lastName) payload.ln = [sha256(normaliseName(userData.lastName))];
+
+  // Hashet kontaktinfo fra en tidligere Planway-booking i denne browser.
+  // Planway giver os intet på /tak, så uden det her har Schedule kun IP og
+  // browser at matche på. Kalderens egne værdier vinder altid: et lead med
+  // friske oplysninger skal ikke overskrives af en gammel booking.
+  const matched = readMatchedIdentity();
+  if (matched) {
+    if (!payload.em && matched.em) payload.em = [matched.em];
+    if (!payload.ph && matched.ph) payload.ph = [matched.ph];
+    if (!payload.fn && matched.fn) payload.fn = [matched.fn];
+    if (!payload.ln && matched.ln) payload.ln = [matched.ln];
+  }
   if (userData?.city) payload.ct = [sha256(normaliseName(userData.city).replace(/\s/g, ""))];
 
   // country: taget fra Vercels geo-header, ellers fra det kaldet selv oplyser.
