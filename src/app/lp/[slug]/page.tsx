@@ -230,7 +230,7 @@ export default async function AdLandingPage({ params }: { params: { slug: string
         </div>
       </section>
 
-      <TrustStrip />
+      <TrustStrip freeConsultation />
 
       {/* ─── Results ───────────────────────────────────────────────── */}
       <section className="py-16 lg:py-20 bg-white">

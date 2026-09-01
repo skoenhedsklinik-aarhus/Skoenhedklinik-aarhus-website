@@ -150,7 +150,7 @@ export function Header() {
                       : "bg-cognac hover:bg-cognac-hover text-white"
                   }`}
                 >
-                  Book gratis konsultation
+                  Book en tid
                 </button>
               </Link>
             </div>
@@ -230,7 +230,7 @@ export function Header() {
                       onClick={() => setMobileOpen(false)}
                       className="block w-full py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-center text-sm font-medium tracking-wide transition-colors"
                     >
-                      Book konsultation
+                      Book en tid
                     </Link>
                   </div>
                 </div>

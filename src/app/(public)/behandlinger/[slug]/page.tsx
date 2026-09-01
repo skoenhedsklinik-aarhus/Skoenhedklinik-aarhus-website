@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getServices, getServiceBySlug, getPricingTiers } from "@/lib/supabase-queries";
 import { enrichServiceWithFallback, getServiceThumbnail, getSkeletonService } from "@/lib/services-fallback";
+import { bookLabel, hasFreeConsultation } from "@/lib/consultation";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { TrustStrip } from "@/components/shared/TrustStrip";
 import { CallbackForm } from "@/components/shared/CallbackForm";
@@ -117,6 +118,10 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
         : null;
   const minPriceLabel = minPrice !== null ? minPrice.toLocaleString("da-DK") : null;
 
+  // Gratis konsultation må kun loves på laserbehandlingerne. Alle andre
+  // behandlinger får en ren book-knap.
+  const freeConsultation = hasFreeConsultation(service.slug);
+
   const procedureJsonLd = medicalProcedureSchema(s);
   const hasFaq = s.faq && Array.isArray(s.faq) && s.faq.length > 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -165,7 +170,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
           <div className="flex flex-col sm:flex-row items-start gap-4 mb-7">
             <Link href={`/book?service=${service.slug}`}>
               <button className="px-8 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors">
-                Book gratis konsultation
+                {bookLabel(service.slug)}
               </button>
             </Link>
             <Link href="#priser">
@@ -186,14 +191,18 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
             </span>
             <span className="w-1 h-1 rounded-full bg-white/40" />
             <span>Registreret hos Styrelsen for Patientsikkerhed</span>
-            <span className="w-1 h-1 rounded-full bg-white/40 hidden sm:block" />
-            <span className="hidden sm:block">Gratis & uforpligtende konsultation</span>
+            {freeConsultation && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-white/40 hidden sm:block" />
+                <span className="hidden sm:block">Gratis & uforpligtende konsultation</span>
+              </>
+            )}
           </div>
         </div>
       </section>
 
       {/* ─── 1b. Trust strip ───────────────────────────────────────── */}
-      <TrustStrip />
+      <TrustStrip freeConsultation={freeConsultation} />
 
       {/* ─── 2. Intro — Full Width Section (First Part, only if split) ─── */}
       {hasSplit && (
@@ -233,13 +242,13 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
                 dangerouslySetInnerHTML={{ __html: hasSplit ? secondPart : firstPart }}
               />
               
-              {service.requires_consultation && (
+              {freeConsultation && service.requires_consultation && (
                 <div className="glass-cognac rounded-2xl p-8 border border-cognac/20 relative overflow-hidden shadow-sm">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-cognac/5 rounded-full -mr-10 -mt-10 pointer-events-none" />
                   <span className="eyebrow text-cognac text-[10px] tracking-wider mb-2 block uppercase font-medium">Lovpligtig forundersøgelse</span>
                   <h4 className="font-heading text-2xl text-textPrimary font-light mb-4">Konsultation v/ Louise</h4>
                   <p className="text-textBody text-sm leading-relaxed mb-5 font-light">
-                    Hos Skønhedsklinik Aarhus tilbyder vi en gratis og helt uforpligtende konsultation, før du kan starte et forløb med laser hårfjerning. Konsultationen er et lovpligtigt krav og en vigtig del af processen, så vi sikrer, at behandlingen er den rette for dig.
+                    Hos Skønhedsklinik Aarhus tilbyder vi en gratis og helt uforpligtende konsultation, før du kan starte et forløb med {service.name.toLowerCase()}. Konsultationen er et lovpligtigt krav og en vigtig del af processen, så vi sikrer, at behandlingen er den rette for dig.
                   </p>
                   <p className="text-textBody text-sm leading-relaxed mb-6 font-light">
                     Vores erfarne sygeplejerske Louise, som har mange års erfaring inden for laser- og skønhedsbehandlinger, gennemgår hele forløbet med dig. Sammen taler I om dine ønsker, vurderer din hud- og hårtype for at lægge den mest præcise og sikre behandlingsplan. Du får også mulighed for at få prøvet laseren på et lille område, så du kan mærke behandlingen inden start.
@@ -476,7 +485,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
             <div className="mt-10 text-center">
               <Link href={`/book?service=${service.slug}`}>
                 <button className="px-9 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors">
-                  Book gratis konsultation
+                  {bookLabel(service.slug)}
                 </button>
               </Link>
               <p className="text-textMuted text-xs mt-3">
@@ -597,8 +606,12 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
         </section>
       )}
 
-      <FinalCTA />
-      <StickyMobileCTA serviceSlug={service.slug} serviceName={service.name} />
+      <FinalCTA freeConsultation={freeConsultation} />
+      <StickyMobileCTA
+        serviceSlug={service.slug}
+        serviceName={service.name}
+        bookLabel={bookLabel(service.slug)}
+      />
     </main>
   );
 }

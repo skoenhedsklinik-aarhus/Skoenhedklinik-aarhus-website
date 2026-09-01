@@ -62,7 +62,7 @@ export function StickyBookBar() {
             className="flex-grow py-3.5 bg-cognac hover:bg-cognac-hover text-white rounded-full flex items-center justify-center gap-2 text-sm font-medium tracking-wide transition-colors"
           >
             <CalendarCheck className="w-4 h-4" />
-            Book gratis konsultation
+            Book en tid
           </Link>
           <a
             href="tel:+4561445999"

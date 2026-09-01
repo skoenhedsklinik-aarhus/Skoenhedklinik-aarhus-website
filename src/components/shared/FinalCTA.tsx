@@ -4,7 +4,12 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { trackConversion } from "@/lib/pixel";
 
-export function FinalCTA() {
+/**
+ * `freeConsultation` sættes kun på behandlingssider med gratis konsultation
+ * (laser hårfjerning, tatoveringsfjernelse, pico laser). Alle andre steder
+ * er CTA'en en ren book-knap uden løfte om gratis konsultation.
+ */
+export function FinalCTA({ freeConsultation = false }: { freeConsultation?: boolean }) {
   return (
     <section className="section-dark relative py-28 lg:py-36 overflow-hidden">
       {/* Decorative gradient blob */}
@@ -27,7 +32,7 @@ export function FinalCTA() {
           </span>
 
           <h2 className="font-heading text-4xl md:text-5xl lg:text-[60px] text-cream font-light leading-[1.08] mb-5 text-balance max-w-2xl mx-auto">
-            Book din gratis konsultation i dag
+            {freeConsultation ? "Book din gratis konsultation i dag" : "Book din tid i dag"}
           </h2>
 
           <div className="w-10 h-px bg-cognac mx-auto mb-7" />
@@ -43,7 +48,7 @@ export function FinalCTA() {
                 whileTap={{ scale: 0.98 }}
                 className="px-9 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors"
               >
-                Book konsultation
+                {freeConsultation ? "Book gratis konsultation" : "Book en tid"}
               </motion.button>
             </Link>
             <Link href="tel:+4561445999" onClick={() => trackConversion("Contact", { content_category: "final-cta" })}>
@@ -58,7 +63,8 @@ export function FinalCTA() {
           </div>
 
           <p className="text-cream/40 text-xs font-medium tracking-wide mt-8">
-            ★★★★★ 5,0 på Google · Registreret hos Styrelsen for Patientsikkerhed · Gratis & uforpligtende
+            ★★★★★ 5,0 på Google · Registreret hos Styrelsen for Patientsikkerhed
+            {freeConsultation ? " · Gratis & uforpligtende" : " · Certificerede behandlere"}
           </p>
         </motion.div>
       </div>

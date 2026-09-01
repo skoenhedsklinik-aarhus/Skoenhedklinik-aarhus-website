@@ -19,7 +19,7 @@ export function StickyMobileCTA({
   serviceSlug,
   serviceName,
   bookHref,
-  bookLabel = "Book gratis konsultation",
+  bookLabel = "Book en tid",
   contentCategory = "behandling",
 }: {
   serviceSlug: string;

@@ -28,7 +28,7 @@ function HeroContent() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-7">
           <Link href="/book">
             <button className="px-8 py-4 bg-cognac hover:bg-cognac-hover text-white rounded-full text-sm font-medium tracking-wide transition-colors">
-              Book gratis konsultation
+              Book en tid
             </button>
           </Link>
           <Link href="/behandlinger">

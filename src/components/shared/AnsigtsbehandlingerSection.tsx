@@ -246,8 +246,8 @@ export function AnsigtsbehandlingerSection() {
           </h2>
           <p className="text-textMuted text-base mt-4 max-w-xl mx-auto">
             Alle behandlinger tilpasses din hud. Vælg en behandling nedenfor og se
-            forløb, varighed og pris. Er du i tvivl, lægger vi planen sammen ved en
-            gratis konsultation.
+            forløb, varighed og pris. Er du i tvivl, hjælper vi dig med at vælge,
+            når du booker.
           </p>
         </div>
 

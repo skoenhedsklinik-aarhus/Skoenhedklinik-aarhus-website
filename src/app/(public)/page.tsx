@@ -16,12 +16,12 @@ import { localBusinessSchema, reviewsSchema } from "@/lib/schema";
 export const metadata: Metadata = {
   title: "Skønhedsklinik Aarhus — Certificeret skønhedsbehandling i Aarhus C",
   description:
-    "Professionel skønhedsklinik i Aarhus. Specialister i laser hårfjerning, ansigtsbehandlinger, sugaring, tattoo-fjernelse og tandblegning. Gratis konsultation. Registreret hos STPS.",
+    "Professionel skønhedsklinik i Aarhus. Specialister i laser hårfjerning, ansigtsbehandlinger, sugaring, tattoo-fjernelse og tandblegning. Gratis konsultation på laserbehandlinger. Registreret hos STPS.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "Skønhedsklinik Aarhus — Professionel skønhedsbehandling",
     description:
-      "Certificeret klinik i Aarhus C. Laser hårfjerning, ansigtsbehandlinger, sugaring og meget mere. Book gratis konsultation.",
+      "Certificeret klinik i Aarhus C. Laser hårfjerning, ansigtsbehandlinger, sugaring og meget mere. Book din tid online.",
     url: "/",
   },
 };

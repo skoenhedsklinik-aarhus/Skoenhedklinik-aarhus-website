@@ -115,7 +115,7 @@ export function ServicesClient({ services }: ServicesClientProps) {
                           {service.short_description}
                         </p>
                         <span className="inline-flex items-center gap-1.5 text-cognac-light text-xs font-medium tracking-wide">
-                          Book konsultation
+                          Book en tid
                           <span className="translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
                         </span>
                       </div>

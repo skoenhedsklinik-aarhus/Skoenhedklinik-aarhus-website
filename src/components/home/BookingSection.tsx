@@ -296,7 +296,7 @@ export function BookingSection() {
             <p className="text-textBody text-base md:text-lg leading-relaxed mb-8">
               Ved du ikke helt, hvor du skal starte? Svar på et par spørgsmål, så
               guider vi dig til den behandling, der passer bedst til dine ønsker.
-              Alle konsultationer er gratis og uforpligtende.
+              Det tager under et minut og er helt uforpligtende.
             </p>
             <div className="space-y-4">
               {[
@@ -454,7 +454,7 @@ export function BookingSection() {
                         </div>
 
                         <p className="text-sm font-medium text-textPrimary mb-3">
-                          Book en gratis konsultation
+                          Book en tid
                         </p>
                         <div className="grid sm:grid-cols-2 gap-3">
                           <Link
@@ -466,7 +466,7 @@ export function BookingSection() {
                             className="flex items-center justify-center gap-2 py-3.5 px-4 bg-cognac hover:bg-cognac-hover text-white rounded-full font-medium text-sm transition-colors"
                           >
                             <Calendar className="w-4 h-4" />
-                            Fysisk konsultation
+                            Book tid online
                           </Link>
                           <button
                             onClick={() => {
