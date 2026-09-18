@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Loader2, Phone } from "lucide-react";
 import {
   submitConsultationLead,
@@ -20,6 +20,7 @@ export function CallbackForm({
   treatmentName,
   source = "callback-form",
   variant = "glass",
+  collapsible = false,
 }: {
   /** Treatment shown to admin in the lead ("Laser hårfjerning" etc.) */
   treatmentName?: string;
@@ -27,6 +28,16 @@ export function CallbackForm({
   source?: string;
   /** "solid" gives an opaque card — use on dark backgrounds */
   variant?: "glass" | "solid";
+  /**
+   * Vis kun en knap, indtil den besøgende trykker.
+   *
+   * Felterne findes slet ikke i DOM'en før da. Klikker nogen ind fra en Meta-
+   * annonce, scroller Instagrams in-app browser af sig selv ned til den første
+   * kontaktformular på siden. Det sker kun ved annonceklik, ikke når samme
+   * link åbnes fra en besked, og ikke i Safari eller Chrome. Vi kan ikke slå
+   * det fra i annoncen, så vi fjerner det den leder efter.
+   */
+  collapsible?: boolean;
 }) {
   const cardClass =
     variant === "solid"
@@ -37,6 +48,13 @@ export function CallbackForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [expanded, setExpanded] = useState(!collapsible);
+  const nameRef = useRef<HTMLInputElement>(null);
+
+  // Tastaturet skal op med det samme, når felterne først er der.
+  useEffect(() => {
+    if (collapsible && expanded) nameRef.current?.focus();
+  }, [collapsible, expanded]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,8 +113,8 @@ export function CallbackForm({
     );
   }
 
-  return (
-    <form onSubmit={handleSubmit} className={`${cardClass} p-7 md:p-8`}>
+  const intro = (
+    <>
       <div className="flex items-center gap-3 mb-1.5">
         <div className="w-9 h-9 rounded-full bg-cognac/10 flex items-center justify-center shrink-0">
           <Phone className="w-4 h-4 text-cognac" />
@@ -114,6 +132,34 @@ export function CallbackForm({
         )}
         . Helt uforpligtende.
       </p>
+    </>
+  );
+
+  const footnote = (
+    <p className="text-center text-textMuted text-[11px] mt-3">
+      Vi ringer inden for 24 timer på hverdage · Ingen binding
+    </p>
+  );
+
+  if (!expanded) {
+    return (
+      <div className={`${cardClass} p-7 md:p-8`}>
+        {intro}
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="w-full py-3.5 bg-cognac hover:bg-cognac-hover text-white rounded-full font-medium text-sm transition-colors"
+        >
+          Ring mig op
+        </button>
+        {footnote}
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className={`${cardClass} p-7 md:p-8`}>
+      {intro}
 
       <div className="space-y-3">
         <div>
@@ -122,6 +168,7 @@ export function CallbackForm({
           </label>
           <input
             id={`cb-name-${source}`}
+            ref={nameRef}
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -156,9 +203,7 @@ export function CallbackForm({
         {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
         {submitting ? "Sender…" : "Ring mig op"}
       </button>
-      <p className="text-center text-textMuted text-[11px] mt-3">
-        Vi ringer inden for 24 timer på hverdage · Ingen binding
-      </p>
+      {footnote}
     </form>
   );
 }

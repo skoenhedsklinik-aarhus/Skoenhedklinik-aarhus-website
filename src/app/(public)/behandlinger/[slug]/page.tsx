@@ -562,7 +562,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
                 ))}
               </ul>
             </div>
-            <CallbackForm treatmentName={service.name} source={`behandling-${service.slug}`} />
+            <CallbackForm treatmentName={service.name} source={`behandling-${service.slug}`} collapsible />
           </div>
         </div>
       </section>
