@@ -95,9 +95,41 @@ export interface Database {
           fbclid?: string | null
           landing_page?: string | null
           referrer?: string | null
+          // Førsteberøring. Tilføjet af supabase/migrations/add_touchpoints.sql.
+          // ft_id er besøgs-id'et fra sk_ft-cookien og er hele koblingen til
+          // touchpoints, altså til kunderejsen.
+          ft_id?: string | null
+          ft_at?: string | null
+          ft_source?: string | null
+          ft_medium?: string | null
+          ft_campaign?: string | null
+          ft_content?: string | null
+          ft_term?: string | null
+          ft_fbclid?: string | null
+          ft_gclid?: string | null
+          ft_landing_page?: string | null
         }
         Insert: Partial<Database['public']['Tables']['consultation_leads']['Row']>
         Update: Partial<Database['public']['Tables']['consultation_leads']['Row']>
+      }
+      touchpoints: {
+        Row: {
+          id: string
+          visitor_id: string
+          occurred_at: string
+          path: string | null
+          referrer_host: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_term: string | null
+          fbclid: string | null
+          gclid: string | null
+          created_at: string
+        }
+        Insert: Partial<Database['public']['Tables']['touchpoints']['Row']>
+        Update: Partial<Database['public']['Tables']['touchpoints']['Row']>
       }
       opening_hours: {
         Row: {

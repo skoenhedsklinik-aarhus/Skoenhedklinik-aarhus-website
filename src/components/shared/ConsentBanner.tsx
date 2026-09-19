@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { CONSENT_EVENT, readConsent, type ConsentValue } from "@/lib/consent";
+import { stashLanding, stashedLanding } from "@/lib/landing";
 
 /**
  * Samtykke til markedsføringscookies.
@@ -41,6 +42,11 @@ export function ConsentBanner() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    // Husk landingssiden FØR der er svaret på banneret. Accepterer nogen
+    // først på side fem, skal førsteberøringen stadig pege på den side, de
+    // faktisk landede på, og dermed på den rigtige annonce.
+    stashLanding();
+
     // Først efter mount: serveren og browseren skal ikke være uenige om,
     // hvorvidt banneret er der, og cookien findes kun i browseren.
     setVisible(readConsent() === "unknown");
@@ -57,6 +63,18 @@ export function ConsentBanner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ value, fbclid: currentFbclid() }),
       });
+
+      // Førsteberøringen sættes server-side og kun ved ja. Den bruger den
+      // gemte landingsside, ikke den aktuelle. Endepunktet er idempotent og
+      // rører aldrig en cookie, der allerede findes: første besøg vinder.
+      if (value === "granted") {
+        await fetch("/api/first-touch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(stashedLanding()),
+          keepalive: true,
+        });
+      }
     } catch {
       // Netværksfejl må ikke låse siden. Banneret bliver stående og kan
       // prøves igen ved næste sidevisning.

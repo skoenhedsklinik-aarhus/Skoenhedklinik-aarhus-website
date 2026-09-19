@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogOut, Home, Settings, Clock, Users, Gift, Scissors, CreditCard, PhoneCall } from "lucide-react";
+import { LogOut, Home, Settings, Clock, Users, Gift, Scissors, CreditCard, PhoneCall, Route } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminLayout({
@@ -19,6 +19,10 @@ export default async function AdminLayout({
     return <>{children}</>;
   }
 
+  // Kunderejsen er ClicknContents. Menupunktet findes ikke for klinikken, og
+  // selve siden svarer 404 uden rollen. Se src/lib/cnc-access.ts.
+  const erCnc = user.app_metadata?.cnc === true;
+
   return (
     <div className="min-h-screen bg-cream flex">
       {/* Sidebar */}
@@ -34,6 +38,11 @@ export default async function AdminLayout({
           <Link href="/admin/henvendelser" className="flex items-center gap-3 px-4 py-3 text-textBody hover:bg-beige rounded-lg">
             <PhoneCall className="w-5 h-5" /> Henvendelser
           </Link>
+          {erCnc && (
+            <Link href="/admin/kunderejse" className="flex items-center gap-3 px-4 py-3 text-textBody hover:bg-beige rounded-lg">
+              <Route className="w-5 h-5" /> Kunderejse
+            </Link>
+          )}
           <Link href="/admin/behandlinger" className="flex items-center gap-3 px-4 py-3 text-textBody hover:bg-beige rounded-lg">
             <Scissors className="w-5 h-5" /> Behandlinger
           </Link>

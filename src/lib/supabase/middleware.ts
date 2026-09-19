@@ -2,6 +2,14 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { Database } from "@/types/supabase";
 
+/**
+ * Kunderejsen er ClicknContents, ikke klinikkens, og den må ikke afsløre sin
+ * egen eksistens. Derfor sendes den IKKE til login som resten af /admin:
+ * siden svarer selv 404 til alle, der ikke har rollen, hvad enten de er
+ * logget ind eller ej. Se src/app/admin/kunderejse/page.tsx.
+ */
+const SKJULT_PRAEFIKS = "/admin/kunderejse";
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request: {
@@ -17,7 +25,8 @@ export async function updateSession(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     if (
       request.nextUrl.pathname.startsWith("/admin") &&
-      request.nextUrl.pathname !== "/admin/login"
+      request.nextUrl.pathname !== "/admin/login" &&
+      !request.nextUrl.pathname.startsWith(SKJULT_PRAEFIKS)
     ) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin/login";
@@ -83,7 +92,10 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Admin route protection
-  if (request.nextUrl.pathname.startsWith("/admin")) {
+  if (
+    request.nextUrl.pathname.startsWith("/admin") &&
+    !request.nextUrl.pathname.startsWith(SKJULT_PRAEFIKS)
+  ) {
     // If not logged in and not on the login page, redirect to login
     if (!user && request.nextUrl.pathname !== "/admin/login") {
       const url = request.nextUrl.clone();

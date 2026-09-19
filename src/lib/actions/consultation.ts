@@ -1,9 +1,11 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { sendMetaEvent } from "@/lib/meta/capi";
 import { sendLeadNotification } from "@/lib/email/lead-notification";
 import type { Attribution } from "@/lib/attribution";
+import { FT_COOKIE, decodeFirstTouch } from "@/lib/first-touch";
 
 export type ConsultationLeadInput = {
   name: string;
@@ -54,6 +56,38 @@ function attributionLine(attr?: Attribution, source?: string): string | null {
   if (parts.length <= 1 && attr?.referrer) parts.push(`henvist fra: ${attr.referrer}`);
   if (attr?.landingPage) parts.push(`landingsside: ${attr.landingPage}`);
   return parts.length ? parts.join(" · ") : null;
+}
+
+/**
+ * Førsteberøringen fra sk_ft-cookien, læst server-side.
+ *
+ * Det er HER kunderejsen bliver til et menneske: ft_id er besøgs-id'et, og
+ * det samme id står på hver eneste berøring i touchpoints. Sker denne
+ * skrivning ikke, kan en rejse aldrig knyttes til et lead.
+ *
+ * Bemærk forskellen til attribution-felterne ovenfor: de kommer fra
+ * sessionStorage i browseren og er dermed dette besøgs kilde. ft_* kommer fra
+ * en 90 dage gammel HttpOnly-cookie og er den ALLERFØRSTE kilde. Begge dele
+ * gemmes, fordi de svarer på hver sit spørgsmål.
+ */
+function firstTouchColumns(): Record<string, string | null> {
+  const ft = decodeFirstTouch(cookies().get(FT_COOKIE)?.value);
+  if (!ft) return {};
+
+  const ts = ft.ts && !Number.isNaN(Date.parse(ft.ts)) ? new Date(ft.ts).toISOString() : null;
+
+  return {
+    ft_id: ft.id,
+    ft_at: ts,
+    ft_source: clip(ft.utm_source, 120),
+    ft_medium: clip(ft.utm_medium, 120),
+    ft_campaign: clip(ft.utm_campaign, 255),
+    ft_content: clip(ft.utm_content, 255),
+    ft_term: clip(ft.utm_term, 255),
+    ft_fbclid: clip(ft.fbclid, 255),
+    ft_gclid: clip(ft.gclid, 255),
+    ft_landing_page: clip(ft.landing_page, 255),
+  };
 }
 
 /** Postgres/PostgREST codes for "that column doesn't exist". */
@@ -116,6 +150,7 @@ export async function submitConsultationLead(
         ...baseRow,
         note: note || null,
         ...attributionColumns,
+        ...firstTouchColumns(),
       } as never,
     ]);
 
