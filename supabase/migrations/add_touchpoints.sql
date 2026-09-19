@@ -74,6 +74,15 @@ create index if not exists touchpoints_visitor_idx
 --   UPDATE/DELETE  ingen policy = ingen adgang for nogen via API'et.
 --           Oprydning sker med databaseadgang.
 
+-- Rettighederne skal gives EKSPLICIT. En policy uden en GRANT under sig gør
+-- ingenting: rollen får "permission denied for table", og ruten svarer
+-- logged: false uden at nogen opdager det. Det skete i verifikationen, fordi
+-- Supabase' standardrettigheder kun gælder tabeller oprettet gennem deres
+-- egen vej.
+grant insert on public.touchpoints to anon, authenticated;
+grant select on public.touchpoints to authenticated;
+-- Bevidst ingen select til anon, og ingen update/delete til nogen.
+
 alter table public.touchpoints enable row level security;
 
 drop policy if exists "anon can insert touchpoints" on public.touchpoints;
