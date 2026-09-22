@@ -131,6 +131,20 @@ export interface Database {
         Insert: Partial<Database['public']['Tables']['touchpoints']['Row']>
         Update: Partial<Database['public']['Tables']['touchpoints']['Row']>
       }
+      bookings: {
+        Row: {
+          id: string
+          visitor_id: string
+          occurred_at: string
+          event_id: string | null
+          treatment: string | null
+          treatment_slug: string | null
+          value_dkk: number | null
+          created_at: string
+        }
+        Insert: Partial<Database['public']['Tables']['bookings']['Row']>
+        Update: Partial<Database['public']['Tables']['bookings']['Row']>
+      }
       opening_hours: {
         Row: {
           day_of_week: number

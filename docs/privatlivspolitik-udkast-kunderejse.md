@@ -53,6 +53,12 @@ Udfylder du en kontaktformular, knyttes de oplysninger, du selv indtaster
 hvilke sider netop du har læst. Udfylder du ingen formular, forbliver
 oplysningerne knyttet til et tilfældigt id, som vi ikke kan sætte navn på.
 
+Gennemfører du en booking, registrerer vi desuden tidspunktet for bookingen og
+hvilken behandling den gælder, knyttet til det samme besøgs-id. Selve
+bookingen, dit navn og dine kontaktoplysninger behandles af Planway og står
+ikke i denne måling. Har du tidligere udfyldt en formular på hjemmesiden, kan
+bookingen kobles til din henvendelse.
+
 Vi deler desuden oplysninger om din adfærd på siden med Meta (Facebook og
 Instagram) gennem Meta Pixel og Metas Conversions API, når du har givet
 samtykke. Kontaktoplysninger sendes aldrig i klar tekst: de omdannes til en
@@ -63,7 +69,8 @@ privatlivspolitik på facebook.com/privacy/policy.
 **Retsgrundlag:** dit samtykke, jf. databeskyttelsesforordningens artikel 6,
 stk. 1, litra a, og cookiebekendtgørelsens § 3.
 
-**Opbevaring:** oplysninger om sidevisninger slettes efter 12 måneder.
+**Opbevaring:** oplysninger om sidevisninger og bookinger slettes efter 12
+måneder.
 Henvendelser fra kontaktformularen slettes, når de ikke længere er nødvendige
 for at behandle din forespørgsel.
 
@@ -100,6 +107,12 @@ som kan sætte deres egne cookies, vi ikke har kontrol over:
      'slet-gamle-beroeringer',
      '30 3 * * *',
      $$delete from public.touchpoints where occurred_at < now() - interval '12 months'$$
+   );
+
+   select cron.schedule(
+     'slet-gamle-bookinger',
+     '35 3 * * *',
+     $$delete from public.bookings where occurred_at < now() - interval '12 months'$$
    );
    ```
 

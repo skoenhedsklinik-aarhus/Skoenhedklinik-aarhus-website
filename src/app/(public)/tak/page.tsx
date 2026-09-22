@@ -83,7 +83,11 @@ export default async function BookingThankYouPage({
 
   return (
     <main className="bg-cream min-h-screen">
-      <BookingConfirmed treatmentName={treatmentName} value={bookingValue} />
+      <BookingConfirmed
+        treatmentName={treatmentName}
+        treatmentSlug={treatmentSlug}
+        value={bookingValue}
+      />
 
       <section className="container mx-auto px-4 lg:px-8 py-20 lg:py-28 max-w-2xl">
         <div className="text-center">

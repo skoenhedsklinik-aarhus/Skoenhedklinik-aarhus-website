@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { isCnc } from "@/lib/cnc-access";
 import { getJourney } from "@/lib/touchpoints";
+import { getBookings } from "@/lib/bookings";
 import { JourneyTimeline } from "@/components/admin/JourneyTimeline";
 import type { Database } from "@/types/supabase";
 
@@ -62,6 +63,10 @@ export default async function KunderejseDetaljePage({
     lead.created_at,
   );
 
+  const bookinger = lead.ft_id
+    ? ((await getBookings([lead.ft_id])).get(lead.ft_id) ?? [])
+    : [];
+
   const omraader = Array.isArray(lead.areas) ? (lead.areas as string[]) : [];
   const anbefalinger = Array.isArray(lead.recommendations)
     ? (lead.recommendations as string[])
@@ -80,6 +85,27 @@ export default async function KunderejseDetaljePage({
       <p className="mb-8 text-textBody">
         {lead.phone} · henvendte sig {fmtDato(lead.created_at)}
       </p>
+
+      {bookinger.length > 0 && (
+        <section className="mb-8 rounded-xl border border-cognac/30 bg-cognac/5 p-6">
+          <h2 className="mb-2 font-heading text-xl text-textPrimary">
+            {bookinger.length === 1 ? "Har booket en tid" : `Har booket ${bookinger.length} tider`}
+          </h2>
+          <ul className="space-y-1 text-sm text-textBody">
+            {bookinger.map((b) => (
+              <li key={b.id}>
+                <span className="font-medium text-textPrimary">{fmtDato(b.occurred_at)}</span>
+                {b.treatment ? ` · ${b.treatment}` : ""}
+                {b.value_dkk ? ` · anslået ${Math.round(Number(b.value_dkk))} kr.` : ""}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-xs text-textMuted">
+            Registreret på kvitteringssiden efter Planway. Selve tiden og
+            kontaktoplysningerne står i Planway, ikke her.
+          </p>
+        </section>
+      )}
 
       <section className="mb-8 rounded-xl border border-sand bg-white p-6 shadow-sm">
         <h2 className="mb-4 font-heading text-xl text-textPrimary">Henvendelsen</h2>

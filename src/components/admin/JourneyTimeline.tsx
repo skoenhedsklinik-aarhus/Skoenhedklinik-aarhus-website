@@ -28,15 +28,21 @@ const VIS_STIER = 12;
 export function JourneyTimeline({
   journey,
   truncated,
+  /** Hvad skellet i tidslinjen er. En rejse kan ende i en henvendelse eller
+   *  i en booking, og teksten skal sige hvilken. */
+  anledning = "henvendelsen",
 }: {
   journey: Journey;
   truncated: boolean;
+  anledning?: "henvendelsen" | "bookingen";
 }) {
+  const skel = anledning === "bookingen" ? "Bookingen" : "Henvendelsen";
+  const tidTil = anledning === "bookingen" ? "Tid til booking" : "Tid til henvendelse";
   if (journey.pageviews === 0) {
     return (
       <p className="text-sm text-textMuted">
-        Ingen berøringer registreret. Enten er leadet fra før sporingen, eller
-        også sagde den besøgende nej til cookies.
+        Ingen berøringer registreret. Enten er den fra før sporingen, eller også
+        sagde den besøgende nej til cookies.
       </p>
     );
   }
@@ -48,8 +54,8 @@ export function JourneyTimeline({
         <p className="mb-5 rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-sm text-textPrimary">
           <strong>
             Kom tilbage {journey.sessionsAfterLead}{" "}
-            {journey.sessionsAfterLead === 1 ? "gang" : "gange"} efter
-            henvendelsen
+            {journey.sessionsAfterLead === 1 ? "gang" : "gange"} efter{" "}
+            {anledning}
           </strong>{" "}
           ({journey.pageviewsAfterLead}{" "}
           {journey.pageviewsAfterLead === 1 ? "sidevisning" : "sidevisninger"}).
@@ -69,9 +75,7 @@ export function JourneyTimeline({
           <dd className="text-xl text-textPrimary">{journey.pageviews}</dd>
         </div>
         <div>
-          <dt className="text-xs uppercase tracking-wide text-textMuted">
-            Tid til henvendelse
-          </dt>
+          <dt className="text-xs uppercase tracking-wide text-textMuted">{tidTil}</dt>
           <dd className="text-xl text-textPrimary">
             {journey.daysToLead === null
               ? "—"
@@ -100,7 +104,7 @@ export function JourneyTimeline({
         {journey.lastSourceBeforeLead &&
           journey.lastSourceBeforeLead !== journey.firstSource && (
             <p>
-              <span className="text-textMuted">Sidste kilde før henvendelsen:</span>{" "}
+              <span className="text-textMuted">Sidste kilde før {anledning}:</span>{" "}
               <span className="font-medium text-textPrimary">
                 {journey.lastSourceBeforeLead}
               </span>
@@ -114,7 +118,7 @@ export function JourneyTimeline({
             {s.afterLead && !journey.sessions[i - 1]?.afterLead && (
               <p className="mb-3 mt-1 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-success">
                 <span className="h-px flex-1 bg-success/40" />
-                Henvendelsen
+                {skel}
                 <span className="h-px flex-1 bg-success/40" />
               </p>
             )}

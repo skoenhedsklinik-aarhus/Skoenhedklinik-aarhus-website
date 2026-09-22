@@ -121,9 +121,12 @@ function isFramed(): boolean {
 
 export function BookingConfirmed({
   treatmentName,
+  treatmentSlug,
   value,
 }: {
   treatmentName: string | null;
+  /** Behandlingens slug, kun brugt til at mærke bookingen i kunderejsen. */
+  treatmentSlug?: string | null;
   /** Estimated booking value in DKK, or null when no price is known. */
   value: number | null;
 }) {
@@ -201,12 +204,32 @@ export function BookingConfirmed({
     // console.info, never console.error — a tracking detail is not a fault.
     console.info(`[schedule] event_id=${eventId}`);
 
+    // Registrér bookingen i kunderejsen, så den kan kobles til den annonce og
+    // de sider, der førte til den. Bevidst EFTER trackConversion og uden
+    // await: intet her må kunne forsinke eller forhindre konverteringen.
+    // Serveren læser besøgs-id'et af sk_ft-cookien og gør ingenting uden
+    // samtykke. Det samme eventId sendes med, så rækken kan slås op i
+    // Events Manager, og så en genindlæsning ikke bliver til en booking mere.
+    void fetch("/api/booking", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventId,
+        treatment: treatmentName,
+        treatmentSlug: treatmentSlug ?? null,
+        value: value ?? null,
+      }),
+      keepalive: true,
+    }).catch(() => {
+      // Ingen registrering, ingen fejl til den besøgende.
+    });
+
     // Clear the booking cookies so a later visit to /tak can't re-label itself
     // with a stale booking.
     for (const name of ["sk_booking_service", "sk_booking_slug"]) {
       document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
     }
-  }, [treatmentName, value]);
+  }, [treatmentName, treatmentSlug, value]);
 
   return null;
 }
