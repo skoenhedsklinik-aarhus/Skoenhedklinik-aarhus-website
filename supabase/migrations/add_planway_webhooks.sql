@@ -102,5 +102,11 @@ create index if not exists bookings_planway_booking_idx
 revoke all on public.booking_intents from anon, authenticated;
 revoke all on public.planway_webhook_events from anon, authenticated;
 
+-- Heller ikke service role får rettigheder af sig selv i dette projekt. RLS
+-- springer den over, men uden en GRANT afvises den med "permission denied".
+grant select, insert, update, delete on public.booking_intents to service_role;
+grant select, insert, update on public.planway_webhook_events to service_role;
+grant select, insert, update on public.bookings to service_role;
+
 alter table public.booking_intents enable row level security;
 alter table public.planway_webhook_events enable row level security;
