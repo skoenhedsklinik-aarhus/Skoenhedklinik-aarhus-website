@@ -141,9 +141,58 @@ export interface Database {
           treatment_slug: string | null
           value_dkk: number | null
           created_at: string
+          planway_booking_id: string | null
+          status: string | null
+          booked_service: string | null
+          booked_price_dkk: number | null
+          starts_at: string | null
+          cancelled_at: string | null
         }
         Insert: Partial<Database['public']['Tables']['bookings']['Row']>
         Update: Partial<Database['public']['Tables']['bookings']['Row']>
+      }
+      booking_intents: {
+        Row: {
+          id: string
+          event_id: string
+          visitor_id: string | null
+          em: string | null
+          ph: string | null
+          fn: string | null
+          ln: string | null
+          fbc: string | null
+          fbp: string | null
+          external_id: string | null
+          client_ip: string | null
+          user_agent: string | null
+          test_mode: boolean
+          treatment: string | null
+          treatment_slug: string | null
+          created_at: string
+          updated_at: string
+          matched_at: string | null
+          planway_booking_id: string | null
+          planway_customer_id: string | null
+        }
+        Insert: Partial<Database['public']['Tables']['booking_intents']['Row']>
+        Update: Partial<Database['public']['Tables']['booking_intents']['Row']>
+      }
+      planway_webhook_events: {
+        Row: {
+          id: string
+          kind: 'booking' | 'cancelled' | 'sale'
+          planway_id: string | null
+          received_at: string
+          matched: boolean
+          event_id: string | null
+          capi_sent: boolean
+          service: string | null
+          amount_dkk: number | null
+          starts_at: string | null
+          shape: Json | null
+        }
+        Insert: Partial<Database['public']['Tables']['planway_webhook_events']['Row']>
+        Update: Partial<Database['public']['Tables']['planway_webhook_events']['Row']>
       }
       opening_hours: {
         Row: {

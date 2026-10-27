@@ -189,28 +189,114 @@ export async function sendMetaEvent(input: CapiEventInput): Promise<boolean> {
     return false;
   }
 
-  const body: Record<string, unknown> = {
-    data: [
-      {
-        event_name: input.eventName,
-        event_time: input.eventTime ?? Math.floor(Date.now() / 1000),
-        event_id: input.eventId,
-        action_source: "website",
-        ...(input.eventSourceUrl && { event_source_url: input.eventSourceUrl }),
-        user_data: buildUserData(input.userData, input.identity),
-        ...(input.customData && { custom_data: cleanCustomData(input.customData) }),
-      },
-    ],
-  };
-
   // Only for a browser that opted in with ?metatest=1. Stamping every
   // visitor's events with the test code would push real conversions into the
   // Test Events tool, where Meta does not count them for delivery or
   // reporting. See applyTestModeCookie in src/lib/identity.ts.
-  if (
-    process.env.META_TEST_EVENT_CODE &&
-    cookies().get(TEST_MODE_COOKIE)?.value === "1"
-  ) {
+  const testMode = cookies().get(TEST_MODE_COOKIE)?.value === "1";
+
+  return postEvent(
+    {
+      event_name: input.eventName,
+      event_time: input.eventTime ?? Math.floor(Date.now() / 1000),
+      event_id: input.eventId,
+      action_source: "website",
+      ...(input.eventSourceUrl && { event_source_url: input.eventSourceUrl }),
+      user_data: buildUserData(input.userData, input.identity),
+      ...(input.customData && { custom_data: cleanCustomData(input.customData) }),
+    },
+    testMode,
+  );
+}
+
+/**
+ * Matchnøgler til et event, der ikke kommer fra en browser.
+ *
+ * em/ph/fn/ln er allerede SHA-256 (de er hashet i proxyen og ligger kun som
+ * hash i booking_intents). externalId og country er rå og hashes her, af
+ * samme grund som i buildUserData.
+ */
+export type ServerUserData = {
+  em?: string | null;
+  ph?: string | null;
+  fn?: string | null;
+  ln?: string | null;
+  externalId?: string | null;
+  fbc?: string | null;
+  fbp?: string | null;
+  clientIp?: string | null;
+  userAgent?: string | null;
+  country?: string | null;
+};
+
+export type ServerEventInput = {
+  eventName: string;
+  eventId: string;
+  /** "website" for en online-booking, "physical_store" for et salg i kassen. */
+  actionSource: "website" | "physical_store";
+  /** Unix-sekunder. Skal ligge inden for de sidste 7 dage. */
+  eventTime: number;
+  eventSourceUrl?: string;
+  userData: ServerUserData;
+  customData?: Record<string, string | number | string[] | undefined>;
+  /** Browseren, der bookede, havde ?metatest=1 slået til. */
+  testMode?: boolean;
+};
+
+const HASH = /^[0-9a-f]{64}$/;
+
+/**
+ * Send et event, der udløses af Planways server og ikke af en browser.
+ *
+ * Rører bevidst hverken headers() eller cookies(): i en webhook er det
+ * Planways server, der kalder, så IP, browser og cookies ville være deres og
+ * ikke kundens. Alt kommer fra den intent, der blev gemt, da kunden bookede.
+ *
+ * Samtykket er ikke tjekket her, fordi der ikke er nogen cookie at tjekke.
+ * Det er tjekket, da intenten blev skrevet, og en intent findes kun med
+ * samtykke. Kald derfor KUN den her med data fra en matchet intent.
+ */
+export async function sendServerEvent(input: ServerEventInput): Promise<boolean> {
+  const u = input.userData;
+  const userData: Record<string, string | string[]> = {};
+
+  for (const key of ["em", "ph", "fn", "ln"] as const) {
+    const value = u[key];
+    if (value && HASH.test(value)) userData[key] = [value];
+  }
+  if (u.externalId) userData.external_id = [sha256(u.externalId.trim().toLowerCase())];
+  if (u.fbc && FB_VALUE.test(u.fbc)) userData.fbc = u.fbc;
+  if (u.fbp && FB_VALUE.test(u.fbp)) userData.fbp = u.fbp;
+  if (u.clientIp) userData.client_ip_address = u.clientIp;
+  if (u.userAgent) userData.client_user_agent = u.userAgent;
+  const country = u.country?.trim().toLowerCase();
+  if (country && /^[a-z]{2}$/.test(country)) userData.country = [sha256(country)];
+
+  return postEvent(
+    {
+      event_name: input.eventName,
+      event_time: input.eventTime,
+      event_id: input.eventId,
+      action_source: input.actionSource,
+      ...(input.eventSourceUrl && { event_source_url: input.eventSourceUrl }),
+      user_data: userData,
+      ...(input.customData && { custom_data: cleanCustomData(input.customData) }),
+    },
+    input.testMode === true,
+  );
+}
+
+/** Selve kaldet til Graph API. Fælles for browser- og serverudløste events. */
+async function postEvent(
+  event: Record<string, unknown>,
+  testMode: boolean,
+): Promise<boolean> {
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const accessToken = process.env.META_CAPI_ACCESS_TOKEN;
+  if (!pixelId || !accessToken) return false;
+
+  const body: Record<string, unknown> = { data: [event] };
+  if (testMode && process.env.META_TEST_EVENT_CODE) {
     body.test_event_code = process.env.META_TEST_EVENT_CODE;
   }
 
@@ -228,7 +314,7 @@ export async function sendMetaEvent(input: CapiEventInput): Promise<boolean> {
     if (!response.ok) {
       console.error(
         "[meta-capi] Rejected:",
-        input.eventName,
+        event.event_name,
         response.status,
         await response.text(),
       );
@@ -236,7 +322,7 @@ export async function sendMetaEvent(input: CapiEventInput): Promise<boolean> {
     }
     return true;
   } catch (error) {
-    console.error("[meta-capi] Request failed:", input.eventName, error);
+    console.error("[meta-capi] Request failed:", event.event_name, error);
     return false;
   }
 }

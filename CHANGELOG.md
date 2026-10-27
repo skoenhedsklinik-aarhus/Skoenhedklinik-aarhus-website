@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-10-27: Planway-webhooks, bekræftede bookinger og ægte omsætning
+
+Planway har en webhook-app (Apps → Webhooks), som sender et kald ved hver ny
+booking, hver aflysning og hvert salg i kassen. Den var aldrig slået til. Nu
+bruges tre af dem.
+
+**`Schedule` fra Planways server.** Indtil nu kom bookingens server-halvdel fra
+`/tak`, og den afhænger af, at kvitteringssiden bliver indlæst. Webhooken
+kommer uanset hvad. Den sendes med samme `event_id` som pixlen: proxyen danner
+id'et i det øjeblik, bookingen sendes, og lægger det i cookien `cnc_bk`, som
+`/tak` bruger. Pixel, bridge og webhook bliver dermed til én booking i Meta.
+Værdien bliver Planways pris for den bookede behandling og ikke længere et gæt
+på laveste listepris.
+
+**`Purchase` fra kassen.** Første gang Meta får omsætning, der faktisk er
+betalt. Sendes som fysisk butik og kun for kunder, der har sagt ja til cookies
+og booket via sitet inden for 90 dage. Alle andre salg tælles, men sendes ikke.
+
+**Aflysninger** markeres på bookingen i kunderejsen (`bookings.status`). Meta
+kan ikke tage et event tilbage, så der sendes intet.
+
+**Koblingen.** Webhooken kommer fra Planways server uden kundens cookies, IP
+eller samtykke. Derfor gemmer proxyen, når bookingen sendes, de samme hashede
+matchnøgler som i `cnc_am` plus klik-id, browser-id, IP og `event_id` i
+`booking_intents`. Kun med samtykke, slettet efter 90 dage, og tabellen kan
+kun læses med service role. Webhookens mail og telefon hashes på samme måde og
+matches mod den.
+
+**Formatet er ukendt.** Planway dokumenterer ikke, hvad kaldene indeholder.
+Hvert kald gemmes derfor som sin form (feltnavne og typer, ingen kundedata) i
+`planway_webhook_events`, og oversættelsen skrives ud fra det første rigtige
+kald. Indtil da sendes intet til Meta fra webhooks.
+
+Kræver `PLANWAY_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` og migrationen
+`add_planway_webhooks.sql`. Se trin 3c i `OPSAETNING-tracking-og-anmeldelser.md`.
+
 ## 2026-08-25 — Samtykke, external_id og stop for falske bookinger
 
 Event Match Quality på `Schedule` lå på 5,3/10. Tre ting lå bag, og de er

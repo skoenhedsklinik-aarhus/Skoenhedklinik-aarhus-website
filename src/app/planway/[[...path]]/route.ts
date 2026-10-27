@@ -1,12 +1,22 @@
 import { type NextRequest } from "next/server";
 import { CONSENT_COOKIE, parseConsent } from "@/lib/consent";
-import { cookieDomain, isSecureRequest } from "@/lib/identity";
+import { BOOKING_EVENT_COOKIE, BOOKING_EVENT_MAX_AGE } from "@/lib/booking";
+import { FT_COOKIE, decodeFirstTouch } from "@/lib/first-touch";
+import {
+  FBC_COOKIE,
+  FBP_COOKIE,
+  TEST_MODE_COOKIE,
+  UID_COOKIE,
+  cookieDomain,
+  isSecureRequest,
+} from "@/lib/identity";
 import {
   MATCH_COOKIE,
   MATCH_MAX_AGE,
   hashBookingIdentity,
   serialiseMatchedIdentity,
 } from "@/lib/meta/matched-identity";
+import { recordIntent, type IntentInput } from "@/lib/planway/intents";
 
 /**
  * Reverse proxy for Planways bookingwidget.
@@ -113,11 +123,11 @@ function captureBookingIdentity(
   outHeaders: Headers,
   body: Buffer | undefined,
   contentType: string,
-): void {
+): IntentInput | null {
   try {
-    if (!body || !/application\/x-www-form-urlencoded/i.test(contentType)) return;
+    if (!body || !/application\/x-www-form-urlencoded/i.test(contentType)) return null;
     if (parseConsent(request.cookies.get(CONSENT_COOKIE)?.value) !== "granted") {
-      return;
+      return null;
     }
 
     const fields = new URLSearchParams(body.toString("utf8"));
@@ -125,7 +135,7 @@ function captureBookingIdentity(
     const email = fields.get("info_email");
     const phone = fields.get("phonenumber");
     // Ikke bookingformularen. Rør ikke cookien.
-    if (!name && !email && !phone) return;
+    if (!name && !email && !phone) return null;
 
     const identity = hashBookingIdentity({
       name,
@@ -133,7 +143,7 @@ function captureBookingIdentity(
       phone,
       countryCode: fields.get("countrycode"),
     });
-    if (!identity) return;
+    if (!identity) return null;
 
     const domain = cookieDomain(request.headers.get("host"));
     const attributes = [
@@ -149,6 +159,63 @@ function captureBookingIdentity(
       ...(domain ? [`Domain=${domain}`] : []),
     ];
     outHeaders.append("set-cookie", attributes.join("; "));
+
+    // Bookingens event_id. Et nyt for hver indsendelse: sender browseren
+    // formularen mere end én gang, matcher webhooken den nyeste, og det er
+    // også den, /tak læser. Host-only, så /tak kan rydde den fra JavaScript.
+    const eventId = crypto.randomUUID();
+    outHeaders.append(
+      "set-cookie",
+      [
+        `${BOOKING_EVENT_COOKIE}=${eventId}`,
+        `Max-Age=${BOOKING_EVENT_MAX_AGE}`,
+        "Path=/",
+        "SameSite=Lax",
+        ...(isSecureRequest(request) ? ["Secure"] : []),
+      ].join("; "),
+    );
+
+    const cookie = (name: string) => {
+      const raw = request.cookies.get(name)?.value;
+      if (!raw) return null;
+      try {
+        return decodeURIComponent(raw);
+      } catch {
+        return raw;
+      }
+    };
+
+    return {
+      eventId,
+      visitorId: decodeFirstTouch(request.cookies.get(FT_COOKIE)?.value)?.id ?? null,
+      identity,
+      fbc: cookie(FBC_COOKIE),
+      fbp: cookie(FBP_COOKIE),
+      externalId: cookie(UID_COOKIE),
+      clientIp:
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        request.headers.get("x-real-ip"),
+      userAgent: request.headers.get("user-agent"),
+      testMode: cookie(TEST_MODE_COOKIE) === "1",
+      treatment: cookie("sk_booking_service"),
+      treatmentSlug: cookie("sk_booking_slug"),
+    };
+  } catch {
+    // Måling må aldrig vælte en booking.
+    return null;
+  }
+}
+
+/**
+ * Gem matchnøglerne, men vent højst 1,5 sekund. Bookingens svar fra Planway
+ * er allerede hentet; det her må kun forsinke det en anelse, aldrig stoppe det.
+ */
+async function recordIntentQuickly(intent: IntentInput): Promise<void> {
+  try {
+    await Promise.race([
+      recordIntent(intent),
+      new Promise((resolve) => setTimeout(resolve, 1500)),
+    ]);
   } catch {
     // Måling må aldrig vælte en booking.
   }
@@ -205,12 +272,15 @@ async function proxy(request: NextRequest, path: string[] | undefined) {
 
   // Var det her bookingens indsendelse? Så hash kontaktoplysningerne, mens de
   // passerer, og giv Conversions API noget at matche `Schedule` på.
-  captureBookingIdentity(
+  // Samme oplysninger gemmes som matchnøgler, så Planways webhook kan koble
+  // bookingen tilbage til denne browser og sende Schedule fra serveren.
+  const intent = captureBookingIdentity(
     request,
     outHeaders,
     body,
     request.headers.get("content-type") ?? "",
   );
+  if (intent) await recordIntentQuickly(intent);
 
   const contentType = upstream.headers.get("content-type") ?? "";
   if (!REWRITABLE.test(contentType)) {

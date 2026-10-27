@@ -462,6 +462,74 @@ jer et lead.
 
 ---
 
+## 3c. Planway-webhooks: bekræftede bookinger og ægte omsætning (15 min)
+
+Planway sender et kald til sitet, hver gang en booking oprettes eller slettes,
+og hver gang der registreres et salg i kassen. Sitet bruger tre af dem:
+
+| Webhook i Planway | Hvad sitet gør | Til Meta |
+|---|---|---|
+| Ny booking | Kobler bookingen til den browser, der bookede, og lægger Planways behandling og pris på den | `Schedule` fra serveren, med samme `event_id` som pixlen og den ægte pris |
+| Slettet booking | Markerer bookingen som aflyst i kunderejsen | Intet. Meta kan ikke tage et event tilbage |
+| Nyt salg | Finder kunden, hvis hun har booket via sitet med samtykke inden for 90 dage | `Purchase` med det faktiske beløb, som fysisk butik |
+
+**Hvorfor:** `Schedule` fra `/tak` afhænger af, at kvitteringssiden når at blive
+indlæst. Lukker kunden fanen, er bookingen væk. Webhooken kommer fra Planways
+egen server, uanset hvad kunden gør. Og `Purchase` fra kassen er første gang,
+Ads Manager kan vise omsætning, der rent faktisk er betalt.
+
+**Hvem der sendes for:** kun kunder, der har sagt ja til cookies på sitet og
+booket gennem det. Manuelle bookinger, bookinger direkte på planway.com og
+kunder uden samtykke tælles i `planway_webhook_events`, men sendes ikke til
+Meta. Det er besluttet bevidst (2026-10-27): at sende alle betalende kunder til
+Meta kræver, at klinikkens privatlivspolitik og samtykke dækker det.
+
+**Sådan kobles webhooken til browseren:** når bookingformularen sendes gennem
+vores proxy, gemmes hashet mail og telefon, klik-id, browser-id, IP og
+bookingens `event_id` i `booking_intents`. Kun med samtykke, slettes efter 90
+dage, og tabellen kan kun læses med service role. Webhookens mail og telefon
+hashes på samme måde og matches mod den, mail først, så telefon.
+
+### 3c.1 Opsætning
+
+1. Vercel: tilføj `PLANWAY_WEBHOOK_SECRET` og `SUPABASE_SERVICE_ROLE_KEY` (se
+   tabellen nederst) og redeploy.
+2. Supabase: kør `supabase/migrations/add_planway_webhooks.sql` (samme
+   fremgangsmåde som trin 0).
+3. Planway → **Apps** → **Webhooks** → **Åben**. Indsæt, med secret'en fra
+   Vercel i stedet for `<token>`:
+
+   | Felt | URL |
+   |---|---|
+   | Ny booking | `https://www.skoenhedsklinik-aarhus.dk/api/planway/webhook/booking?token=<token>` |
+   | Slettet booking | `https://www.skoenhedsklinik-aarhus.dk/api/planway/webhook/cancelled?token=<token>` |
+   | Nyt salg | `https://www.skoenhedsklinik-aarhus.dk/api/planway/webhook/sale?token=<token>` |
+
+   Lad de tre andre felter stå tomme. **Gem**.
+
+> **Brug `www.`** Domænet uden `www` svarer med en 308-omdirigering, og det er
+> ikke sikkert, at Planway følger den med en POST.
+
+### 3c.2 Formatet læres af det første kald
+
+Planway dokumenterer ikke, hvad kaldene indeholder. Hvert kald gemmes derfor i
+`planway_webhook_events.shape` som feltnavne, typer og mønstre, uden navne,
+mails eller telefonnumre, og logges i Vercel som `[planway-webhook] … shape=`.
+
+Når det første rigtige kald af hver type er kommet, skrives
+`mapBookingPayload`, `mapSalePayload` og `mapCancelPayload` i
+`src/lib/planway/webhook.ts`. Indtil da sendes intet til Meta fra webhooks, og
+alt andet kører som før. Matchnøglerne gemmes allerede fra første deploy, så
+koblingen virker fra den dag, mappingen er på plads.
+
+### 3c.3 Slå Planways Facebook Pixel fra
+
+Når den første `Purchase` fra kassen er set i Events Manager: Planway →
+**Apps** → **Facebook Pixel** → **Deaktiver**. Ellers blandes Planways
+browser-`Purchase` (mest fra personalets backoffice, se afsnit 5) med den ægte.
+
+---
+
 ## 4. Test at det hele virker (10 min)
 
 1. Events Manager → **Testhændelser** → kopiér testkoden (`TEST12345`).
@@ -498,18 +566,23 @@ ikke mod "Ring mig op"-formularen.
 Struktur: én bred kampagne, ét annoncesæt, Advantage+ placeringer, attribution
 7 dages klik og 1 dags visning.
 
-### Optimér ikke mod `Purchase`
+### `Purchase` betyder betalt omsætning
 
-`Purchase` kommer fra Planway, ikke fra vores kode. Målt over en uge kom
-**8 ud af 12** fra `app.planway.com`, altså klinikkens eget personale der
-opretter bookinger i backoffice. Den er desuden browser-only, uden Conversions
-API, uden deduplikering og uden værdi, og den fyrer på et domæne klinikken ikke
-kan verificere. Planway kan ikke begrænse pixlen til bookingsiden, så støjen
-bliver liggende. Brug `Schedule` i stedet.
+`Purchase` kommer fra to steder, indtil Planways Facebook Pixel-app er slået
+fra (trin 3c.3):
 
-Bemærk også: én kundebooking kan udløse **både** Planways `Purchase` og vores
-`Schedule`. De dedupliceres ikke, da det er to forskellige eventnavne. Tæl derfor
-ikke begge som bookinger i rapportering.
+- **Planways pixel** (browser): støj. Målt over en uge kom **8 ud af 12** fra
+  `app.planway.com`, altså personalet der opretter bookinger i backoffice. Ingen
+  Conversions API, ingen deduplikering, ingen værdi.
+- **Kassen via webhook** (server, fysisk butik): ét event pr. betalt salg, med
+  beløbet, kun for kunder der har booket via sitet med samtykke.
+
+Når Planways pixel er slået fra, er `Purchase` kun det sidste. Med
+samtykkekravet er det en delmængde af salgene, og et køb ligger ofte uger efter
+klikket. Optimeringen mod `Schedule` i trappen ovenfor er uændret.
+
+Én kundebooking giver `Schedule` ved bookingen og senere `Purchase` ved
+betalingen. Det er to forskellige ting og skal ikke lægges sammen som bookinger.
 
 ### Domæneverificering
 
@@ -580,3 +653,5 @@ behandlingen i kalenderen nedenfor").
 | `RESEND_API_KEY` | Resend → API Keys | Ja, til mailnotifikationer |
 | `LEAD_NOTIFICATION_TO` | — (klinikkens mailadresse) | Ja, til mailnotifikationer |
 | `RESEND_FROM` | — | Nej (standard: henvendelser@…) |
+| `PLANWAY_WEBHOOK_SECRET` | Generér: `openssl rand -hex 32` | Ja, til Planway-webhooks |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API | Ja, til Planway-webhooks |

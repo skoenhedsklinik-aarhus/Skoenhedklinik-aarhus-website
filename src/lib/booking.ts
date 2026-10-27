@@ -53,3 +53,14 @@ export type BookableService = {
   /** Planway's internal service id, or null until mapped in the CMS. */
   planwayServiceId: string | null;
 };
+
+/**
+ * Bookingens event_id, dannet i proxyen i det øjeblik bookingen sendes.
+ *
+ * Deles af tre parter, der hver sender `Schedule`: pixlen og bridgen på /tak,
+ * og Planways webhook. Med samme id deduplikerer Meta dem til én booking.
+ * Kun et tilfældigt UUID, ingen persondata, så den må gerne kunne læses af
+ * JavaScript. Ryddes af /tak, når bookingen er rapporteret.
+ */
+export const BOOKING_EVENT_COOKIE = "cnc_bk";
+export const BOOKING_EVENT_MAX_AGE = 60 * 60 * 6; // 6 timer, samme som /tak

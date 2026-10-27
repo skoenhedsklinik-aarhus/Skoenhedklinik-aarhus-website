@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { trackConversion, newEventId } from "@/lib/pixel";
+import { BOOKING_EVENT_COOKIE } from "@/lib/booking";
 
 /**
  * Fires the booking conversion on the Planway confirmation page.
@@ -99,6 +100,24 @@ function planwayVerdict(): boolean | null {
   }
 }
 
+/**
+ * Bookingens event_id fra proxyen, hvis bookingen gik gennem den.
+ *
+ * Proxyen danner id'et, idet bookingen sendes, og gemmer det også til Planways
+ * webhook. Bruges det her, lander pixel, bridge og webhook på samme id, og
+ * Meta tæller én booking i stedet for tre.
+ */
+function bookingEventId(): string | null {
+  try {
+    const match = document.cookie.match(
+      new RegExp(`(?:^|; )${BOOKING_EVENT_COOKIE}=([0-9a-f-]{36})(?:;|$)`, "i"),
+    );
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
 /** True when the document was reached from Planway's booking system. */
 function cameFromPlanway(): boolean {
   try {
@@ -141,9 +160,15 @@ export function BookingConfirmed({
     // widget would be a broken page, not a tracking decision.
     if (isFramed()) {
       const existing = readJson<Marker>(MARKER_KEY);
-      if (!existing || !isFresh(existing.ts) || existing.fired) {
+      const fromProxy = bookingEventId();
+      if (
+        !existing ||
+        !isFresh(existing.ts) ||
+        existing.fired ||
+        (fromProxy !== null && existing.id !== fromProxy)
+      ) {
         writeJson(MARKER_KEY, {
-          id: newEventId(),
+          id: fromProxy ?? newEventId(),
           ts: Date.now(),
           fired: false,
         } satisfies Marker);
@@ -179,7 +204,8 @@ export function BookingConfirmed({
     // Reusing the id minted in the framed load keeps one booking to one id
     // across both page loads, so the pixel and the Conversions API halves
     // deduplicate against each other rather than double-counting.
-    const eventId = marker && isFresh(marker.ts) ? marker.id : newEventId();
+    const eventId =
+      marker && isFresh(marker.ts) ? marker.id : (bookingEventId() ?? newEventId());
 
     writeJson(MARKER_KEY, {
       id: eventId,
@@ -226,7 +252,7 @@ export function BookingConfirmed({
 
     // Clear the booking cookies so a later visit to /tak can't re-label itself
     // with a stale booking.
-    for (const name of ["sk_booking_service", "sk_booking_slug"]) {
+    for (const name of ["sk_booking_service", "sk_booking_slug", BOOKING_EVENT_COOKIE]) {
       document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
     }
   }, [treatmentName, treatmentSlug, value]);
