@@ -50,6 +50,7 @@ export function HeroSection() {
     <ScrollExpandMedia
       mediaType="video"
       mediaSrc="/videos/hero.mp4"
+      posterSrc="/images/video-posters/home.jpg"
       bgImageSrc="/images/filler.avif"
       title="Tidløs Skønhed"
       date="Skønhedsklinik Aarhus"

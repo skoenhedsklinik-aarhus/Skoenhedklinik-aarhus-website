@@ -57,6 +57,8 @@ export async function createService(data: any) {
 
   revalidatePath("/admin/behandlinger");
   revalidatePath("/behandlinger");
+  revalidatePath("/behandlinger/[slug]", "page");
+  revalidatePath("/lp/[slug]", "page");
   revalidatePath(`/behandlinger/${data.slug}`);
   return { success: true };
 }
@@ -95,6 +97,8 @@ export async function updateService(id: string, data: any) {
 
   revalidatePath("/admin/behandlinger");
   revalidatePath("/behandlinger");
+  revalidatePath("/behandlinger/[slug]", "page");
+  revalidatePath("/lp/[slug]", "page");
   revalidatePath(`/behandlinger/${data.slug}`);
   return { success: true };
 }
@@ -113,5 +117,7 @@ export async function deleteService(id: string) {
 
   revalidatePath("/admin/behandlinger");
   revalidatePath("/behandlinger");
+  revalidatePath("/behandlinger/[slug]", "page");
+  revalidatePath("/lp/[slug]", "page");
   return { success: true };
 }

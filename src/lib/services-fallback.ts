@@ -72,6 +72,11 @@ const heroVideoMap: Record<string, string> = {
   "wax-behandling": "/videos/services/wax-behandling.mp4",
 };
 
+export function getVideoPoster(slug: string, videoUrl: string, heroImageUrl?: string | null): string {
+  if (heroVideoMap[slug] === videoUrl) return `/images/video-posters/${slug}.jpg`;
+  return heroImageUrl || "/images/filler.avif";
+}
+
 /**
  * The image used to represent a treatment everywhere outside its detail hero
  * (homepage cards, listing grid, related-services). Mirrors the secondary

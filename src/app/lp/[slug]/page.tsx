@@ -107,7 +107,7 @@ export function generateStaticParams() {
   return Object.keys(LP_CONTENT).map((slug) => ({ slug }));
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const lp = LP_CONTENT[params.slug];
@@ -133,10 +133,12 @@ export default async function AdLandingPage({ params }: { params: { slug: string
   const lp = LP_CONTENT[params.slug];
   if (!lp) notFound();
 
-  const service = await getServiceBySlug(params.slug);
+  const [service, allPricingTiers, googleReviews] = await Promise.all([
+    getServiceBySlug(params.slug),
+    getPricingTiers(),
+    getGoogleReviews(3),
+  ]);
   if (!service) notFound();
-
-  const allPricingTiers = await getPricingTiers();
   const priceValues = allPricingTiers
     .filter((p) => p.service_id === service.id)
     .map((p) => Number(p.price_dkk))
@@ -147,7 +149,6 @@ export default async function AdLandingPage({ params }: { params: { slug: string
   // Real Google reviews when available — the placeholder quotes in LP_CONTENT
   // are only a stopgap, and running paid traffic against invented reviews is a
   // markedsføringslov problem.
-  const googleReviews = await getGoogleReviews(3);
   const reviewCards =
     googleReviews.source === "google"
       ? googleReviews.reviews.map((r) => ({

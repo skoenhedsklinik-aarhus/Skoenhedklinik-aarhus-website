@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, ReactNode } 
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { HeroVideo } from '@/components/shared/HeroVideo';
 
 // useLayoutEffect on the server warns; fall back to useEffect there.
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -255,13 +256,9 @@ const ScrollExpandMedia = ({
           >
             {mediaType === 'video' ? (
               <div className="relative w-full h-full pointer-events-none">
-                <video
+                <HeroVideo
                   src={mediaSrc}
-                  poster={posterSrc}
-                  autoPlay muted loop playsInline preload="auto"
-                  className="w-full h-full object-cover"
-                  disablePictureInPicture
-                  disableRemotePlayback
+                  posterSrc={posterSrc || bgImageSrc}
                 />
                 {/* Own compositor layer so its per-frame opacity change does not
                     repaint the video layer (a Chrome-specific cost). */}

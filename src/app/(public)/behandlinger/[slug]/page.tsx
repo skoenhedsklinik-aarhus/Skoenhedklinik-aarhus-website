@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getServices, getServiceBySlug, getPricingTiers } from "@/lib/supabase-queries";
-import { enrichServiceWithFallback, getServiceThumbnail, getSkeletonService } from "@/lib/services-fallback";
+import { enrichServiceWithFallback, getServiceThumbnail, getSkeletonService, getVideoPoster } from "@/lib/services-fallback";
 import { bookLabel, hasFreeConsultation } from "@/lib/consultation";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { TrustStrip } from "@/components/shared/TrustStrip";
@@ -13,6 +13,7 @@ import { AnsigtsbehandlingerSection, ANSIGTSBEHANDLING_FROM_PRICE } from "@/comp
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Shield, Clock, Leaf, Star, Info, Phone } from "lucide-react";
 import { medicalProcedureSchema, faqPageSchema } from "@/lib/schema";
+import { HeroVideo } from "@/components/shared/HeroVideo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://skoenhedsklinik-aarhus.dk";
 
@@ -31,7 +32,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export const dynamic = "force-dynamic";
+// Public content can be served from the CDN between background refreshes.
+export const revalidate = 300;
 export const dynamicParams = true;
 
 export async function generateMetadata(
@@ -63,10 +65,13 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
   // Fall back to a skeleton object for known slugs when Supabase is unavailable
   // (e.g. build without secrets, or the DB is down). enrichServiceWithFallback
   // fills in the full content below, so the page degrades gracefully instead of 404'ing.
-  const service = (await getServiceBySlug(params.slug)) || getSkeletonService(params.slug);
+  const [serviceData, allPricingTiers, allServices] = await Promise.all([
+    getServiceBySlug(params.slug),
+    getPricingTiers(),
+    getServices(),
+  ]);
+  const service = serviceData || getSkeletonService(params.slug);
   if (!service) notFound();
-
-  const allPricingTiers = await getPricingTiers();
 
   const prices = allPricingTiers.filter((p) => p.service_id === service.id);
   const groupedPrices: Record<string, typeof prices> = prices.reduce((acc, price) => {
@@ -76,7 +81,6 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
     return acc;
   }, {} as Record<string, typeof prices>);
 
-  const allServices = await getServices();
   const relatedServices = allServices
     .filter((s) => s.category === service.category && s.slug !== service.slug)
     .slice(0, 3);
@@ -136,21 +140,16 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
       <section className="relative w-full h-[70vh] min-h-[500px] flex items-end overflow-hidden">
         <div className="absolute inset-0 z-0 bg-textPrimary">
           {s.hero_video_url ? (
-            <video
-              className="h-full w-full object-cover"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-            >
-              <source src={s.hero_video_url} type="video/mp4" />
-            </video>
+            <HeroVideo
+              key={s.hero_video_url}
+              src={s.hero_video_url}
+              posterSrc={getVideoPoster(params.slug, s.hero_video_url, service.hero_image_url)}
+            />
           ) : (
             <Image
               src={service.hero_image_url || "/placeholder.jpg"}
               alt={service.name}
-              fill priority
+              fill priority sizes="100vw"
               className="object-cover"
             />
           )}

@@ -27,9 +27,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const services = await getServices();
-  const teamMembers = await getTeamMembers();
-  const googleReviews = await getGoogleReviews(5);
+  const [services, teamMembers, googleReviews] = await Promise.all([
+    getServices(),
+    getTeamMembers(),
+    getGoogleReviews(5),
+  ]);
 
   // Rich results (stars in Google) — only ever emitted from real Google data.
   // Marking up fallback testimonials would be a structured-data policy breach.

@@ -17,6 +17,10 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
+  // Public pages do not need an admin session refresh to render.
+  const pathname = request.nextUrl.pathname;
+  if (!pathname.startsWith("/admin") && !pathname.startsWith("/auth")) return supabaseResponse;
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

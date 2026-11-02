@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { cache } from "react";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -35,7 +36,8 @@ export async function getServices(): Promise<any[]> {
   return ((data as any[]) || []).filter((s) => !HIDDEN_SERVICE_SLUGS.has(s.slug));
 }
 
-export async function getServiceBySlug(slug: string): Promise<any> {
+// Share the lookup between page rendering and generateMetadata in one request.
+export const getServiceBySlug = cache(async (slug: string): Promise<any> => {
   const supabase = createClient();
   if (!supabase) return null;
 
@@ -51,7 +53,7 @@ export async function getServiceBySlug(slug: string): Promise<any> {
     return null;
   }
   return data;
-}
+});
 
 export async function getPricingTiers(): Promise<any[]> {
   const supabase = createClient();
