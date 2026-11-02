@@ -3,6 +3,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Priserne vises på /priser, behandlingssiderne, LP'erne og i laser-pop-up'en,
+ * som ligger i layoutet for alle offentlige sider. Supabase-svarene caches i
+ * Next's Data Cache, så uden dette ser de sider gamle priser, indtil cachen
+ * tømmes manuelt.
+ */
+function revalidatePriceViews() {
+  revalidatePath("/", "layout");
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createPricingTier(data: any) {
   const supabase = createClient();
@@ -27,8 +37,7 @@ export async function createPricingTier(data: any) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/admin/priser");
-  revalidatePath("/priser");
+  revalidatePriceViews();
   return { success: true };
 }
 
@@ -55,8 +64,7 @@ export async function updatePricingTier(id: string, data: any) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/admin/priser");
-  revalidatePath("/priser");
+  revalidatePriceViews();
   return { success: true };
 }
 
@@ -72,7 +80,6 @@ export async function deletePricingTier(id: string) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/admin/priser");
-  revalidatePath("/priser");
+  revalidatePriceViews();
   return { success: true };
 }
