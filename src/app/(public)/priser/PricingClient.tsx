@@ -148,7 +148,12 @@ export function PricingClient({ pricingTiers, packagesOffers }: PricingClientPro
 
                 <div className="space-y-12">
                   {Object.entries(subcategories).map(([subcat, tiers]) => (
-                    <div key={subcat}>
+                    // Ankeret bruges af laser-pop-up'en: /priser#haarfjerning-pakker
+                    <div
+                      key={subcat}
+                      id={`${categoryId}-${subcat.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                      className="scroll-mt-40"
+                    >
                       {subcat !== "Andre" && (
                         <h3 className="font-heading text-2xl text-textPrimary mb-6 pb-2 border-b border-sand">
                           {subcat}

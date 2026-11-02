@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { StickyBookBar } from "@/components/shared/StickyBookBar";
+import { LaserPackagesPopupGate } from "@/components/shared/LaserPackagesPopupGate";
 
 export default function PublicLayout({
   children,
@@ -22,6 +23,7 @@ export default function PublicLayout({
       </div>
       <Footer />
       <StickyBookBar />
+      <LaserPackagesPopupGate />
     </>
   );
 }

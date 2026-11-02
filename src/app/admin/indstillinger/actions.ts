@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { LASER_POPUP_SETTING } from "@/lib/laser-popup";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SiteSettings = any;
@@ -38,4 +39,30 @@ export async function updateSiteSettings(settings: SiteSettings) {
     console.error("Error updating site settings:", error);
     return { success: false, error: error.message };
   }
+}
+
+export async function setLaserPopupEnabled(enabled: boolean) {
+  const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Ikke autoriseret" };
+  }
+
+  const { error } = await supabase
+    .from("site_settings")
+    .upsert({ key: LASER_POPUP_SETTING, value: enabled ? "true" : "false" } as never, {
+      onConflict: "key",
+    });
+
+  if (error) {
+    console.error("Error updating laser popup setting:", error);
+    return { success: false, error: error.message };
+  }
+
+  // Pop-up'en ligger i layoutet for alle offentlige sider.
+  revalidatePath("/", "layout");
+
+  return { success: true };
 }

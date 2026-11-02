@@ -1,5 +1,7 @@
 import { getSiteSettings } from "@/lib/supabase-queries";
 import { SiteSettingsForm } from "./SiteSettingsForm";
+import { LaserPopupToggle } from "./LaserPopupToggle";
+import { LASER_POPUP_SETTING } from "@/lib/laser-popup";
 
 export default async function AdminSiteSettingsPage() {
   const settings = await getSiteSettings();
@@ -14,6 +16,10 @@ export default async function AdminSiteSettingsPage() {
         </p>
         
         <SiteSettingsForm initialData={settings} />
+      </div>
+
+      <div className="bg-white rounded-xl p-8 border border-sand shadow-sm max-w-3xl mt-8">
+        <LaserPopupToggle initialEnabled={settings[LASER_POPUP_SETTING] === "true"} />
       </div>
     </div>
   );
