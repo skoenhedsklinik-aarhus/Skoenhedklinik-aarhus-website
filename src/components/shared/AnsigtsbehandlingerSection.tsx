@@ -17,24 +17,26 @@ type Block = {
 type Facial = {
   name: string;
   tag?: string;
+  /** Bruges kun, hvis prisrækken i admin ikke har en varighed. */
   duration: string;
-  price: string;
-  packagePrice?: string;
   image: string;
   intro: string;
   blocks: Block[];
 };
 
-// Behandlingsmenu for Ansigtsbehandling. Indholdet vedligeholdes her i koden,
+// Behandlingsmenu for Ansigtsbehandling. Teksterne vedligeholdes her i koden,
 // så hver behandling får sit eget forløb beskrevet. Billederne ligger i
 // /public/images/services.
+//
+// Priserne ligger IKKE her. De hentes fra Priser i admin, så klinikken selv kan
+// rette dem. En prisrække hører til en behandling, når dens navn starter med
+// behandlingens navn ("Microneedling (1 behandling)" hører til "Microneedling").
+// Står der "(3 behandlinger)" i navnet, er rækken pakkeprisen.
 const FACIALS: Facial[] = [
   {
     name: "Microneedling",
     tag: "Ansigtsbehandling",
     duration: "ca. 60 min",
-    price: "850 kr.",
-    packagePrice: "Pakke med 3 behandlinger: 2.400 kr.",
     image: "/images/services/ansigtsbehandling.avif",
     intro:
       "Opnå fornyet og ungdommelig hud med vores microneedling-behandling. Små, præcise nåle stimulerer hudens egen kollagenproduktion og forbedrer hudens struktur. Behandlingen reducerer fine linjer, ar og pigmentforandringer og giver fastere, glattere og mere strålende hud. Den tilpasses din hudtype og dine behov og udføres med professionelle produkter og udstyr i trygge rammer.",
@@ -55,8 +57,6 @@ const FACIALS: Facial[] = [
     name: "Retinol Resurface",
     tag: "Eksklusiv peel med synlig effekt",
     duration: "ca. 30 min",
-    price: "799 kr.",
-    packagePrice: "Pakke med 4 behandlinger: 2.800 kr.",
     image: "/images/services/ansigtsbehandling-retinol.avif",
     intro:
       "En avanceret medicinsk peeling baseret på NEOSTRATA ProSystem, udelukkende til professionel brug. Ideel til dig, der ønsker at forbedre hudens struktur, reducere fine linjer og opnå en smukkere og mere ensartet hudtone. Peelingen med 3 % Retinol Boosting Complex giver synlig hudfornyelse uden downtime.",
@@ -100,7 +100,6 @@ const FACIALS: Facial[] = [
     name: "Glow & Renew",
     tag: "Ansigtsbehandling",
     duration: "ca. 50 min",
-    price: "599 kr.",
     image: "/images/services/ansigtsbehandling-glow.avif",
     intro:
       "En mild men effektiv ansigtsbehandling med PHA fra NEOSTRATA, som eksfolierer skånsomt, stimulerer cellefornyelsen og efterlader huden frisk, glat og strålende. Behandlingen passer til alle hudtyper, også sart hud.",
@@ -121,7 +120,6 @@ const FACIALS: Facial[] = [
     name: "Clear Skin",
     tag: "Udrensende ansigtsbehandling",
     duration: "ca. 50 min",
-    price: "579 kr.",
     image: "/images/services/ansigtsbehandling-clear-skin.avif",
     intro:
       "En effektiv behandling med NEOSTRATA, målrettet urenheder, tilstopninger og fedtet hud. Behandlingen renser i dybden uden at udtørre huden og efterlader den frisk, balanceret og beroliget.",
@@ -143,7 +141,6 @@ const FACIALS: Facial[] = [
     name: "Even Skin",
     tag: "Mod pigmentpletter og ujævn hudtone",
     duration: "ca. 50 min",
-    price: "629 kr.",
     image: "/images/services/ansigtsbehandling-even-skin.avif",
     intro:
       "En effektiv behandling med AHA/PHA-syrer og antioxidanter fra NEOSTRATA, der arbejder målrettet på pigmentpletter, solskader og ujævn hudtone. Behandlingen lysner huden gradvist og forbedrer dens klarhed og glød. Ideel som del af et kurforløb.",
@@ -165,7 +162,6 @@ const FACIALS: Facial[] = [
     name: "Firm & Smooth",
     tag: "Anti-aging behandling",
     duration: "ca. 55 min",
-    price: "649 kr.",
     image: "/images/services/ansigtsbehandling-firm-smooth.avif",
     intro:
       "En avanceret anti-age behandling med NEOSTRATA, der målrettet mindsker fine linjer og rynker, forbedrer hudens fasthed og stimulerer cellefornyelsen. Kombinationen af AHA og Bionic PHA forbedrer hudens struktur og giver et mere glat, fast og ungdommeligt udtryk.",
@@ -187,7 +183,6 @@ const FACIALS: Facial[] = [
     name: "Hydra Boost",
     tag: "Intens fugtpleje",
     duration: "ca. 40 min",
-    price: "499 kr.",
     image: "/images/services/ansigtsbehandling-hydra-boost.avif",
     intro:
       "En fugtgivende ansigtsbehandling med NEOSTRATA-produkter, der genopretter hudens fugtbalance og beroliger tør eller dehydreret hud. Perfekt som en opfriskende og blødgørende pleje til alle hudtyper.",
@@ -209,7 +204,6 @@ const FACIALS: Facial[] = [
     name: "Redness Rescue",
     tag: "Beroligende behandling for rødme og sensitiv hud",
     duration: "ca. 45 min",
-    price: "549 kr.",
     image: "/images/services/ansigtsbehandling-redness.avif",
     intro:
       "En skånsom og styrkende behandling med NEOSTRATA, der reducerer rødme, irritation og inflammation. Særligt velegnet til dig med sensitiv hud, tendens til rødme, rosacea eller hud i ubalance. Behandlingen genopretter hudens barriere og giver øjeblikkelig ro og komfort.",
@@ -229,13 +223,43 @@ const FACIALS: Facial[] = [
   },
 ];
 
-// Laveste enkeltpris blandt ansigtsbehandlingerne — bruges som prisanker
-// ("fra X kr.") på behandlingssidens hero.
-export const ANSIGTSBEHANDLING_FROM_PRICE = Math.min(
-  ...FACIALS.map((f) => parseInt(f.price, 10)).filter((n) => Number.isFinite(n))
-);
+export type FacialPriceTier = {
+  name: string;
+  price_dkk: number;
+  duration_minutes: number | null;
+};
 
-export function AnsigtsbehandlingerSection() {
+function kroner(pris: number): string {
+  return `${pris.toLocaleString("da-DK")} kr.`;
+}
+
+/** Antal behandlinger i navnet, fx "(3 behandlinger)". Uden tal er det én. */
+function antalBehandlinger(navn: string): number {
+  const match = navn.match(/\((\d+)\s*behandling(?:er)?\)/i);
+  return match ? parseInt(match[1], 10) : 1;
+}
+
+/**
+ * Enkeltpris og pakkepris for en behandling. Findes ingen række, vises der
+ * ingen pris: en manglende pris er bedre end en gammel.
+ */
+function priserFor(facial: Facial, tiers: FacialPriceTier[]) {
+  const egne = tiers.filter((t) =>
+    t.name.toLowerCase().startsWith(facial.name.toLowerCase()),
+  );
+  const enkelt = egne.find((t) => antalBehandlinger(t.name) === 1);
+  const pakke = egne.find((t) => antalBehandlinger(t.name) > 1);
+
+  return {
+    pris: enkelt ? kroner(enkelt.price_dkk) : null,
+    varighed: enkelt?.duration_minutes ? `ca. ${enkelt.duration_minutes} min` : facial.duration,
+    pakke: pakke
+      ? `Pakke med ${antalBehandlinger(pakke.name)} behandlinger: ${kroner(pakke.price_dkk)}`
+      : null,
+  };
+}
+
+export function AnsigtsbehandlingerSection({ tiers }: { tiers: FacialPriceTier[] }) {
   return (
     <section className="py-20 lg:py-28 bg-white border-t border-sand/40">
       <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
@@ -252,98 +276,103 @@ export function AnsigtsbehandlingerSection() {
         </div>
 
         <Accordion defaultValue={["facial-0"]} className="space-y-4">
-          {FACIALS.map((f, index) => (
-            <AccordionItem
-              key={f.name}
-              value={`facial-${index}`}
-              className="border border-sand/50 rounded-2xl bg-cream/40 px-5 sm:px-7 overflow-hidden transition-all duration-300"
-            >
-              <AccordionTrigger className="py-5 no-underline hover:no-underline group">
-                <div className="flex flex-1 flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4 pr-3 text-left">
-                  <div>
-                    <h3 className="font-heading text-xl md:text-2xl text-textPrimary font-medium group-hover:text-cognac transition-colors leading-tight">
-                      {f.name}
-                    </h3>
-                    {f.tag && (
-                      <p className="text-textMuted text-xs tracking-wide mt-0.5">{f.tag}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="inline-flex items-center gap-1.5 text-textMuted text-xs">
-                      <Clock className="w-3.5 h-3.5" />
-                      {f.duration}
-                    </span>
-                    <span className="font-heading text-lg text-cognac font-medium tabular-nums whitespace-nowrap">
-                      {f.price}
-                    </span>
-                  </div>
-                </div>
-              </AccordionTrigger>
-
-              <AccordionContent className="pb-8 pt-1">
-                <div className="grid md:grid-cols-5 gap-7 lg:gap-9 items-start">
-                  {/* Image */}
-                  <div className="md:col-span-2">
-                    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl shadow-sm border border-sand/30">
-                      <Image
-                        src={f.image}
-                        alt={`${f.name} ansigtsbehandling`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 40vw"
-                        className="object-cover"
-                      />
+          {FACIALS.map((f, index) => {
+            const { pris, varighed, pakke } = priserFor(f, tiers);
+            return (
+              <AccordionItem
+                key={f.name}
+                value={`facial-${index}`}
+                className="border border-sand/50 rounded-2xl bg-cream/40 px-5 sm:px-7 overflow-hidden transition-all duration-300"
+              >
+                <AccordionTrigger className="py-5 no-underline hover:no-underline group">
+                  <div className="flex flex-1 flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4 pr-3 text-left">
+                    <div>
+                      <h3 className="font-heading text-xl md:text-2xl text-textPrimary font-medium group-hover:text-cognac transition-colors leading-tight">
+                        {f.name}
+                      </h3>
+                      {f.tag && (
+                        <p className="text-textMuted text-xs tracking-wide mt-0.5">{f.tag}</p>
+                      )}
                     </div>
-                  </div>
-
-                  {/* Text */}
-                  <div className="md:col-span-3">
-                    <p className="text-textBody leading-relaxed font-light mb-6">
-                      {f.intro}
-                    </p>
-
-                    {f.blocks.map((block, bi) => (
-                      <div key={bi} className="mb-6 last:mb-0">
-                        {block.heading && (
-                          <h4 className="font-heading text-base text-textPrimary font-medium mb-3">
-                            {block.heading}
-                          </h4>
-                        )}
-                        {block.text && (
-                          <p className="text-textBody text-sm leading-relaxed font-light mb-3 last:mb-0">
-                            {block.text}
-                          </p>
-                        )}
-                        {block.items && (
-                          <ul className="space-y-2">
-                            {block.items.map((item, ii) => (
-                              <li
-                                key={ii}
-                                className="flex gap-3 items-start text-textBody text-sm leading-relaxed"
-                              >
-                                <span className="w-1.5 h-1.5 rounded-full bg-cognac shrink-0 mt-2" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-
-                    <div className="mt-7 flex flex-wrap items-center gap-4">
-                      <Link href="/book?service=ansigtsbehandling">
-                        <button className="px-7 py-3 bg-cognac hover:bg-cognac-hover text-white rounded-full text-xs font-semibold tracking-wide transition-colors">
-                          Book nu
-                        </button>
-                      </Link>
-                      {f.packagePrice && (
-                        <span className="text-textMuted text-xs">{f.packagePrice}</span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="inline-flex items-center gap-1.5 text-textMuted text-xs">
+                        <Clock className="w-3.5 h-3.5" />
+                        {varighed}
+                      </span>
+                      {pris && (
+                        <span className="font-heading text-lg text-cognac font-medium tabular-nums whitespace-nowrap">
+                          {pris}
+                        </span>
                       )}
                     </div>
                   </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+                </AccordionTrigger>
+
+                <AccordionContent className="pb-8 pt-1">
+                  <div className="grid md:grid-cols-5 gap-7 lg:gap-9 items-start">
+                    {/* Image */}
+                    <div className="md:col-span-2">
+                      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl shadow-sm border border-sand/30">
+                        <Image
+                          src={f.image}
+                          alt={`${f.name} ansigtsbehandling`}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 40vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Text */}
+                    <div className="md:col-span-3">
+                      <p className="text-textBody leading-relaxed font-light mb-6">
+                        {f.intro}
+                      </p>
+
+                      {f.blocks.map((block, bi) => (
+                        <div key={bi} className="mb-6 last:mb-0">
+                          {block.heading && (
+                            <h4 className="font-heading text-base text-textPrimary font-medium mb-3">
+                              {block.heading}
+                            </h4>
+                          )}
+                          {block.text && (
+                            <p className="text-textBody text-sm leading-relaxed font-light mb-3 last:mb-0">
+                              {block.text}
+                            </p>
+                          )}
+                          {block.items && (
+                            <ul className="space-y-2">
+                              {block.items.map((item, ii) => (
+                                <li
+                                  key={ii}
+                                  className="flex gap-3 items-start text-textBody text-sm leading-relaxed"
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-cognac shrink-0 mt-2" />
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+
+                      <div className="mt-7 flex flex-wrap items-center gap-4">
+                        <Link href="/book?service=ansigtsbehandling">
+                          <button className="px-7 py-3 bg-cognac hover:bg-cognac-hover text-white rounded-full text-xs font-semibold tracking-wide transition-colors">
+                            Book nu
+                          </button>
+                        </Link>
+                        {pakke && (
+                          <span className="text-textMuted text-xs">{pakke}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
         </Accordion>
       </div>
     </section>

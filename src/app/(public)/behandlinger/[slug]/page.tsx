@@ -9,7 +9,7 @@ import { FinalCTA } from "@/components/shared/FinalCTA";
 import { TrustStrip } from "@/components/shared/TrustStrip";
 import { CallbackForm } from "@/components/shared/CallbackForm";
 import { StickyMobileCTA } from "@/components/shared/StickyMobileCTA";
-import { AnsigtsbehandlingerSection, ANSIGTSBEHANDLING_FROM_PRICE } from "@/components/shared/AnsigtsbehandlingerSection";
+import { AnsigtsbehandlingerSection } from "@/components/shared/AnsigtsbehandlingerSection";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Shield, Clock, Leaf, Star, Info, Phone } from "lucide-react";
 import { medicalProcedureSchema, faqPageSchema } from "@/lib/schema";
@@ -112,14 +112,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
   const priceValues = prices
     .map((p) => Number(p.price_dkk))
     .filter((n) => Number.isFinite(n) && n > 0);
-  // For ansigtsbehandling er behandlingsmenuen priskilden, så vi ankrer på dens
-  // laveste pris. Øvrige behandlinger ankrer på den laveste DB-pris.
-  const minPrice =
-    service.slug === "ansigtsbehandling"
-      ? ANSIGTSBEHANDLING_FROM_PRICE
-      : priceValues.length > 0
-        ? Math.min(...priceValues)
-        : null;
+  const minPrice = priceValues.length > 0 ? Math.min(...priceValues) : null;
   const minPriceLabel = minPrice !== null ? minPrice.toLocaleString("da-DK") : null;
 
   // Gratis konsultation må kun loves på laserbehandlingerne. Alle andre
@@ -277,7 +270,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
       </section>
 
       {/* ─── 2c. Ansigtsbehandlinger menu (kun ansigtsbehandling) ────── */}
-      {service.slug === "ansigtsbehandling" && <AnsigtsbehandlingerSection />}
+      {service.slug === "ansigtsbehandling" && <AnsigtsbehandlingerSection tiers={prices} />}
 
       {/* ─── 3. Benefits grid ──────────────────────────────────────── */}
       {s.benefits && Array.isArray(s.benefits) && s.benefits.length > 0 && (
