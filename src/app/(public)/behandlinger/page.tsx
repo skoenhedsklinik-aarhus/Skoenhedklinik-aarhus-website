@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Vores behandlinger — Skønhedsklinik Aarhus",
     description:
-      "Se alle behandlinger hos Skønhedsklinik Aarhus i Aarhus C. Laser hårfjerning, laser, sugaring, ansigtsbehandlinger og mere.",
+      "Se alle behandlinger hos Skønhedsklinik Aarhus i Aarhus C. Laser hårfjerning, sugaring, ansigtsbehandlinger og mere.",
     url: "/behandlinger",
   },
 };

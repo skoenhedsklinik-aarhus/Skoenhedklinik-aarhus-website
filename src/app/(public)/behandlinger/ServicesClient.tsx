@@ -19,7 +19,7 @@ const CATEGORIES = [
   { id: "wax", label: "Wax" },
   { id: "tand", label: "Tandblegning" },
   { id: "threading", label: "Threading" },
-  { id: "tatovering", label: "Tattoo fjernelse" },
+  { id: "tatovering", label: "Tattoo-fjernelse" },
 ];
 
 interface ServicesClientProps {

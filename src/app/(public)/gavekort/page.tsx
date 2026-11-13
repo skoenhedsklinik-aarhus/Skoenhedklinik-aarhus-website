@@ -6,12 +6,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 export const metadata: Metadata = {
   title: "Gavekort — Skønhedsklinik Aarhus",
   description:
-    "Giv gaven af velfærd og selvforkælelse. Køb et gavekort til Skønhedsklinik Aarhus online. Gyldigt i 3 år. Kan bruges til alle behandlinger.",
+    "Giv gaven af velvære og selvforkælelse. Køb et gavekort til Skønhedsklinik Aarhus online. Gyldigt i 3 år. Kan bruges til alle behandlinger.",
   alternates: { canonical: "/gavekort" },
   openGraph: {
     title: "Gavekort — Skønhedsklinik Aarhus",
     description:
-      "Den perfekte gave — køb et gavekort til en kær og lad dem vælge behandling selv.",
+      "Den perfekte gave — køb et gavekort til en, du holder af, og lad dem selv vælge behandling.",
     url: "/gavekort",
   },
 };

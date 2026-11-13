@@ -36,7 +36,7 @@ type LpContent = {
 
 const LP_CONTENT: Record<string, LpContent> = {
   "tattoo-fjernelse": {
-    eyebrow: "Tattoo fjernelse i Aarhus C",
+    eyebrow: "Tattoo-fjernelse i Aarhus C",
     headline: "Fortryder du din tatovering?",
     subline:
       "Sikker og effektiv fjernelse med avanceret Pico Laser — udført af certificerede behandlere. Start med en gratis vurdering af din tatovering.",
@@ -48,7 +48,7 @@ const LP_CONTENT: Record<string, LpContent> = {
     ],
     image: "/images/services/tattoo-fjernelse.avif",
     resultImages: [
-      { src: "/images/services/tattoo-fjernelse.avif", alt: "Tattoo fjernelse hos Skønhedsklinik Aarhus" },
+      { src: "/images/services/tattoo-fjernelse.avif", alt: "Tattoo-fjernelse hos Skønhedsklinik Aarhus" },
       { src: "/images/services/tattoo-fjernelse-2.avif", alt: "Pico Laser behandling" },
     ],
     steps: [
@@ -57,7 +57,7 @@ const LP_CONTENT: Record<string, LpContent> = {
       { title: "Laserbehandling", desc: "Pico Laseren nedbryder blækket gradvist over få behandlinger, mens huden skånes mest muligt." },
     ],
     faq: [
-      { q: "Gør det ondt?", a: "De fleste beskriver det som små, hurtige prik — mindre end at få tatoveringen lavet. Hver behandling tager typisk kun 10-20 minutter." },
+      { q: "Gør det ondt?", a: "De fleste beskriver det som små, hurtige prikker — mindre end at få tatoveringen lavet. Hver behandling tager typisk kun 10-20 minutter." },
       { q: "Hvor mange behandlinger skal der til?", a: "Det afhænger af tatoveringens størrelse, farver og alder — typisk 4-10 behandlinger. Du får en ærlig vurdering ved den gratis konsultation." },
       { q: "Hvad koster det?", a: "Prisen afhænger af tatoveringens størrelse. Du får en fast pris ved den gratis vurdering, så der er ingen overraskelser." },
       { q: "Er det sikkert?", a: "Ja. Vi er registreret hos Styrelsen for Patientsikkerhed, og behandlingen udføres altid af certificerede behandlere med moderne Pico Laser-udstyr." },
@@ -90,7 +90,7 @@ const LP_CONTENT: Record<string, LpContent> = {
       { title: "Varigt resultat", desc: "Hårvæksten reduceres markant for hver behandling — glat hud uden barbering, voks eller indgroede hår." },
     ],
     faq: [
-      { q: "Gør det ondt?", a: "De fleste oplever kun et lille varmt prik — langt mindre ubehageligt end voks. Ved den gratis konsultation kan du prøve laseren, før du beslutter dig." },
+      { q: "Gør det ondt?", a: "De fleste oplever kun en lille, varm prik — langt mindre ubehageligt end voks. Ved den gratis konsultation kan du prøve laseren, før du beslutter dig." },
       { q: "Hvor mange behandlinger skal der til?", a: "Typisk 6-10 behandlinger, afhængigt af område, hudtype og hårfarve. Du får en realistisk plan ved konsultationen." },
       { q: "Virker det på min hud- og hårtype?", a: "Diode-laseren virker bedst på mørkt hår. Ved konsultationen vurderer vi ærligt, om laser er det rigtige for dig — og siger det, hvis det ikke er." },
       { q: "Hvad koster det?", a: "Prisen afhænger af området — se fast prisliste ved konsultationen. Forløbspakker giver rabat pr. behandling." },

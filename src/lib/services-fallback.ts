@@ -102,7 +102,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
   switch (slug) {
     case "laser-haarfjerning":
       if (!s.long_description || s.long_description.length < 200) {
-        s.long_description = `<p>Diode-laser er den mest effektive metode til varig reduktion af uønsket hårvækst. Laseren målretter pigmentet i hårsækken og ødelægger den ved roden, så hårene enten stopper med at vokse eller bliver markant finere og svagere over tid.</p><p>Behandlingen er skånsom, hurtig og velegnet til de fleste hudtyper. Diode-laseren har indbygget køling, som gør den mere behagelig end mange andre hårfjerningsmetoder. Allerede efter få behandlinger vil du opleve en tydelig reduktion af hårvæksten.</p><p>Hvis du ønsker et langtidsresultat uden barbering, voks eller indgroede hår, er diode-laser den mest moderne og holdbare løsning.</p><h3>Glat hud uden irritation</h3><p>Laser hårfjerning med diode-laser hjælper ikke kun med at fjerne uønsket hår – den reducerer også risikoen for irritation og indgroede hår markant.</p><p>Når hårsækken ødelægges, stopper den med at producere hår, der kan vokse skævt ind i huden. Det gør diode-laser særligt ideel til dig, der ofte oplever røde knopper, skægpest-lignende irritation eller indgroede hår efter barbering eller voksbehandlinger.</p><p>Behandlingen giver en mere ensartet, blød og glat hud med færre gener i hverdagen. Kontakt os for rådgivning, eller book en tid for at komme i gang.</p>`;
+        s.long_description = `<p>Diode-laser er den mest effektive metode til varig reduktion af uønsket hårvækst. Laseren målretter pigmentet i hårsækken og ødelægger den ved roden, så hårene enten stopper med at vokse eller bliver markant finere og svagere over tid.</p><p>Behandlingen er skånsom, hurtig og velegnet til de fleste hudtyper. Diode-laseren har indbygget køling, som gør den mere behagelig end mange andre hårfjerningsmetoder. Allerede efter få behandlinger vil du opleve en tydelig reduktion af hårvæksten.</p><p>Hvis du ønsker et langtidsresultat uden barbering, voks eller indgroede hår, er diode-laser den mest moderne og holdbare løsning.</p><h3>Glat hud uden irritation</h3><p>Laser hårfjerning med diode-laser hjælper ikke kun med at fjerne uønsket hår – den reducerer også risikoen for irritation og indgroede hår markant.</p><p>Når hårsækken ødelægges, stopper den med at producere hår, der kan vokse skævt ind i huden. Det gør diode-laser særligt ideel til dig, der ofte oplever røde knopper, skægpestlignende irritation eller indgroede hår efter barbering eller voksbehandlinger.</p><p>Behandlingen giver en mere ensartet, blød og glat hud med færre gener i hverdagen. Kontakt os for rådgivning, eller book en tid for at komme i gang.</p>`;
       }
       if (s.benefits.length === 0) {
         s.benefits = [
@@ -115,7 +115,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
         s.faq = [
           {
             question: "Hvad er laser hårfjerning med diode-laser?",
-            answer: "<p>Laser hårfjerning med diode-laser er en avanceret og effektiv metode til at reducere uønsket hårvækst markant. Laseren sender et præcist lysimpuls ned i hårsækken, hvor varmeenergien ødelægger hårroden, så den ikke kan producere hår igen.</p>"
+            answer: "<p>Laser hårfjerning med diode-laser er en avanceret og effektiv metode til at reducere uønsket hårvækst markant. Laseren sender en præcis lysimpuls ned i hårsækken, hvor varmeenergien ødelægger hårroden, så den ikke kan producere hår igen.</p>"
           },
           {
             question: "Gør laserbehandlingen ondt?",
@@ -239,7 +239,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
       }
       if (s.benefits.length === 0) {
         s.benefits = [
-          { icon: "leaf", title: "100% Naturligt", description: "Lavet udelukkende af sukker, vand og citron. Indeholder ingen kemikalier." },
+          { icon: "leaf", title: "100% naturligt", description: "Lavet udelukkende af sukker, vand og citron. Indeholder ingen kemikalier." },
           { icon: "shield", title: "Færre indgroede hår", description: "Hårene trækkes ud i vækstretningen, så de ikke knækker under huden." },
           { icon: "star", title: "Ekstremt skånsom", description: "Klæber kun til håret, ikke huden. Perfekt til sart hud og intimzoner." }
         ];
@@ -285,8 +285,8 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
       }
       if (s.benefits.length === 0) {
         s.benefits = [
-          { icon: "star", title: "2-8 Toner lysere", description: "Hurtige og synlige resultater på under en time." },
-          { icon: "shield", title: "100% Smertefrit", description: "Ingen isninger, smerter eller skader på emaljen og tandkødet." },
+          { icon: "star", title: "2-8 toner lysere", description: "Hurtige og synlige resultater på under en time." },
+          { icon: "shield", title: "100% smertefrit", description: "Ingen isninger, smerter eller skader på emaljen og tandkødet." },
           { icon: "leaf", title: "Skånsom LED-teknik", description: "Mild gel kombineret med koldt blåt LED-lys for optimal sikkerhed." }
         ];
       }
@@ -325,7 +325,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
       if (s.benefits.length === 0) {
         s.benefits = [
           { icon: "star", title: "Knivskarp præcision", description: "Fjerner selv de mindste dun og definerer bryn med millimeterpræcision." },
-          { icon: "leaf", title: "100% Naturligt & skånsomt", description: "Ingen kemikalier, voks eller varme – kun ren bomuldstråd. Perfekt til sart hud." },
+          { icon: "leaf", title: "100% naturligt & skånsomt", description: "Ingen kemikalier, voks eller varme – kun ren bomuldstråd. Perfekt til sart hud." },
           { icon: "clock", title: "Langtidsholdbart", description: "Hårene trækkes op ved roden, så huden forbliver glat i 3–5 uger." }
         ];
       }
@@ -359,7 +359,7 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
 
     case "bryn-og-vipper":
       if (!s.long_description || s.long_description.length < 200) {
-        s.long_description = `<p>Fremhæv dine øjnes naturlige skønhed med vores professionelle bryn- og vippebehandlinger hos Skønhedsklinik Aarhus. Vi tilbyder et bredt udvalg af behandlinger – herunder farvning af bryn og vipper, præcis retning med voks og pincet, samt det utroligt populære Lash Lift (vippebuk) og Brow Lamination (bryn-løft). Hver eneste behandling skræddersyes nøje efter dine ansigtstræk, farver og personlige ønsker.</p><p>Vi anvender milde, skånsomme kvalitetsprodukter, som plejer og styrker hårene undervejs, så du opnår et sundt, smukt og langtidsholdbart resultat.</p><h3>Vågn op med et friskt og åbent blik</h3><p>Et Lash Lift er den ideelle løsning til dig, der ønsker smukt buede vipper, som får dine øjne til at se større og mere åbne ud, helt uden brug af vippebukker eller mascara.</p><p>Kombineret med Brow Lamination og farvning kan du tæmme vilde brynhår og give dem en fyldig, perfekt defineret form, der holder i ugevis. Det sparer dig dyrebar tid foran spejlet hver eneste morgen.</p>`;
+        s.long_description = `<p>Fremhæv dine øjnes naturlige skønhed med vores professionelle bryn- og vippebehandlinger hos Skønhedsklinik Aarhus. Vi tilbyder et bredt udvalg af behandlinger – herunder farvning af bryn og vipper, præcis retning med voks og pincet, samt det utroligt populære Lash Lift (vippebuk) og Brow Lamination (brynløft). Hver eneste behandling skræddersyes nøje efter dine ansigtstræk, farver og personlige ønsker.</p><p>Vi anvender milde, skånsomme kvalitetsprodukter, som plejer og styrker hårene undervejs, så du opnår et sundt, smukt og langtidsholdbart resultat.</p><h3>Vågn op med et friskt og åbent blik</h3><p>Et Lash Lift er den ideelle løsning til dig, der ønsker smukt buede vipper, som får dine øjne til at se større og mere åbne ud, helt uden brug af vippebukker eller mascara.</p><p>Kombineret med Brow Lamination og farvning kan du tæmme vilde brynhår og give dem en fyldig, perfekt defineret form, der holder i ugevis. Det sparer dig dyrebar tid foran spejlet hver eneste morgen.</p>`;
       }
       if (s.benefits.length === 0) {
         s.benefits = [

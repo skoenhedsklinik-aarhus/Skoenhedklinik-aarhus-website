@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Handelsbetingelser — Skønhedsklinik Aarhus",
   description:
-    "Læs vores handelsbetingelser: afbudspolitik (24 timers afmelding), lovpligtig forundsøgelse, priser og betaling, gavekort, reklamation og dine rettigheder.",
+    "Læs vores handelsbetingelser: afbudspolitik (24 timers afmelding), lovpligtig forundersøgelse, priser og betaling, gavekort, reklamation og dine rettigheder.",
   alternates: { canonical: "/handelsbetingelser" },
   robots: { index: true, follow: false },
 };

@@ -16,6 +16,7 @@ interface TeamMember {
 const TEAM_PHOTO_MAP: Record<string, string> = {
   "Aliaa Jamil": "/images/team-aliaa.avif",
   "Lise Lindhal": "/images/team-lise.avif",
+  "Lise Lindahl": "/images/team-lise.avif",
   "Louise Simonsen": "/images/team-louise.avif",
 };
 

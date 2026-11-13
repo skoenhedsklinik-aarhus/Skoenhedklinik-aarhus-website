@@ -133,7 +133,7 @@ export function BeforeAfterSlider() {
             </h2>
             <div className="w-10 h-px bg-cognac mb-7" />
             <p className="text-textBody text-base md:text-lg leading-relaxed mb-4">
-              Laser hårfjerning med laser giver langvarige resultater, som ses allerede fra første behandling. Vores certificerede behandlere tilpasser hvert forløb til din hud og behov.
+              Laser hårfjerning giver langvarige resultater, som ses allerede fra første behandling. Vores certificerede behandlere tilpasser hvert forløb til din hud og behov.
             </p>
             <p className="text-textBody text-base leading-relaxed mb-10">
               Billederne er fra en af vores klienters behandlingsforløb — optaget i vores klinik i Aarhus C.

@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const TREATMENTS = [
   { name: "Laser hårfjerning", slug: "laser-haarfjerning" },
-  { name: "Tattoo fjernelse", slug: "tattoo-fjernelse" },
+  { name: "Tattoo-fjernelse", slug: "tattoo-fjernelse" },
   { name: "Ansigtsbehandling", slug: "ansigtsbehandling" },
   { name: "Sugaring hårfjerning", slug: "sugaring" },
   { name: "Tandblegning", slug: "tandblegning" },

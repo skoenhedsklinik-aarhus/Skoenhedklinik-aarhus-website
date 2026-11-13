@@ -13,6 +13,7 @@ import { AnsigtsbehandlingerSection } from "@/components/shared/Ansigtsbehandlin
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Shield, Clock, Leaf, Star, Info, Phone } from "lucide-react";
 import { medicalProcedureSchema, faqPageSchema } from "@/lib/schema";
+import { categoryLabel } from "@/lib/service-categories";
 import { HeroVideo } from "@/components/shared/HeroVideo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://skoenhedsklinik-aarhus.dk";
@@ -151,7 +152,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
 
         <div className="container relative z-10 mx-auto px-4 lg:px-8 pb-14 md:pb-20">
           <span className="eyebrow text-cognac-light mb-4 block">
-            {service.category.replace(/-/g, " ")}
+            {categoryLabel(service.category)}
           </span>
           <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl text-white font-light leading-[1.06] mb-6 max-w-3xl text-balance">
             {service.name}
@@ -259,7 +260,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
               <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-lg shadow-2xl border border-sand/20">
                 <Image
                   src={(s.gallery && s.gallery.length > 0 ? s.gallery[0] : service.hero_image_url) || "/placeholder.jpg"}
-                  alt={`${service.name} behandling`}
+                  alt={`${service.name} hos Skønhedsklinik Aarhus`}
                   fill
                   className="object-cover"
                 />
