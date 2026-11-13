@@ -22,15 +22,51 @@ export default function TermsPage() {
 
       <section className="px-4 pb-24">
         <div className="container mx-auto max-w-3xl bg-white rounded-2xl p-8 md:p-12 shadow-sm border border-sand prose prose-lg text-textBody prose-headings:font-heading prose-headings:text-textPrimary">
-          <h2>1. Tidsbestilling og afbudspolitik</h2>
+          <h2>1. Bookingbetingelser</h2>
+          <p>Ved booking accepterer du nedenstående betingelser.</p>
+
+          <h3>Afbud</h3>
+          <p>Afbud skal ske senest 24 timer før behandlingens start.</p>
           <p>
-            For at sikre den bedst mulige oplevelse for alle vores klienter, beder vi dig overholde følgende regler for tidsbestilling og afbud:
+            Ved afbud senere end 24 timer før aftalen opkræves 70 % af behandlingens normale pris før eventuelle rabatter.
           </p>
-          <ul>
-            <li><strong>Afbud:</strong> Vi har en afbudspolitik der hedder, afmelding meldes inden 24 timer, ellers bliver man opkrævet fuld betaling for den bookede behandling.</li>
-            <li><strong>Måde for afbud:</strong> Aflysning af tid skal ske online via vores bookingsystem (Planway) eller via e-mail. Afbud kan <strong>ikke</strong> ske via telefonsvarer eller SMS.</li>
-            <li><strong>Forsinkelser:</strong> Ved forsinkelser på over 15 minutter forbeholder vi os retten til at annullere din tid og opkræve fuld betaling, da vi derved ikke kan nå at udføre behandlingen forsvarligt uden at forsinke de efterfølgende klienter.</li>
-          </ul>
+          <p>
+            Ved udeblivelse uden afbud opkræves 100 % af behandlingens normale pris før eventuelle rabatter.
+          </p>
+
+          <h3>Forsinkelse</h3>
+          <p>Kommer du for sent, kan behandlingstiden blive forkortet, uden at prisen reduceres.</p>
+          <p>
+            Hvis behandlingen ikke kan gennemføres på grund af din forsinkelse, opkræves 70 % af behandlingens normale pris før eventuelle rabatter.
+          </p>
+
+          <h3>Betaling</h3>
+          <p>
+            Behandlinger betales på behandlingsdagen. Ved opkrævning for sent afbud eller udeblivelse skal beløbet betales inden den frist, der fremgår af opkrævningen.
+          </p>
+          <p>
+            Beløbet betales via MobilePay til <strong>112813</strong>. Skriv venligst dit fulde navn og datoen for din aftale i beskedfeltet.
+          </p>
+          <p>
+            Send derefter en besked med dit navn og et billede af betalingskvitteringen til klinikkens telefonnummer <a href="tel:+4561445999">61 44 59 99</a>, så vi hurtigt kan registrere din betaling.
+          </p>
+
+          <h3>Manglende betaling og inkasso</h3>
+          <p>
+            Ved manglende betaling sender vi et skriftligt inkassovarsel med en betalingsfrist på mindst 10 dage fra afsendelsen.
+          </p>
+          <p>
+            Hvis beløbet fortsat ikke er betalt efter fristens udløb, kan kravet overdrages til inkasso. Dette kan medføre yderligere omkostninger efter gældende regler.
+          </p>
+          <p>
+            Har du allerede betalt, eller er du uenig i kravet, bedes du kontakte klinikken hurtigst muligt.
+          </p>
+
+          <h3>Kontakt</h3>
+          <p>
+            Afbud kan foretages via din onlinebooking inden afbudsfristens udløb eller ved direkte kontakt til klinikken på telefon <a href="tel:+4561445999">61 44 59 99</a>.
+          </p>
+          <p>Tak, fordi du respekterer vores tid.</p>
 
           <h2>2. Lovpligtig forundersøgelse</h2>
           <p>

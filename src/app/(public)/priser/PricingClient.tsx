@@ -206,7 +206,10 @@ export function PricingClient({ pricingTiers, packagesOffers }: PricingClientPro
           <div className="bg-cream rounded-xl p-8 border border-sand">
             <h3 className="font-heading text-2xl text-textPrimary mb-4">Afbestillingspolitik</h3>
             <p className="text-textBody text-sm leading-relaxed">
-              Vi har en afbudspolitik der hedder, afmelding meldes inden 24 timer, ellers bliver man opkrævet fuld betaling. Aflysning af tid skal ske online eller via mail, dette skal ikke ske via telefonsvaren. Ved forsinkelser over 15 min forbeholder vi retten til at annullere jeres tid og opkræve fuld betaling.
+              Afbud skal ske senest 24 timer før behandlingens start, via din onlinebooking eller på telefon 61 44 59 99. Ved senere afbud opkræves 70 % af behandlingens normale pris før eventuelle rabatter, og ved udeblivelse uden afbud 100 %. Kommer du for sent, kan behandlingstiden blive forkortet, uden at prisen reduceres. Kan behandlingen ikke gennemføres på grund af forsinkelsen, opkræves 70 %.
+            </p>
+            <p className="text-textBody text-sm leading-relaxed mt-3">
+              Læs de fulde <a href="/handelsbetingelser" className="underline text-cognac">bookingbetingelser</a>.
             </p>
           </div>
 
