@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Om os — Skønhedsklinik Aarhus",
     description:
-      "Mød Aliaa, Lise og Louise — teamet bag Skønhedsklinik Aarhus. Professionelle behandlere med hjertet på rette sted.",
+      "Mød Aliaa, Maahi, Louise og Lise: teamet bag Skønhedsklinik Aarhus. Professionelle behandlere med hjertet på rette sted.",
     url: "/om-os",
   },
 };
@@ -42,13 +42,31 @@ const VALUES = [
 const PROFILES = [
   {
     name: "Aliaa Jamil",
-    role: "Ejer & behandler",
-    photo: "/images/team-aliaa.avif",
+    role: "Ejer & kosmetiker",
+    photo: "/images/team/aliaa-uniform.webp",
     bio: [
-      "Jeg hedder Aliaa, og jeg kommer oprindeligt fra København. I 2010 blev jeg færdiguddannet fra NEXT/Cph West som kosmetiker – en uddannelse der gav mig et solidt fundament inden for både skønhed, hudpleje og æstetik. Siden da har jeg arbejdet i flere anerkendte klinikker i København, hvor jeg har oparbejdet stor erfaring inden for hudpleje, kropsbehandlinger og professionelle produkter. Med tiden udviklede jeg en særlig passion for huden, og i dag er jeg specialiseret i hudterapi og resultatorienteret pleje.",
-      "Ad kærlighedens vej flyttede jeg til Aarhus og startede et helt nyt kapitel i mit liv i denne smukke og varme by. Her grundlagde jeg min egen klinik, hvor jeg hver dag får lov til at arbejde med det, jeg elsker: at hjælpe mennesker med at føle sig smukke, selvsikre og godt tilpas i deres egen hud.",
-      "Hos Skønhedsklinik Aarhus tilbyder jeg ansigtsbehandlinger, sugaring og voks, laser hårfjerning, tandblegning og meget mere. Jeg vælger altid behandlinger med omtanke og arbejder professionelt, trygt og omsorgsfuldt, så hver kunde får den bedste oplevelse.",
-      "Som person er jeg nærværende, kærlig og imødekommende. For mig er skønhed ikke kun behandlinger – det er også følelsen af at blive set, hørt og mødt med varme. Min dør er åben for alle, og jeg ønsker, at alle der træder ind hos mig føler sig velkomne, trygge og værdsatte.",
+      "Jeg hedder Aliaa Jamil, og jeg er kvinden bag Skønhedsklinik Aarhus.",
+      "Jeg kommer oprindeligt fra Irak, hvor jeg læste på universitetet, inden jeg kom til Danmark i 2003. Her har jeg skabt mit liv og fundet min faglige passion. Jeg er også mor til en søn, som betyder utrolig meget for mig.",
+      "I 2010 blev jeg færdiguddannet som kosmetiker fra NEXT/Cph West. Min kosmetikeruddannelse og alle mine faglige kurser og certifikater er fra Danmark. Gennem årene har jeg arbejdet på flere klinikker i København og opbygget erfaring med hudpleje, skønhedsbehandlinger og professionelle produkter. Jeg videreuddanner mig løbende, fordi jeg elsker mit fag og ønsker at give mine kunder velovervejede behandlinger med fokus på kvalitet og tryghed.",
+      "For tre år siden flyttede jeg til Aarhus, og for omkring to år siden begyndte min rejse som selvstændig her i byen med min egen klinik på Trøjborg. Det har været en rejse fyldt med arbejde, læring og mange dejlige møder.",
+      "I begyndelsen af september flyttede klinikken fra Trøjborg til Åboulevarden 39, 5. th., midt i Aarhus. Jeg er utrolig glad for de nye lokaler og for at kunne byde jer velkommen i rammer, hvor der er plads til ro, nærvær og forkælelse.",
+      "Jeg er dybt taknemmelig for den måde, både mine kunder og denne fantastiske by har taget imod mig på. Tak for jeres tillid, jeres støtte og for at anbefale klinikken til andre. Hver eneste booking og hvert eneste besøg er med til at gøre min drøm mulig.",
+      "For mig handler skønhed også om at føle sig set, hørt og godt tilpas. Jeg ønsker, at alle, der træder ind i klinikken, føler sig velkomne, trygge og værdsatte.",
+      "Jeg glæder mig til at dele endnu mere med jer. Flere behandlinger og nye produkter er på vej, og jeg vil fortsat udvælge dem med omhu. Når jeg er overbevist om, at noget kan gøre en positiv forskel for jer, vil jeg arbejde for at tilbyde det i klinikken.",
+      "Tak, fordi I er en del af min rejse. Jeg glæder mig til alt det, der venter os.",
+    ],
+  },
+  {
+    name: "Maahi",
+    role: "Kosmetolog",
+    photo: "/images/team/maahi-2.webp",
+    bio: [
+      "Fra december bliver Maahi en del af vores team som kosmetolog, og vi glæder os til at byde hende velkommen.",
+      "Maahi kommer oprindeligt fra Shiraz i Iran. Hendes lægefaglige rejse begyndte i 2009 på Shiraz University of Medical Sciences, hvor hun blev færdiguddannet som læge i 2016. Siden har hun arbejdet med almen medicin, familielægearbejde og æstetisk medicin. Gennem sit arbejde har hun opbygget erfaring med blandt andet Botox, fillers, tatoveringsfjernelse med laser, microneedling, fraktioneret CO2-laser og forskellige former for ansigtsforyngelse.",
+      "I december 2025 flyttede Maahi til Danmark for at begynde et nyt kapitel. Hun arbejder på at videreføre sin lægefaglige rejse her, samtidig med at hun lærer dansk og den danske kultur bedre at kende. Hos os arbejder hun som kosmetolog.",
+      "For Maahi handler æstetik først og fremmest om mennesker. Hun elsker den personlige kontakt, og noget af det, der glæder hende mest, er at se klienter gå hjem med et smil og en god følelse. Tryghed, nærvær og det at føle sig hørt er centrale værdier for hende.",
+      "Hun elsker at male og har en stor passion for kunst, kreativitet og de små detaljer. Det afspejler sig i hendes fokus på præcision, ansigtets anatomi og naturlige, harmoniske resultater.",
+      "I fritiden nyder hun at spille padel og holde sig aktiv. Hun taler flydende engelsk og har lært dansk i næsten et år, og hun er taknemmelig for den varme modtagelse, hun har fået i Danmark. Maahi glæder sig til at lære jer at kende og byde jer velkommen til behandling fra december.",
     ],
   },
   {

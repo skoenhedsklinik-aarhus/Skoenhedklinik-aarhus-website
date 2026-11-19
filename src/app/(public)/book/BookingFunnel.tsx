@@ -18,6 +18,7 @@ const SERVICES = [
   { name: "Bryn & vipper", slug: "bryn-og-vipper", emoji: "👁" },
   { name: "Wax behandling", slug: "wax-behandling", emoji: "🌸" },
   { name: "Mix Sugaring & wax", slug: "mix-sugaring-og-wax", emoji: "💫" },
+  { name: "Spraytan", slug: "spraytan", emoji: "☀️" },
 ];
 
 const STEPS = ["Behandling", "Konsultation", "Book"];

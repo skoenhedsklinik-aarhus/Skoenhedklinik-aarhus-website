@@ -346,11 +346,11 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { n: "01", title: "Personlig konsultation", desc: "Vi gennemgår din hud, dine ønsker og dit mål — og finder den rette behandling til dig." },
-              { n: "02", title: "Skræddersyet behandling", desc: "Behandlingen tilpasses nøje efter din hudtype og de resultater, vi ønsker at opnå." },
-              { n: "03", title: "Opfølgning & støtte", desc: "Vi er altid tilgængelige med råd og vejledning efter behandlingen." },
-            ].map((step) => (
+            {((s.process_steps as { title: string; desc: string }[] | undefined) ?? [
+              { title: "Personlig konsultation", desc: "Vi gennemgår din hud, dine ønsker og dit mål, og finder den rette behandling til dig." },
+              { title: "Skræddersyet behandling", desc: "Behandlingen tilpasses nøje efter din hudtype og de resultater, vi ønsker at opnå." },
+              { title: "Opfølgning & støtte", desc: "Vi er altid tilgængelige med råd og vejledning efter behandlingen." },
+            ]).map((step, i) => ({ ...step, n: String(i + 1).padStart(2, "0") })).map((step) => (
               <div key={step.n} className="glass-cream rounded-xl p-7">
                 <p className="font-heading text-4xl text-cognac/20 font-light mb-4">{step.n}</p>
                 <h4 className="font-heading text-lg text-textPrimary font-medium mb-2">{step.title}</h4>

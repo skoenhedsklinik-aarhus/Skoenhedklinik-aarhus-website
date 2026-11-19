@@ -28,6 +28,7 @@ const TREATMENTS = [
   { name: "Bryn & vipper", slug: "bryn-og-vipper" },
   { name: "Wax behandling", slug: "wax-behandling" },
   { name: "Mix Sugaring & wax", slug: "mix-sugaring-og-wax" },
+  { name: "Spraytan", slug: "spraytan" },
 ];
 
 export function Header() {

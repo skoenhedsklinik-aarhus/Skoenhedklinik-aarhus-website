@@ -16,6 +16,7 @@ const skeletonServices: Record<string, any> = {
   "bryn-og-vipper": { name: "Bryn & vipper", slug: "bryn-og-vipper", category: "bryn-vipper", short_description: "Lash Lift, Brow Lamination, farvning og formning af bryn og vipper.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: true, is_active: true },
   "wax-behandling": { name: "Wax behandling", slug: "wax-behandling", category: "haarfjerning", short_description: "Professionel voksbehandling for silkeblød og hårfri hud i ugevis.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: false, is_active: true },
   "mix-sugaring-og-wax": { name: "Mix Sugaring & Wax", slug: "mix-sugaring-og-wax", category: "haarfjerning", short_description: "Det bedste fra to verdener – sugaring på de følsomme områder, voks på resten.", hero_image_url: "/placeholder.jpg", requires_consultation: false, is_popular: false, is_active: true },
+  "spraytan": { name: "Spraytan", slug: "spraytan", category: "spraytan", short_description: "En solkysset glød uden sol og solarium. Fra december 2026.", hero_image_url: "/images/services/spraytan.webp", requires_consultation: false, is_popular: false, is_active: true },
 };
 
 /**
@@ -54,6 +55,12 @@ const galleryMap: Record<string, string[]> = {
   "tandblegning": ["/images/services/tandblegning-hero-live.jpg"],
   "threading": ["/images/services/threading-2.avif"],
   "wax-behandling": ["/images/services/wax-behandling-2.avif"],
+  "spraytan": [
+    // spraypistolen er thumbnail på kort og sekundært billede på siden
+    "/images/services/spraytan-2.webp",
+    "/images/services/spraytan-3.webp",
+    "/images/services/spraytan-portrait.webp",
+  ],
 };
 
 /**
@@ -433,6 +440,76 @@ export function enrichServiceWithFallback(slug: string, service: any): any {
           "Undgå hård træning og intens sved i 24 timer for at undgå røde knopper",
           "Undgå stramt tøj lige efter behandlingen for at lade huden ånde",
           "Påfør kun milde og beroligende produkter (fx ren aloe vera gel) det første døgn"
+        ];
+      }
+      break;
+
+    case "spraytan":
+      if (!s.long_description || s.long_description.length < 200) {
+        s.long_description = `<p>Fra december 2026 tilbyder vi spraytan hos Skønhedsklinik Aarhus. Ønsker du en frisk glød til hverdag, julefrokost, nytår, ferie eller en særlig anledning? Med spraytan får du en solkysset farve uden sol, solarium og UV-stråler.</p><p>Vi tilpasser farven til din hudtone og dine ønsker. Du vælger mellem tre farveintensiteter:</p><ul><li><strong>Light:</strong> En let og diskret glød.</li><li><strong>Medium:</strong> En gylden, mere markeret farve.</li><li><strong>Dark:</strong> En dybere og mere intens farve.</li></ul><p>Det endelige resultat afhænger af din egen hudtone, hudens forberedelse og efterplejen.</p><h3>Hvad er spraytan, og hvordan virker det?</h3><p>Spraytan er en kosmetisk behandling, hvor en fin selvbrunende mist fordeles over huden med en spraypistol. Den selvbrunende ingrediens DHA reagerer med stoffer i hudens yderste lag og skaber en midlertidig brun farve. Behandlingen bruger hverken sol eller UV-stråler.</p><p>Farven aftager gradvist i takt med hudens naturlige fornyelse. Spraytan ændrer ikke din naturlige hudfarve permanent.</p><p>Øjne, læber og slimhinder skal beskyttes, og spraytågen må ikke indåndes. Vi gennemgår beskyttelse og fremgangsmåde før behandlingen.</p><h3>Venindetilbud og klippekort</h3><p><strong>Venindetilbud:</strong> Tag en veninde med, og få spraytan til 250 kr. pr. person. I skal booke sammen og komme til samme besøg. Behandlingerne udføres én ad gangen.</p><p><strong>Klippekort:</strong> Få 5 spraytanbehandlinger for 1.200 kr. Du sparer 300 kr. sammenlignet med 5 enkeltbehandlinger, svarende til en gennemsnitspris på 240 kr. pr. behandling.</p><p>Klippekortet er personligt. Tilbud og klippekort kan ikke kombineres med andre rabatter.</p>`;
+      }
+      if (s.benefits.length === 0) {
+        s.benefits = [
+          { icon: "leaf", title: "Uden sol og UV", description: "En solkysset farve uden solarium og uden UV-stråler." },
+          { icon: "star", title: "Tilpasset din hudtone", description: "Vælg light, medium eller dark. Vi hjælper dig til et naturligt resultat." },
+          { icon: "clock", title: "Klar på 30 minutter", description: "En hurtig behandling før julefrokost, nytår, ferie eller fest." }
+        ];
+      }
+      if (!s.process_steps) {
+        s.process_steps = [
+          { title: "Vi vælger din farve", desc: "Vi taler om din hudtone, dit ønskede resultat og eventuelle hensyn." },
+          { title: "Du gør dig klar", desc: "Du tager smykker af og klæder om til det undertøj eller badetøj, du ønsker at beholde på." },
+          { title: "Huden forberedes", desc: "Ved behov påføres en lille mængde barrierecreme på tørre områder som albuer, knæ og ankler." },
+          { title: "Farven sprayes på", desc: "Du guides gennem nogle enkle stillinger, så produktet fordeles så jævnt som muligt. Ansigtet kan udelades efter ønske." },
+          { title: "Farven tørrer", desc: "Du får tid til at tørre, før du tager løstsiddende tøj på." },
+          { title: "Vejledning med hjem", desc: "Vi fortæller dig præcis, hvornår du må skylle farven af, og hvordan du plejer huden bagefter." }
+        ];
+      }
+      if (s.pre_instructions.length === 0) {
+        s.pre_instructions = [
+          "Fjern uønsket hår i god tid. Barbering bør ske mindst 24 timer før, og voks eller sugaring gerne mindst 48 timer før. Huden skal være rolig og uden irritation ved behandlingen.",
+          "Eksfoliér huden forsigtigt cirka 24 timer før med en mild bodyscrub uden fedtet film eller en blød eksfolieringshandske på fugtig hud. Arbejd let på albuer, knæ, ankler og hæle, skyl grundigt, og undgå hård skrubning.",
+          "Fjern gamle rester af selvbruner, så huden har en så ensartet overflade som muligt.",
+          "Fugt huden dagen før, især hvis du har tørre områder.",
+          "Mød op med ren, tør og afkølet hud. Undgå bodylotion, olie, parfume, deodorant og makeup på de områder, der skal behandles.",
+          "Undgå at skrubbe huden eller tage et meget varmt bad lige inden dit besøg.",
+          "Medbring mørkt, løstsiddende tøj og rummelige sko, og vælg undertøj eller badetøj, der gerne må få farve på sig. Undgå stramme jeans, leggings og stramt undertøj efter behandlingen.",
+          "Planlæg dagen, så du kan undgå vand og sved, mens farven udvikler sig.",
+          "Fortæl os inden behandlingen, hvis du har allergier, sensitiv hud, astma, andre luftvejsproblemer eller tidligere har reageret på selvbruner."
+        ];
+      }
+      if (s.post_instructions.length === 0) {
+        s.post_instructions = [
+          "Følg det tidspunkt for afskylning, du får oplyst i klinikken. Tiden afhænger af produktet.",
+          "Indtil første afskylning: undgå bad, svømning, sauna, træning og aktiviteter, der giver sved, og beskyt huden mod regn og stænk.",
+          "Undgå creme, olie, parfume og deodorant på den behandlede hud indtil første afskylning, og undgå at gnide eller kradse i huden.",
+          "Brug løstsiddende tøj, og begræns friktion fra stramme stropper og elastikker. Vær forsigtig ved håndvask, men nødvendig håndhygiejne skal altid prioriteres.",
+          "Første bad: skyl kort med lunkent vand, brug ikke skrubbehandske eller bodyscrub, og dup huden tør. Det er normalt, at noget af guidefarven skylles af.",
+          "Brug en mild fugtighedscreme dagligt efter første afskylning, og tag korte, lunkne bade frem for lange, varme bade.",
+          "Undgå kraftig eksfoliering og lange ophold i pool, spabad og sauna, mens du vil bevare farven. Barbering og friktion slider også på farven.",
+          "Brug fortsat solbeskyttelse. Spraytan beskytter ikke mod solens stråler."
+        ];
+      }
+      if (s.faq.length === 0) {
+        s.faq = [
+          { question: "Hvor længe holder en spraytan?", answer: "<p>Typisk omkring 5–7 dage, men det varierer med produkt, hudtype, forberedelse og efterpleje. Farven kan holde kortere eller længere og falmer gradvist.</p>" },
+          { question: "Hvornår kan jeg se resultatet?", answer: "<p>Nogle produkter giver en synlig guidefarve med det samme. Den egentlige selvbrunende farve udvikler sig i timerne efter behandlingen. Det præcise forløb afhænger af produktet.</p>" },
+          { question: "Hvornår må jeg gå i bad?", answer: "<p>Du får dit konkrete tidspunkt i klinikken. Der er forskel på almindelige og hurtigudviklende produkter, så følg altid vejledningen til netop din behandling.</p>" },
+          { question: "Bliver jeg orange?", answer: "<p>Vi tilpasser farveintensiteten til din hudtone og dine ønsker for at opnå et naturligt udtryk. Hudens udgangspunkt, produktvalg og efterpleje påvirker resultatet. En mørkere farve er ikke altid det bedste valg.</p>" },
+          { question: "Kan jeg vælge en meget let farve?", answer: "<p>Ja. Du kan vælge en diskret glød frem for en dyb farve. Fortæl os gerne, hvis det er din første spraytan, eller hvis du ønsker et meget naturligt resultat.</p>" },
+          { question: "Skal jeg have spraytan i ansigtet?", answer: "<p>Nej, du kan vælge ansigtet fra. Hvis ansigtet behandles, skal øjenområdet, læber og slimhinder beskyttes.</p>" },
+          { question: "Hvornår skal jeg booke før en fest?", answer: "<p>Vi anbefaler som udgangspunkt 1–2 dage før, så der er tid til farveudvikling og afskylning. Til bryllup eller en anden vigtig begivenhed er en prøvebehandling i god tid en god idé.</p>" },
+          { question: "Smitter farven af?", answer: "<p>Guidefarven kan smitte af på tøj, undertøj og sengetøj, især før første afskylning. Brug derfor mørke tekstiler, og undgå sarte materialer. Vi kan ikke garantere, at alle tekstiler kan vaskes rene.</p>" },
+          { question: "Kan jeg træne samme dag?", answer: "<p>Vent med træning og andre aktiviteter, der giver sved, til den anbefalede udviklingstid og første afskylning er overstået.</p>" },
+          { question: "Kan jeg bade i pool eller havet bagefter?", answer: "<p>Vent til efter udviklingstiden og første afskylning. Hyppig svømning og længere ophold i vand kan forkorte holdbarheden.</p>" },
+          { question: "Hvordan forsvinder farven?", answer: "<p>Farven aftager, når de farvede hudceller naturligt afstødes. Tør hud og friktion kan få den til at falme mere ujævnt. Daglig fugtpleje hjælper med at holde huden smidig.</p>" },
+          { question: "Hvordan fjerner jeg gammel farve før næste behandling?", answer: "<p>Når farven er ved at være væk, kan du blødgøre huden i et lunkent bad og eksfoliere forsigtigt med en mild scrub eller handske. Fjern rester gradvist frem for at skrubbe hårdt. Gør det gerne dagen før dit næste besøg.</p>" },
+          { question: "Hvor ofte kan jeg få spraytan?", answer: "<p>Mange vælger en ny behandling cirka hver 7.–10. dag. Det vigtigste er, at huden er rolig, og at gamle farverester er tilstrækkeligt væk til at give et jævnt nyt resultat.</p>" },
+          { question: "Kan jeg få spraytan, hvis jeg har sensitiv hud?", answer: "<p>Kontakt os inden booking. Vi kan gennemgå ingredienser og vurdere behovet for en test på et mindre område efter produktets vejledning. En test kan ikke udelukke alle reaktioner.</p><p>Vi behandler ikke direkte på åbne sår, solskoldning eller aktivt irriteret hud.</p>" },
+          { question: "Kan jeg få spraytan, hvis jeg er gravid eller ammer?", answer: "<p>Kontakt os før booking, så vi kan gennemgå produktets anvisninger og eventuelle forholdsregler. Under amning må produktet ikke påføres brystvorter eller områder, barnet får i munden.</p>" },
+          { question: "Kan jeg kombinere spraytan med andre behandlinger?", answer: "<p>Fortæl os, hvilke behandlinger du planlægger. Voks, sugaring, peeling og andre behandlinger, der påvirker hudens overflade, skal planlægges før spraytan med passende tid til, at huden bliver rolig igen.</p><p>Efter microneedling, kraftig peeling eller laser skal huden være helet, og din behandler skal have sagt god for næste behandling.</p>" },
+          { question: "Beskytter spraytan mod solen?", answer: "<p>Nej. Den brune farve giver ikke i sig selv solbeskyttelse. Brug solcreme og øvrig solbeskyttelse som normalt.</p>" },
+          { question: "Kan jeg få en allergisk reaktion?", answer: "<p>Ja, ligesom med andre kosmetiske produkter kan irritation eller allergi forekomme. Oplys os om kendte allergier og tidligere reaktioner før dit besøg. Kontakt klinikken, hvis du oplever en reaktion efter behandlingen.</p>" }
         ];
       }
       break;

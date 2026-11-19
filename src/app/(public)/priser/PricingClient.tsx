@@ -18,6 +18,7 @@ const CATEGORIES = [
   { id: "tand", label: "Tandblegning" },
   { id: "threading", label: "Threading" },
   { id: "tatovering", label: "Tattoo-fjernelse" },
+  { id: "spraytan", label: "Spraytan" },
   { id: "pakker", label: "Pakker" },
 ];
 
@@ -154,7 +155,7 @@ export function PricingClient({ pricingTiers, packagesOffers }: PricingClientPro
                       id={`${categoryId}-${subcat.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                       className="scroll-mt-40"
                     >
-                      {subcat !== "Andre" && (
+                      {subcat !== "Andre" && subcat !== catLabel && (
                         <h3 className="font-heading text-2xl text-textPrimary mb-6 pb-2 border-b border-sand">
                           {subcat}
                         </h3>

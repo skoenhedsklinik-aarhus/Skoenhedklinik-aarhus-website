@@ -26,6 +26,7 @@ export function Footer() {
               <li><Link href="/behandlinger/ansigtsbehandling" className="hover:text-cream transition-colors">Ansigtsbehandling</Link></li>
               <li><Link href="/behandlinger/sugaring" className="hover:text-cream transition-colors">Sugaring</Link></li>
               <li><Link href="/behandlinger/tandblegning" className="hover:text-cream transition-colors">Tandblegning</Link></li>
+              <li><Link href="/behandlinger/spraytan" className="hover:text-cream transition-colors">Spraytan</Link></li>
               <li><Link href="/behandlinger" className="hover:text-cream transition-colors underline underline-offset-4 mt-2 block">Se alle behandlinger</Link></li>
             </ul>
           </div>

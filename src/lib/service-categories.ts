@@ -17,6 +17,7 @@ export const SERVICE_CATEGORIES: { value: string; label: string }[] = [
   { value: "tand", label: "Tandblegning" },
   { value: "threading", label: "Threading" },
   { value: "tatovering", label: "Tattoo-fjernelse" },
+  { value: "spraytan", label: "Spraytan" },
   { value: "andet", label: "Andet" },
 ];
 

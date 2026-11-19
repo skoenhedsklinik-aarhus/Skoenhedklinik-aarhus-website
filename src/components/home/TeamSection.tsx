@@ -14,7 +14,8 @@ interface TeamMember {
 }
 
 const TEAM_PHOTO_MAP: Record<string, string> = {
-  "Aliaa Jamil": "/images/team-aliaa.avif",
+  "Aliaa Jamil": "/images/team/aliaa-uniform.webp",
+  Maahi: "/images/team/maahi.webp",
   "Lise Lindhal": "/images/team-lise.avif",
   "Lise Lindahl": "/images/team-lise.avif",
   "Louise Simonsen": "/images/team-louise.avif",
@@ -79,11 +80,25 @@ export function TeamSection({
 }: TeamSectionProps) {
   if (!teamMembers || teamMembers.length === 0) return null;
 
-  // Owner (display_order 1) anchors the centre; the rest flank it.
+  // Owner (display_order 1) anchors the centre; the rest flank it. The first
+  // half of the others go to the right, the rest to the left, so three people
+  // keep the original trio and four become owner + one left + two right.
   const owner = teamMembers[0];
   const sides = teamMembers.slice(1);
-  const leftMember = sides[sides.length - 1];
-  const rightMember = sides.length > 1 ? sides[0] : undefined;
+  const rightCount = Math.ceil(sides.length / 2);
+  const rightMembers = sides.slice(0, rightCount);
+  const leftMembers = sides.slice(rightCount).reverse();
+  const isQuartet = teamMembers.length >= 4;
+  const gridCols = isQuartet
+    ? "sm:grid-cols-2 lg:grid-cols-4 max-w-6xl"
+    : "sm:grid-cols-3 max-w-5xl";
+  const ownerOffset = showCta
+    ? isQuartet
+      ? "lg:mt-24"
+      : "sm:mt-16 lg:mt-24"
+    : isQuartet
+      ? "lg:mt-10"
+      : "sm:mt-10";
 
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-b from-[#E6CDB3] via-[#F0E4D5] to-cream">
@@ -104,8 +119,10 @@ export function TeamSection({
         </motion.div>
 
         {/* Staggered trio — owner centred & lower, others flanking */}
-        <div className="mt-16 lg:mt-20 grid grid-cols-1 sm:grid-cols-3 gap-12 sm:gap-6 lg:gap-12 items-start max-w-5xl mx-auto">
-          {leftMember && <TeamPortrait member={leftMember} />}
+        <div className={`mt-16 lg:mt-20 grid grid-cols-1 ${gridCols} gap-12 sm:gap-6 lg:gap-10 items-start mx-auto`}>
+          {leftMembers.map((m) => (
+            <TeamPortrait key={m.id} member={m} />
+          ))}
 
           {owner && (
             <motion.div
@@ -113,7 +130,7 @@ export function TeamSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-              className={`flex flex-col items-center ${showCta ? "sm:mt-16 lg:mt-24" : "sm:mt-10"}`}
+              className={`flex flex-col items-center ${ownerOffset}`}
             >
               {showCta && (
                 <Link
@@ -140,7 +157,9 @@ export function TeamSection({
             </motion.div>
           )}
 
-          {rightMember && <TeamPortrait member={rightMember} delay={0.2} />}
+          {rightMembers.map((m, i) => (
+            <TeamPortrait key={m.id} member={m} delay={0.2 + i * 0.1} />
+          ))}
         </div>
       </div>
     </section>
