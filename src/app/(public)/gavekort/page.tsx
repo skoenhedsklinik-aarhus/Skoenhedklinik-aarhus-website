@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { FinalCTA } from "@/components/shared/FinalCTA";
-import { ExternalLink } from "lucide-react";
+import { MapPin, Phone } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export const metadata: Metadata = {
   title: "Gavekort — Skønhedsklinik Aarhus",
   description:
-    "Giv gaven af velvære og selvforkælelse. Køb et gavekort til Skønhedsklinik Aarhus online. Gyldigt i 3 år. Kan bruges til alle behandlinger.",
+    "Giv gaven af velvære og selvforkælelse. Køb et gavekort til Skønhedsklinik Aarhus i klinikken eller over telefonen. Gyldigt i 3 år. Kan bruges til alle behandlinger.",
   alternates: { canonical: "/gavekort" },
   openGraph: {
     title: "Gavekort — Skønhedsklinik Aarhus",
@@ -17,8 +17,6 @@ export const metadata: Metadata = {
 };
 
 export default function GiftCardPage() {
-  const iframeUrl = "https://skonhedsklinik-aarhus.planway.com/widget/buy_giftcard";
-
   return (
     <main className="flex flex-col min-h-screen bg-cream">
       {/* Hero */}
@@ -35,26 +33,46 @@ export default function GiftCardPage() {
 
       <div className="container mx-auto max-w-6xl px-4 pb-20 flex flex-col lg:flex-row gap-12 lg:gap-8">
         
-        {/* Left Col: Iframe */}
-        <div className="w-full lg:w-2/3 flex flex-col items-center">
-          <iframe
-            src={iframeUrl}
-            width="100%"
-            style={{ minHeight: "800px", border: 0 }}
-            title="Køb gavekort til Skønhedsklinik Aarhus"
-            loading="lazy"
-            allow="payment"
-            className="bg-white rounded-xl shadow-sm"
-          />
-          <a
-            href={iframeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 flex items-center gap-2 text-textBody hover:text-cognac transition-colors"
-          >
-            Problemer med modulet? <strong className="font-medium">Åbn i nyt vindue</strong>
-            <ExternalLink className="w-4 h-4" />
-          </a>
+        {/* Left Col: Sådan køber du */}
+        {/*
+          Online køb kommer tilbage, når klinikken har Geckos modul til online
+          betaling. Så erstattes dette kort af Geckos gavekortshop.
+        */}
+        <div className="w-full lg:w-2/3">
+          <div className="bg-white rounded-xl p-8 md:p-10 shadow-sm border border-sand">
+            <h2 className="font-heading text-2xl md:text-3xl text-textPrimary mb-3">
+              Sådan køber du et gavekort
+            </h2>
+            <p className="text-textBody mb-8">
+              Gavekort købes i klinikken eller over telefonen. Vælg et beløb, så klarer vi resten.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+              {["500 kr.", "1.000 kr.", "1.500 kr."].map((amount) => (
+                <div
+                  key={amount}
+                  className="rounded-xl border border-sand bg-cream px-4 py-6 text-center"
+                >
+                  <span className="block text-xs uppercase tracking-wide text-textMuted mb-1">Gavekort</span>
+                  <span className="font-heading text-2xl text-textPrimary">{amount}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <a
+                href="tel:+4561445999"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-cognac px-6 py-3 text-white font-medium hover:opacity-90 transition-opacity"
+              >
+                <Phone className="w-4 h-4" />
+                Ring 61 44 59 99
+              </a>
+              <div className="inline-flex items-center gap-2 text-textBody text-sm">
+                <MapPin className="w-4 h-4 text-cognac shrink-0" />
+                Åboulevarden 39, 5. sal th., 8000 Aarhus C
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Right Col: FAQ */}

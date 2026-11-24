@@ -411,7 +411,8 @@ export function ServiceForm({ initialData }: ServiceFormProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-textPrimary">Planway Service ID (valgfrit)</label>
+            <label className="text-sm font-medium text-textPrimary">Gecko ydelses-ID (valgfrit)</label>
+            <p className="text-xs text-textMuted">Forvælger ydelsen, når kunden booker fra denne behandling. Kun tal.</p>
             <input
               type="text"
               value={formData.planway_service_id}
@@ -421,7 +422,8 @@ export function ServiceForm({ initialData }: ServiceFormProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-textPrimary">Planway Staff ID (valgfrit)</label>
+            <label className="text-sm font-medium text-textPrimary">Gecko kalender-ID (valgfrit)</label>
+            <p className="text-xs text-textMuted">Viser kun denne behandlers kalender. Flere adskilles med punktum.</p>
             <input
               type="text"
               value={formData.planway_staff_id}

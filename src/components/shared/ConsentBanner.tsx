@@ -18,7 +18,7 @@ import { stashLanding, stashedLanding } from "@/lib/landing";
  * Plausible er bevidst ikke omfattet: det sætter ingen cookies og gemmer ingen
  * personoplysninger, så det kræver ikke samtykke.
  *
- * Bemærk: bookingmodulet fra Planway ligger i en iframe på /book og har sin
+ * Bemærk: bookingmodulet fra Gecko ligger i en iframe på /book og har sin
  * egen cookiedialog. Den kan vi ikke styre herfra.
  */
 

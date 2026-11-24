@@ -6,7 +6,7 @@ const securityHeaders = [
     value: "max-age=63072000; includeSubDomains; preload",
   },
   {
-    // SAMEORIGIN (not DENY) because we embed Planway iframes on the same origin
+    // SAMEORIGIN (not DENY) so our own pages can still be framed by ourselves
     key: "X-Frame-Options",
     value: "SAMEORIGIN",
   },

@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Analyse (Plausible Analytics):</strong> Vi bruger Plausible til at måle trafik på vores hjemmeside. Plausible er en privatlivsfokuseret løsning, der ikke bruger cookies og ikke indsamler nogen personhenførbare data. Derfor kræves der ikke samtykke til dette.</li>
             <li><strong>Tredjepartsindlejringer:</strong> Nogle sider indeholder indlejret indhold fra tredjeparter. Disse tjenester kan sætte deres egne cookies, som vi ikke har kontrol over:
               <ul>
-                <li><strong>Planway (Booking):</strong> Vores bookingsystem og gavekort-modul er indlejret via Planway. Når du interagerer med disse moduler, gælder Planways cookie- og privatlivspolitik.</li>
+                <li><strong>Gecko Booking (Booking):</strong> Vores bookingsystem er indlejret fra GECKO Booking (GECKO.DK ApS). Når du bruger bookingmodulet, gælder Geckos cookie- og privatlivspolitik.</li>
                 <li><strong>Google Maps:</strong> På vores kontaktside viser vi et kort fra Google Maps. Google kan placere cookies i din browser i denne forbindelse.</li>
               </ul>
             </li>
@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
 
           <h2>3. Personoplysninger ved booking</h2>
           <p>
-            Når du booker en tid hos os, sker dette gennem vores partner Planway. De oplysninger du indtaster (navn, e-mail, telefonnummer) behandles af Planway på vores vegne for at vi kan administrere din aftale og kontakte dig vedrørende din behandling.
+            Når du booker en tid hos os, sker dette gennem vores bookingsystem GECKO Booking (GECKO.DK ApS). De oplysninger du indtaster (navn, e-mail, telefonnummer) behandles af GECKO på vores vegne for at vi kan administrere din aftale og kontakte dig vedrørende din behandling.
           </p>
 
           <h2>4. Google Anmeldelser</h2>

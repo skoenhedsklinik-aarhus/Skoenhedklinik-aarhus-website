@@ -1,48 +1,73 @@
 /**
- * Central place for constructing Planway booking URLs.
+ * Ét sted for klinikkens booking-URL'er. Bookingsystemet er Gecko fra
+ * 24. november 2026 (før det Planway).
  *
- * --- Planway deep-linking status (investigated 2026-05-29) ---
- * Planway publishes NO public documentation for deep-linking a service, and the
- * live booking widget JS (assets/js/widget.js) does NOT read any URL query param
- * to pre-select a service — selection only happens by clicking elements with a
- * `data-id` inside the widget. So appending a param here currently has no effect
- * on Planway's side; it is forward-compatible plumbing, not a working deep link.
+ * Gecko indlejres som en almindelig iframe fra deres eget domæne. Det er det
+ * samme, som deres `iframe.js` gør, bare uden `document.write`:
  *
- * If Planway later adds support (or the real format is confirmed from the
- * dashboard), this is a ONE-LINE change: update PLANWAY_SERVICE_PARAM (and, if
- * needed, the URL shape in buildPlanwayUrl). Everything else flows from here.
+ *   - Forvalg af ydelse: `preSelectService=<Gecko ydelses-ID>`
+ *   - Forvalg af kalender (behandler): `kal=<Gecko kalender-ID>`, flere med punktum
+ *   - Højde: Gecko sender `postMessage` til forældresiden med enten et tal
+ *     eller `{ geckoSetHeight: <px> }`.
  *
- * The ID appended is the service's `planway_service_id` (Planway's internal id),
- * NOT our site slug. Populate it per service in the admin CMS
- * (/admin/behandlinger → "Planway Service ID"). Until it's populated,
- * buildPlanwayUrl falls back to the plain base URL automatically.
+ * ID'erne sættes pr. behandling i admin (/admin/behandlinger). De ligger i de
+ * gamle kolonner `planway_service_id` og `planway_staff_id`, så skiftet ikke
+ * krævede en migration. Er der intet ID, åbner bookingen på ydelseslisten.
  */
 
 /**
- * The clinic's Planway booking page.
+ * Geckos indsætningskode "Default indsætningskode" (Indstillinger >
+ * Indsætningskoder > Online booking).
+ */
+export const GECKO_IC_CODE =
+  process.env.NEXT_PUBLIC_GECKO_IC_CODE || "95d7b838a52db572fe9af5df694760c8b12312";
+
+/** Klinikkens Gecko-domæne. */
+export const GECKO_ORIGIN = "https://skoenhedsklinikaarhus.app5.geckobooking.dk";
+
+/** Kun beskeder fra Geckos egne domæner må styre iframens højde. */
+export function isGeckoOrigin(origin: string): boolean {
+  try {
+    const host = new URL(origin).hostname;
+    return host === "geckobooking.dk" || host.endsWith(".geckobooking.dk");
+  } catch {
+    return false;
+  }
+}
+
+/** Kun hele tal. Alt andet ignoreres, så en forkert værdi aldrig når Gecko. */
+function numericId(value?: string | null): string | null {
+  const trimmed = value?.trim();
+  return trimmed && /^\d+$/.test(trimmed) ? trimmed : null;
+}
+
+/** Kalender-ID'er må være én eller flere, adskilt med punktum (Geckos format). */
+function calendarIds(value?: string | null): string | null {
+  const trimmed = value?.trim();
+  return trimmed && /^\d+(\.\d+)*$/.test(trimmed) ? trimmed : null;
+}
+
+/**
+ * Geckos bookingside, evt. med forvalgt ydelse og kalender.
  *
- * Override with NEXT_PUBLIC_PLANWAY_BOOKING_URL in Vercel if Planway ever hands
- * out a different "Direkte link" (Indstillinger → Online booking → Bookingside),
- * so swapping it needs no code change.
+ * `embedded` styrer kun Geckos skabelon: `dTpl=1` er visningen til et direkte
+ * link i et nyt vindue, uden er det den integrerede visning til iframen.
  */
-export const PLANWAY_BASE_URL =
-  process.env.NEXT_PUBLIC_PLANWAY_BOOKING_URL ||
-  "https://skonhedsklinik-aarhus.planway.com/";
+export function buildBookingUrl(
+  serviceId?: string | null,
+  calendarId?: string | null,
+  { embedded = true }: { embedded?: boolean } = {},
+): string {
+  const url = new URL("/site/index.php", GECKO_ORIGIN);
+  url.searchParams.set("icCode", GECKO_IC_CODE);
+  if (embedded) url.searchParams.set("id", "12312");
+  else url.searchParams.set("dTpl", "1");
 
-/**
- * Query param Planway would use to pre-select a service.
- * UNVERIFIED best guess — see file header. Change only this when confirmed.
- */
-export const PLANWAY_SERVICE_PARAM = "service";
+  const service = numericId(serviceId);
+  if (service) url.searchParams.set("preSelectService", service);
+  const calendar = calendarIds(calendarId);
+  if (calendar) url.searchParams.set("kal", calendar);
 
-/**
- * Build a Planway booking URL, optionally deep-linked to a specific service.
- * Returns the bare base URL when no Planway service id is supplied.
- */
-export function buildPlanwayUrl(planwayServiceId?: string | null): string {
-  if (!planwayServiceId) return PLANWAY_BASE_URL;
-  const url = new URL(PLANWAY_BASE_URL);
-  url.searchParams.set(PLANWAY_SERVICE_PARAM, planwayServiceId);
   return url.toString();
 }
 
@@ -50,17 +75,15 @@ export function buildPlanwayUrl(planwayServiceId?: string | null): string {
 export type BookableService = {
   slug: string;
   name: string;
-  /** Planway's internal service id, or null until mapped in the CMS. */
-  planwayServiceId: string | null;
+  /** Geckos ydelses-ID, eller null indtil det er sat i admin. */
+  bookingServiceId: string | null;
+  /** Geckos kalender-ID(er), eller null for alle behandlere. */
+  bookingCalendarId: string | null;
 };
 
 /**
- * Bookingens event_id, dannet i proxyen i det øjeblik bookingen sendes.
- *
- * Deles af tre parter, der hver sender `Schedule`: pixlen og bridgen på /tak,
- * og Planways webhook. Med samme id deduplikerer Meta dem til én booking.
- * Kun et tilfældigt UUID, ingen persondata, så den må gerne kunne læses af
- * JavaScript. Ryddes af /tak, når bookingen er rapporteret.
+ * Bookingens event_id. Bruges af /tak og webhooken til at deduplikere
+ * `Schedule` hos Meta. Kun et tilfældigt UUID, ingen persondata.
  */
 export const BOOKING_EVENT_COOKIE = "cnc_bk";
 export const BOOKING_EVENT_MAX_AGE = 60 * 60 * 6; // 6 timer, samme som /tak

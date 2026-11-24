@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 
 export default async function BookPage() {
   // Map active services by slug so the embed can resolve ?service=<slug> from
-  // deep links (e.g. /book?service=laser-haarfjerning) to a Planway service id.
+  // deep links (e.g. /book?service=laser-haarfjerning) to a Gecko service id.
+  // The ids live in the old planway_* columns; see lib/booking.ts.
   const services = await getServices();
   const serviceMap: Record<string, BookableService> = {};
   for (const s of services) {
@@ -20,7 +21,8 @@ export default async function BookPage() {
     serviceMap[s.slug] = {
       slug: s.slug,
       name: s.name ?? s.slug,
-      planwayServiceId: s.planway_service_id ?? null,
+      bookingServiceId: s.planway_service_id ?? null,
+      bookingCalendarId: s.planway_staff_id ?? null,
     };
   }
 

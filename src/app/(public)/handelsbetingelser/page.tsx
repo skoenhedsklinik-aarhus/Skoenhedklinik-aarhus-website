@@ -78,7 +78,7 @@ export default function TermsPage() {
             Alle priser på hjemmesiden er i danske kroner (DKK) og er inklusiv moms, hvor dette er gældende. Vi forbeholder os retten til at ændre priserne uden forudgående varsel. Den pris der var gældende på tidspunktet for bookingen, vil dog altid være gældende for den specifikke aftale.
           </p>
           <p>
-            Betaling for behandlinger sker typisk i klinikken efter endt behandling (medmindre forudbetaling er valgt via Planway). Gavekort købes og betales online via Planway.
+            Betaling for behandlinger sker i klinikken på behandlingsdagen. Gavekort købes i klinikken.
           </p>
           <p>
             <strong>Studierabat:</strong> Vi tilbyder 10% i studierabat i hele åbningstiden mod fremvisning af gyldigt studiekort. Fra 1. august 2026 gælder studierabatten alene på behandlinger til 400 kr. og derover. Studierabatten kan ikke kombineres med kampagner, pakkeløsninger eller i forvejen nedsatte priser.

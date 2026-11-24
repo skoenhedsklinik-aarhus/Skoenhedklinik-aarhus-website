@@ -87,8 +87,8 @@ export default async function BookingDetaljePage({ params }: { params: { id: str
       <section className="mb-8 rounded-xl border border-sand bg-white p-6 shadow-sm">
         <h2 className="mb-1 font-heading text-xl text-textPrimary">Bookingen</h2>
         <p className="mb-4 text-sm text-textMuted">
-          Registreret på kvitteringssiden efter Planway. Navn, tidspunkt for selve
-          behandlingen og kontaktoplysninger står i Planway, ikke her.
+          Registreret på kvitteringssiden. Navn, tidspunkt for selve behandlingen
+          og kontaktoplysninger står i bookingsystemet (Gecko), ikke her.
         </p>
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <Felt navn="Behandling" vaerdi={booking.treatment} />

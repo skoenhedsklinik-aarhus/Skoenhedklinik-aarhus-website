@@ -146,7 +146,7 @@ export function PackageForm({ initialData }: PackageFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-textPrimary">Planway Link (til booking)</label>
+          <label className="text-sm font-medium text-textPrimary">Bookinglink (fx /book?service=laser-haarfjerning)</label>
           <input
             type="url"
             value={formData.planway_link}
