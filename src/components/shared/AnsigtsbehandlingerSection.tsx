@@ -37,7 +37,7 @@ const FACIALS: Facial[] = [
     name: "Microneedling",
     tag: "Ansigtsbehandling",
     duration: "ca. 60 min",
-    image: "/images/services/ansigtsbehandling.avif",
+    image: "/images/services/ansigtsbehandling-microneedling.webp",
     intro:
       "Opnå fornyet og ungdommelig hud med vores microneedling-behandling. Små, præcise nåle stimulerer hudens egen kollagenproduktion og forbedrer hudens struktur. Behandlingen reducerer fine linjer, ar og pigmentforandringer og giver fastere, glattere og mere strålende hud. Den tilpasses din hudtype og dine behov og udføres med professionelle produkter og udstyr i trygge rammer.",
     blocks: [
